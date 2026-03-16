@@ -1,199 +1,318 @@
-<main style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding: 48px 20px; max-width: 960px; margin: 0 auto;">
-  <header style="display:flex; justify-content:space-between; align-items:center; gap: 16px;">
-    <div style="font-weight:700; font-size: 18px;">Smart Tinmen</div>
+<main style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; padding: 0; max-width: 100%; margin: 0 auto; background: #FAFBFC;">
 
-    <nav style="display:flex; gap: 14px; font-size: 14px;">
-      <a href="#services" style="text-decoration:none;">Services</a>
-      <a href="#work" style="text-decoration:none;">Work</a>
-      <a href="#process" style="text-decoration:none;">Process</a>
-      <a href="#founders" style="text-decoration:none;">Founders</a>
-      <a href="#contact" style="text-decoration:none;">Contact</a>
-    </nav>
-  </header>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-  <section style="padding: 56px 0 28px;">
-    <h1 style="font-size: 44px; line-height: 1.1; margin: 0 0 14px;">
-      We build working prototypes for real-world robotics & connected devices.
-    </h1>
+  <style>
+    * { box-sizing: border-box; }
 
-    <p style="font-size: 18px; max-width: 70ch; margin: 0 0 22px; opacity: 0.85;">
-      Smart Tinmen is a product prototyping studio spanning electronics, embedded systems, and software.
-      We take fuzzy ideas and turn them into testable builds—so you can validate quickly, demo confidently,
-      and move to pilot or production with clear evidence.
-    </p>
+    a { color: #0B0F14; transition: opacity 0.2s; }
+    a:hover { opacity: 0.7; }
 
-    <div style="display:flex; gap: 12px; flex-wrap: wrap;">
-      <a href="#contact"
-         style="display:inline-block; padding: 12px 16px; border-radius: 10px; background: #111; color: #fff; text-decoration:none; font-weight:600;">
-        Start a project
+    .st-container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    .st-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0; gap: 16px;
+    }
+    .st-header-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: #0B0F14;
+    }
+    .st-header-brand img {
+      width: 38px; height: 38px; border-radius: 50%;
+    }
+    .st-header-brand span {
+      font-weight: 700; font-size: 17px; letter-spacing: -0.02em;
+    }
+    .st-nav { display: flex; gap: 20px; font-size: 14px; font-weight: 500; }
+    .st-nav a { text-decoration: none; opacity: 0.65; }
+    .st-nav a:hover { opacity: 1; }
+
+    .st-hero {
+      padding: 48px 0 40px;
+      display: flex; align-items: center; gap: 48px;
+    }
+    .st-hero-text { flex: 1; }
+    .st-hero-logo {
+      flex-shrink: 0;
+      width: 200px; height: 200px;
+    }
+    .st-hero-logo img {
+      width: 100%; height: 100%;
+      filter: drop-shadow(0 8px 24px rgba(127, 230, 212, 0.3));
+    }
+
+    .st-hero h1 {
+      font-size: 40px; line-height: 1.08; margin: 0 0 16px;
+      letter-spacing: -0.03em; font-weight: 700; color: #0B0F14;
+    }
+    .st-hero p {
+      font-size: 17px; line-height: 1.6; max-width: 58ch;
+      margin: 0 0 24px; color: #3a4555;
+    }
+
+    .st-btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .st-btn-primary {
+      display: inline-block; padding: 13px 22px; border-radius: 12px;
+      background: #0B0F14; color: #fff; text-decoration: none;
+      font-weight: 600; font-size: 15px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .st-btn-primary:hover {
+      transform: translateY(-1px); box-shadow: 0 4px 14px rgba(11,15,20,0.18);
+      opacity: 1; color: #fff;
+    }
+    .st-btn-secondary {
+      display: inline-block; padding: 13px 22px; border-radius: 12px;
+      border: 1.5px solid #d1d5db; color: #0B0F14; text-decoration: none;
+      font-weight: 600; font-size: 15px; background: #fff;
+      transition: border-color 0.15s;
+    }
+    .st-btn-secondary:hover { border-color: #0B0F14; opacity: 1; }
+
+    .st-tags {
+      display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap;
+    }
+    .st-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px; padding: 5px 10px; border-radius: 6px;
+      background: #EEF2F8; color: #475569; letter-spacing: -0.01em;
+    }
+
+    .st-divider { border: none; border-top: 1px solid #e5e7eb; margin: 0; }
+
+    .st-section { padding: 36px 0; }
+    .st-section h2 {
+      font-size: 22px; margin: 0 0 16px; letter-spacing: -0.02em;
+      font-weight: 700; color: #0B0F14;
+    }
+    .st-section > p { margin: 0 0 16px; color: #3a4555; line-height: 1.6; }
+
+    .st-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .st-card {
+      border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .st-card:hover {
+      border-color: #26D3B3; box-shadow: 0 2px 12px rgba(38, 211, 179, 0.08);
+    }
+    .st-card-title {
+      font-weight: 700; font-size: 15px; margin-bottom: 8px; color: #0B0F14;
+    }
+    .st-card p { margin: 0; color: #475569; font-size: 14px; line-height: 1.55; }
+    .st-card-meta {
+      margin-top: 12px; font-family: 'Space Mono', monospace;
+      font-size: 12px; color: #94a3b8;
+    }
+
+    .st-step-num {
+      display: inline-block; width: 28px; height: 28px; line-height: 28px;
+      text-align: center; border-radius: 8px; font-weight: 700; font-size: 13px;
+      background: #26D3B3; color: #0B0F14; margin-bottom: 10px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .st-founder-card {
+      border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px;
+      display: flex; gap: 16px; align-items: center; background: #fff;
+    }
+    .st-founder-card img {
+      width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+      border: 2px solid #EEF2F8;
+    }
+    .st-founder-name { font-weight: 700; font-size: 15px; color: #0B0F14; }
+    .st-founder-role {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px; color: #26D3B3; margin-top: 2px;
+    }
+    .st-founder-bio { font-size: 13px; color: #475569; margin-top: 6px; line-height: 1.5; }
+
+    .st-contact-box {
+      border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px;
+      background: #fff;
+    }
+    .st-contact-box p { margin: 0 0 6px; color: #3a4555; font-size: 15px; }
+    .st-contact-box strong { color: #0B0F14; }
+
+    .st-footer {
+      padding: 20px 0; border-top: 1px solid #e5e7eb;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: #94a3b8;
+    }
+    .st-footer img { width: 24px; height: 24px; border-radius: 50%; opacity: 0.5; }
+
+    @media (max-width: 640px) {
+      .st-hero { flex-direction: column-reverse; gap: 24px; text-align: center; }
+      .st-hero-logo { width: 140px; height: 140px; }
+      .st-hero h1 { font-size: 30px; }
+      .st-btn-row { justify-content: center; }
+      .st-tags { justify-content: center; }
+      .st-nav { gap: 12px; font-size: 13px; }
+      .st-header-brand span { font-size: 15px; }
+    }
+  </style>
+
+  <div class="st-container">
+
+    <!-- ─── Header ──────────────────────────────────────── -->
+    <header class="st-header">
+      <a href="/" class="st-header-brand">
+        <%= image_tag "logo-64.png", alt: "Smart Tinmen" %>
+        <span>Smart Tinmen</span>
       </a>
-      <a href="#work"
-         style="display:inline-block; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd; color: #111; text-decoration:none; font-weight:600;">
-        View case studies
-      </a>
-    </div>
+      <nav class="st-nav">
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#process">Process</a>
+        <a href="#founders">Founders</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
 
-    <div style="display:flex; gap: 10px; margin-top: 18px; font-size: 13px; opacity: 0.7; flex-wrap: wrap;">
-      <span>• 1–2 week proof-of-concept</span>
-      <span>• Electronics + firmware</span>
-      <span>• Robotics / sensing / integration</span>
-      <span>• Deployment-focused engineering</span>
-    </div>
-  </section>
-
-  <hr style="border: none; border-top: 1px solid #eee; margin: 28px 0;">
-
-  <section id="services" style="padding: 10px 0 30px;">
-    <h2 style="font-size: 20px; margin: 0 0 12px;">Services</h2>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">Prototype builds</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Electronics + firmware + software prototypes that are demo-ready and testable in real conditions.
+    <!-- ─── Hero ────────────────────────────────────────── -->
+    <section class="st-hero">
+      <div class="st-hero-text">
+        <h1>We build working prototypes for real-world robotics & connected devices.</h1>
+        <p>
+          Smart Tinmen is a product prototyping studio spanning electronics, embedded systems, and software.
+          We take fuzzy ideas and turn them into testable builds—so you can validate quickly, demo confidently,
+          and move to pilot or production with clear evidence.
         </p>
-      </div>
-
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">Robotics & sensing</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Perception, control, and sensor integration—ROS2 optional—built for reliability and iteration speed.
-        </p>
-      </div>
-
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">De-risking & technical reviews</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Feasibility checks, architecture review, test plans, and a clear roadmap to pilot or production.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="work" style="padding: 10px 0 30px;">
-    <h2 style="font-size: 20px; margin: 0 0 12px;">Work</h2>
-    <p style="margin: 0 0 12px; opacity: 0.85;">
-      A few recent examples across robotics, embedded systems, and deployment-focused engineering.
-    </p>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">Field sensor device prototype</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Built a sensing + logging proof-of-concept under tight power and connectivity constraints, including
-          firmware, data pipeline, and test harness.
-        </p>
-        <div style="margin-top: 10px; font-size: 13px; opacity: 0.7;">
-          10–14 days · electronics + firmware + validation
+        <div class="st-btn-row">
+          <a href="#contact" class="st-btn-primary">Start a project</a>
+          <a href="#work" class="st-btn-secondary">View case studies</a>
+        </div>
+        <div class="st-tags">
+          <span class="st-tag">1–2 week proof-of-concept</span>
+          <span class="st-tag">Electronics + firmware</span>
+          <span class="st-tag">Robotics / sensing</span>
+          <span class="st-tag">Deployment-focused</span>
         </div>
       </div>
+      <div class="st-hero-logo">
+        <%= image_tag "logo-512.png", alt: "Smart Tinmen logo" %>
+      </div>
+    </section>
 
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">Robotics data acquisition module</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Integrated real-time sensors, comms, and software interfaces for a robotics platform, with
-          reliability-first design and deployment documentation.
-        </p>
-        <div style="margin-top: 10px; font-size: 13px; opacity: 0.7;">
-          2–3 weeks · sensing + integration + handover
+    <hr class="st-divider">
+
+    <!-- ─── Services ────────────────────────────────────── -->
+    <section id="services" class="st-section">
+      <h2>Services</h2>
+      <div class="st-grid">
+        <div class="st-card">
+          <div class="st-card-title">Prototype builds</div>
+          <p>Electronics + firmware + software prototypes that are demo-ready and testable in real conditions.</p>
+        </div>
+        <div class="st-card">
+          <div class="st-card-title">Robotics & sensing</div>
+          <p>Perception, control, and sensor integration—ROS2 optional—built for reliability and iteration speed.</p>
+        </div>
+        <div class="st-card">
+          <div class="st-card-title">De-risking & technical reviews</div>
+          <p>Feasibility checks, architecture review, test plans, and a clear roadmap to pilot or production.</p>
         </div>
       </div>
+    </section>
 
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">Operations digitalization tool</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Designed and delivered an end-to-end workflow tool for on-site teams, translating field needs into
-          scoped requirements and a usable implementation with training.
-        </p>
-        <div style="margin-top: 10px; font-size: 13px; opacity: 0.7;">
-          3–6 weeks · stakeholder alignment + delivery
+    <!-- ─── Work ────────────────────────────────────────── -->
+    <section id="work" class="st-section">
+      <h2>Work</h2>
+      <p>A few recent examples across robotics, embedded systems, and deployment-focused engineering.</p>
+      <div class="st-grid">
+        <div class="st-card">
+          <div class="st-card-title">Field sensor device prototype</div>
+          <p>Built a sensing + logging proof-of-concept under tight power and connectivity constraints, including firmware, data pipeline, and test harness.</p>
+          <div class="st-card-meta">10–14 days · electronics + firmware + validation</div>
+        </div>
+        <div class="st-card">
+          <div class="st-card-title">Robotics data acquisition module</div>
+          <p>Integrated real-time sensors, comms, and software interfaces for a robotics platform, with reliability-first design and deployment documentation.</p>
+          <div class="st-card-meta">2–3 weeks · sensing + integration + handover</div>
+        </div>
+        <div class="st-card">
+          <div class="st-card-title">Operations digitalization tool</div>
+          <p>Designed and delivered an end-to-end workflow tool for on-site teams, translating field needs into scoped requirements and a usable implementation with training.</p>
+          <div class="st-card-meta">3–6 weeks · stakeholder alignment + delivery</div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="process" style="padding: 10px 0 30px;">
-    <h2 style="font-size: 20px; margin: 0 0 12px;">Process</h2>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">1) Scope</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          A short kickoff to define constraints, success criteria, and deliverables. You get a clear plan and timeline.
-        </p>
+    <!-- ─── Process ─────────────────────────────────────── -->
+    <section id="process" class="st-section">
+      <h2>Process</h2>
+      <div class="st-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="st-card">
+          <div class="st-step-num">1</div>
+          <div class="st-card-title">Scope</div>
+          <p>A short kickoff to define constraints, success criteria, and deliverables. You get a clear plan and timeline.</p>
+        </div>
+        <div class="st-card">
+          <div class="st-step-num">2</div>
+          <div class="st-card-title">Build</div>
+          <p>Rapid iteration across hardware + software, with weekly demos and decisions captured as we go.</p>
+        </div>
+        <div class="st-card">
+          <div class="st-step-num">3</div>
+          <div class="st-card-title">Test</div>
+          <p>Designed for real conditions: power, sensing quality, reliability, and failure modes—not just a lab demo.</p>
+        </div>
+        <div class="st-card">
+          <div class="st-step-num">4</div>
+          <div class="st-card-title">Handover</div>
+          <p>Working demo + documentation + next-step roadmap (pilot, manufacturing, or productization).</p>
+        </div>
       </div>
+    </section>
 
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">2) Build</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Rapid iteration across hardware + software, with weekly demos and decisions captured as we go.
-        </p>
-      </div>
-
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">3) Test</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Designed for real conditions: power, sensing quality, reliability, and failure modes—not just a lab demo.
-        </p>
-      </div>
-
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-        <div style="font-weight:700;">4) Handover</div>
-        <p style="margin: 8px 0 0; opacity: 0.85;">
-          Working demo + documentation + next-step roadmap (pilot, manufacturing, or productization).
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="founders" style="padding: 10px 0 30px;">
-    <h2 style="font-size: 20px; margin: 0 0 12px;">Founders</h2>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px; display:flex; gap: 14px; align-items:center;">
-        <%= image_tag "HL_picture.jpg",
-              alt: "Harold Loop — CEO",
-              style: "width: 72px; height: 72px; border-radius: 999px; object-fit: cover; border: 1px solid #eee;" %>
-
-        <div>
-          <div style="font-weight: 700;">Harold Loop</div>
-          <div style="opacity: 0.75; font-size: 14px;">CEO</div>
-          <div style="margin-top: 6px; opacity: 0.85; font-size: 13px;">
-            Project leadership, stakeholder alignment, and on-site delivery for complex technical environments.
+    <!-- ─── Founders ────────────────────────────────────── -->
+    <section id="founders" class="st-section">
+      <h2>Founders</h2>
+      <div class="st-grid">
+        <div class="st-founder-card">
+          <%= image_tag "HL_picture.jpg", alt: "Harold Loop — CEO" %>
+          <div>
+            <div class="st-founder-name">Harold Loop</div>
+            <div class="st-founder-role">CEO</div>
+            <div class="st-founder-bio">Project leadership, stakeholder alignment, and on-site delivery for complex technical environments.</div>
+          </div>
+        </div>
+        <div class="st-founder-card">
+          <%= image_tag "MDH_picture.jpg", alt: "Matthieu de Hemptinne — CTO" %>
+          <div>
+            <div class="st-founder-name">Matthieu de Hemptinne</div>
+            <div class="st-founder-role">CTO</div>
+            <div class="st-founder-bio">Robotics, embedded systems, and deployment-focused software—built to work in constrained real-world settings.</div>
           </div>
         </div>
       </div>
+    </section>
 
-      <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px; display:flex; gap: 14px; align-items:center;">
-        <%= image_tag "MDH_picture.jpg",
-              alt: "Matthieu de Hemptinne — CTO",
-              style: "width: 72px; height: 72px; border-radius: 999px; object-fit: cover; border: 1px solid #eee;" %>
-
-        <div>
-          <div style="font-weight: 700;">Matthieu de Hemptinne</div>
-          <div style="opacity: 0.75; font-size: 14px;">CTO</div>
-          <div style="margin-top: 6px; opacity: 0.85; font-size: 13px;">
-            Robotics, embedded systems, and deployment-focused software—built to work in constrained real-world settings.
-          </div>
-        </div>
+    <!-- ─── Contact ─────────────────────────────────────── -->
+    <section id="contact" class="st-section">
+      <h2>Contact</h2>
+      <p>
+        Email us with: (1) what you're building, (2) constraints (budget, timeline, environment), and (3) what success looks like.
+        We'll reply with a scoped plan and an estimate.
+      </p>
+      <div class="st-contact-box">
+        <p><strong>Email:</strong> info@smarttinmen.com</p>
+        <p style="color: #94a3b8; font-size: 13px;">Typical reply time: 1–2 business days.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="contact" style="padding: 10px 0 40px;">
-    <h2 style="font-size: 20px; margin: 0 0 12px;">Contact</h2>
-    <p style="margin: 0 0 14px; opacity: 0.85;">
-      Email us with: (1) what you’re building, (2) constraints (budget, timeline, environment), and (3) what success looks like.
-      We’ll reply with a scoped plan and an estimate.
-    </p>
+    <!-- ─── Footer ──────────────────────────────────────── -->
+    <footer class="st-footer">
+      <span>© <%= Time.current.year %> Smart Tinmen</span>
+      <%= image_tag "logo-64.png", alt: "Smart Tinmen" %>
+    </footer>
 
-    <div style="border: 1px solid #eee; border-radius: 14px; padding: 16px;">
-      <p style="margin: 0 0 8px;"><strong>Email:</strong> info@smarttinmen.nl</p>
-      <p style="margin: 0; opacity: 0.8;">Typical reply time: 1–2 business days.</p>
-    </div>
-  </section>
-
-  <footer style="padding-top: 10px; border-top: 1px solid #eee; opacity: 0.7; font-size: 13px;">
-    © <%= Time.current.year %> Smart Tinmen
-  </footer>
+  </div>
 </main>
