@@ -1,17 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Smart Tinmen Website" %></title>
+    <title><%= content_for?(:title) ? yield(:title) : "Smart Tinmen" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<%= content_for?(:description) ? yield(:description) : 'We build working prototypes for real-world robotics & connected devices.' %>">
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Favicons -->
     <link rel="icon" href="<%= asset_path('favicon.ico') %>" sizes="any">
     <link rel="icon" type="image/png" sizes="16x16" href="<%= asset_path('favicon-16.png') %>">
     <link rel="icon" type="image/png" sizes="32x32" href="<%= asset_path('favicon-32.png') %>">
     <link rel="icon" type="image/png" sizes="48x48" href="<%= asset_path('favicon-48.png') %>">
     <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('apple-touch-icon-180.png') %>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<%= asset_path('android-192.png') %>">
+    <link rel="icon" type="image/png" sizes="512x512" href="<%= asset_path('android-512.png') %>">
+
+    <!-- Open Graph (Slack, LinkedIn, WhatsApp, iMessage, Discord …) -->
+    <meta property="og:type"        content="website">
+    <meta property="og:title"       content="<%= content_for?(:title) ? yield(:title) : 'Smart Tinmen' %>">
+    <meta property="og:description" content="<%= content_for?(:description) ? yield(:description) : 'We build working prototypes for real-world robotics & connected devices.' %>">
+    <meta property="og:image"       content="<%= asset_url('logo-512.png') %>">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card"  content="summary">
+    <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'Smart Tinmen' %>">
+    <meta name="twitter:image" content="<%= asset_url('logo-512.png') %>">
+
+    <meta http-equiv="x-dns-prefetch-control" content="on">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
