@@ -1,0 +1,58 @@
+<%# ============================================================
+    FILE: app/views/home/_founders.html.erb
+    PURPOSE: Founders section — 4 clickable founder cards.
+    Each card calls openFounder('id') defined in home.js.
+    Image paths are in data-img so home.js can read them without ERB.
+    ============================================================ %>
+
+<section id="founders" class="st-section">
+  <h2>Founders</h2>
+  <div class="st-grid">
+
+    <%# ── Harold ── %>
+    <div class="st-founder-card" data-founder="harold" data-img="<%= image_path 'HL_picture.jpg' %>">
+      <%= image_tag "HL_picture.jpg", alt: "Harold Loop — CEO" %>
+      <div>
+        <div class="st-founder-name">Harold Loop</div>
+        <div class="st-founder-role">CEO</div>
+        <div class="st-founder-bio">Project leadership, stakeholder alignment, and on-site delivery for complex technical environments.</div>
+        <div class="st-founder-hint">Click for full profile</div>
+      </div>
+    </div>
+
+    <%# ── Matthieu ── %>
+    <div class="st-founder-card" data-founder="matthieu" data-img="<%= image_path 'MDH_picture.jpg' %>">
+      <%= image_tag "MDH_picture.jpg", alt: "Matthieu de Hemptinne — CTO" %>
+      <div>
+        <div class="st-founder-name">Matthieu de Hemptinne</div>
+        <div class="st-founder-role">CTO</div>
+        <div class="st-founder-bio">Robotics, embedded systems, and deployment-focused software—built to work in constrained real-world settings.</div>
+        <div class="st-founder-hint">Click for full profile</div>
+      </div>
+    </div>
+
+    <% if false %>
+        <div class="st-founder-card" data-founder="geoffroy" data-img="<%= image_path 'GDC_picture.jpg' %>">
+          <%= image_tag "GDC_picture.jpg", alt: "Geoffroy de Cannière — Co-founder & Head of Forest & Field Operations" %>
+          <div>
+            <div class="st-founder-name">Geoffroy de Cannière</div>
+            <div class="st-founder-role">Co-founder & Head of Forest & Field Operations</div>
+            <div class="st-founder-bio">Forest management, connected field tools, and ecological deployment across Europe and Africa.</div>
+            <div class="st-founder-hint">Click for full profile</div>
+          </div>
+        </div>
+    <% end %>
+    <% if false %>
+    <%# ── Camilla ── %>
+    <div class="st-founder-card" data-founder="camilla" data-img="<%= image_path 'CP_picture.png' %>">
+      <%= image_tag "CP_picture.png", alt: "Camilla Poli — Co-founder & Head of Operations" %>
+      <div>
+        <div class="st-founder-name">Camilla Poli</div>
+        <div class="st-founder-role">Co-founder & Head of Operations</div>
+        <div class="st-founder-bio">Team scaling, delivery systems, and client operations—keeping projects on track as complexity grows.</div>
+        <div class="st-founder-hint">Click for full profile</div>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</section>

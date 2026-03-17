@@ -1,0 +1,30 @@
+<%# ============================================================
+    FILE: app/views/home/_hero.html.erb
+    PURPOSE: Hero section — headline, description, CTA buttons, tags, logo.
+    ============================================================ %>
+
+<section class="st-hero">
+  <div class="st-hero-text">
+    <h1>We build working prototypes for real-world robotics, connected devices & ecological monitoring.</h1>
+    <p>
+      Smart Tinmen is a product prototyping studio spanning electronics, embedded systems, software,
+      and field-deployable ecological sensing. We take fuzzy ideas and turn them into testable
+      builds—so you can validate quickly, demo confidently, and move to pilot or production with
+      clear evidence.
+    </p>
+    <div class="st-btn-row">
+      <a href="#contact" class="st-btn-primary">Start a project</a>
+      <a href="#work" class="st-btn-secondary">View case studies</a>
+    </div>
+    <div class="st-tags">
+      <span class="st-tag">1–2 week proof-of-concept</span>
+      <span class="st-tag">Electronics + firmware</span>
+      <span class="st-tag">Robotics / sensing</span>
+      <span class="st-tag">Deployment-focused</span>
+      <span class="st-tag st-tag-green">Wildlife & forest monitoring</span>
+    </div>
+  </div>
+  <div class="st-hero-logo">
+    <%= image_tag "logo-512.png", alt: "Smart Tinmen logo" %>
+  </div>
+</section>

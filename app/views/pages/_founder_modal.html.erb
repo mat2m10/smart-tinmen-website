@@ -1,0 +1,31 @@
+<%# ============================================================
+    FILE: app/views/home/_founder_modal.html.erb
+    PURPOSE: Modal overlay for founder profiles.
+    - All content is injected dynamically by openFounder() in home.js
+    - Backdrop click & Escape key close the modal (also in home.js)
+    ============================================================ %>
+
+<div class="st-modal-backdrop" id="founderModal">
+  <div class="st-modal" id="founderModalInner">
+
+    <div class="st-modal-header">
+      <img id="modal-img" src="" alt="">
+      <div>
+        <div class="st-modal-name" id="modal-name"></div>
+        <div class="st-modal-role" id="modal-role"></div>
+      </div>
+    </div>
+
+    <hr class="st-modal-divider">
+
+    <div class="st-modal-section-label">Background</div>
+    <div class="st-modal-body" id="modal-bio"></div>
+
+    <div class="st-modal-section-label">Key skills</div>
+    <div class="st-modal-skills" id="modal-skills"></div>
+
+    <div class="st-modal-section-label">Experience highlights</div>
+    <div class="st-modal-exp" id="modal-exp"></div>
+
+  </div>
+</div>
