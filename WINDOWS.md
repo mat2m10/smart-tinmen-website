@@ -41,26 +41,19 @@ You should see: **Virtualization: Enabled**
 If not enabled, activate it in BIOS/UEFI (Intel VT-x / AMD-V / SVM).
 
 ------------------------------------------------------------------------
+
+## Obvious but lets say it anyways
+
+Be connected to a microsoft account
+Make sure that windows is activated
+------------------------------------------------------------------------
+
 ## Install Windows Terminal (optional but recommended)
 
 Open Command Prompt and run:
 ``` powershell
-winget install Microsoft.WindowsTerminal
+winget install Microsoft.WindowsTerminal --source winget
 ```
-
-No Microsoft account required. Once installed, Windows Terminal supports
-WSL2, PowerShell, and CMD all in one place with tabs.
-
-If winget is not available, download directly from GitHub:
-``` powershell
-curl -L -o terminal.msixbundle https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_Win10.msixbundle
-```
-try this
-``` powershell
-powershell -Command "Invoke-WebRequest -Uri 'https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_Win10.msixbundle' -OutFile 'terminal.msixbundle'"
-```
-Then open File Explorer, navigate to where the file was downloaded, and
-double-click the `.msixbundle` file to install it.
 
 ------------------------------------------------------------------------
 ## Install WSL2 + Ubuntu
