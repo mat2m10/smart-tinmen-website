@@ -43,7 +43,7 @@ If not enabled, activate it in BIOS/UEFI (Intel VT-x / AMD-V / SVM).
 ------------------------------------------------------------------------
 
 ## Obvious but lets say it anyways
-
+-
 Be connected to a microsoft account
 Make sure that windows is activated
 ------------------------------------------------------------------------
@@ -54,7 +54,12 @@ Open Command Prompt and run:
 ``` powershell
 winget install Microsoft.WindowsTerminal --source winget
 ```
+## Install VS Code
 
+Download: https://code.visualstudio.com/download
+``` bash
+winget install Microsoft.VisualStudioCode --source winget
+```
 ------------------------------------------------------------------------
 ## Install WSL2 + Ubuntu
 
@@ -65,6 +70,9 @@ Run:
 
 ``` powershell
 wsl --install
+```
+``` powershell
+wsl --set-default Ubuntu
 ```
 
 Restart your computer when finished.
@@ -100,11 +108,8 @@ If it prints `root`, stop and fix your Ubuntu user setup.
 
 ------------------------------------------------------------------------
 
-## Install VS Code
 
-Download: https://code.visualstudio.com/download
-
-### Connect VS Code to WSL
+## Connect VS Code to WSL
 
 From Ubuntu:
 
@@ -126,7 +131,7 @@ sudo apt install -y curl git imagemagick jq unzip vim zsh tree
 
 ------------------------------------------------------------------------
 
-## GitHub CLI (optional)
+## GitHub CLI
 
 Install GitHub CLI (`gh`):
 
@@ -178,7 +183,18 @@ Install build dependencies:
 sudo apt-get update
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev sqlite3 libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev python3-dev
 ```
-
+## Install locale
+``` bash
+sudo apt update
+sudo apt install locales
+sudo locale-gem en_US.UTF-8
+sudo update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+```
+## Add ssh key folder
+``` bash
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+```
 ## Configure .zshrc
 
 Open it in VS Code:
