@@ -108,9 +108,9 @@ wsl --install
 wsl -l -v
 ```
 
-> You should see Ubuntu listed with **VERSION 2**. If it shows version 1, ask for help.
+**Restart your computer when finished.**
 
-If Ubuntu wasn't installed automatically, run:
+run:
 
 ```powershell
 wsl --install Ubuntu
@@ -125,7 +125,7 @@ When you open Ubuntu for the first time, it will ask you to create a user accoun
 
 > 💡 Remember this password! You'll need it whenever you use `sudo`.
 
-**Restart your computer when finished.**
+
 
 ### Set Ubuntu as your default terminal
 
