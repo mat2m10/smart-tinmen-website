@@ -247,7 +247,7 @@ This makes sure your terminal handles text encoding correctly (avoids weird char
 ```bash
 sudo apt update
 sudo apt install locales
-sudo locale-gem en_US.UTF-8
+sudo locale-gen en_US.UTF-8
 sudo update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 ```
 
