@@ -55,6 +55,10 @@ If winget is not available, download directly from GitHub:
 ``` powershell
 curl -L -o terminal.msixbundle https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_Win10.msixbundle
 ```
+try this
+``` powershell
+powershell -Command "Invoke-WebRequest -Uri 'https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_Win10.msixbundle' -OutFile 'terminal.msixbundle'"
+```
 Then open File Explorer, navigate to where the file was downloaded, and
 double-click the `.msixbundle` file to install it.
 
