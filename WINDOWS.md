@@ -1,212 +1,283 @@
 # Development Setup (Windows + WSL2 + Ubuntu + Python)
 
-This guide walks you through setting up a modern Python development
-environment on **Windows** using **WSL2**, **Ubuntu**, **VS Code**, and
-**pyenv**.
+This guide walks you through setting up a modern Python development environment on **Windows** using **WSL2**, **Ubuntu**, **VS Code**, and **pyenv**.
 
-Please follow the steps in order.
+> ⚠️ **Follow the steps in order — skipping ahead can break things later.**
 
-------------------------------------------------------------------------
+---
 
-## GitHub Account
+## 1. GitHub Account
 
-1.  Create an account: https://github.com/join\
-2.  Upload a profile picture and verify your name:
-    https://github.com/settings/profile\
-3.  Enable Two-Factor Authentication (2FA):\
-    https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication
+You'll need a GitHub account to store and share your code.
 
-------------------------------------------------------------------------
+1. Create an account: https://github.com/join
+2. Upload a profile picture and verify your name: https://github.com/settings/profile
+3. Enable Two-Factor Authentication (2FA) — this protects your account:
+   https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication
 
-## Windows Version
+---
 
-You need **Windows 10 (version 2004+)** or **Windows 11**.
+## 2. Check Your Windows Version
 
-Check your version: - Press `Windows + R` - Type `winver` - Press
-`Enter`
+You need **Windows 10 (version 2004 or later)** or **Windows 11** for WSL2 to work.
 
-If Windows 10 is below 2004, update via Windows Update: - Press
-`Windows + R` - Type `ms-settings:windowsupdate` - Press `Enter` - Click
-**Check updates**
+**How to check:**
+- Press `Windows + R`
+- Type `winver`
+- Press `Enter`
 
-------------------------------------------------------------------------
+If your Windows 10 version is **below 2004**, update it:
+- Press `Windows + R`
+- Type `ms-settings:windowsupdate`
+- Press `Enter`
+- Click **Check for updates**
 
-## Virtualization
+---
 
-Check if virtualization is enabled: - Press `Windows + R` - Type
-`taskmgr` - Press `Enter` - Go to **Performance → CPU**
+## 3. Enable Virtualization
+
+WSL2 requires virtualization to be enabled in your CPU settings.
+
+**How to check:**
+- Press `Windows + R`
+- Type `taskmgr`
+- Press `Enter`
+- Go to **Performance → CPU**
 
 You should see: **Virtualization: Enabled**
 
-If not enabled, activate it in BIOS/UEFI (Intel VT-x / AMD-V / SVM).
+If it says **Disabled**, you'll need to enable it in your BIOS/UEFI settings (look for **Intel VT-x**, **AMD-V**, or **SVM**). Google your laptop model + "enable virtualization BIOS" if you're unsure how.
 
-------------------------------------------------------------------------
+---
 
-## Obvious but lets say it anyways
--
-Be connected to a microsoft account
-Make sure that windows is activated
-------------------------------------------------------------------------
+## 4. Before You Continue — Quick Checklist
 
-## Install Windows Terminal (optional but recommended)
+Make sure you've done these before moving forward:
 
-Open Command Prompt and run:
-``` powershell
+- ✅ You're signed in to a **Microsoft account** on Windows
+- ✅ **Windows is activated** (Settings → System → Activation)
+
+---
+
+## 5. Install Windows Terminal *(optional but recommended)*
+
+Windows Terminal gives you a much nicer experience than the default Command Prompt.
+
+Open **Command Prompt** and run:
+
+```powershell
 winget install Microsoft.WindowsTerminal --source winget
 ```
-## Install VS Code
 
-Download: https://code.visualstudio.com/download
-``` bash
+---
+
+## 6. Install VS Code
+
+VS Code is the code editor you'll use throughout the course.
+
+Download it at: https://code.visualstudio.com/download
+
+Or install via command line:
+
+```bash
 winget install Microsoft.VisualStudioCode --source winget
 ```
-------------------------------------------------------------------------
-## Install WSL2 + Ubuntu
 
-Open **Command Prompt as Administrator**: - Press `Windows + R` - Type
-`cmd` - Press `Ctrl + Shift + Enter`
+---
+
+## 7. Install WSL2 + Ubuntu
+
+WSL2 lets you run a real Linux environment inside Windows.
+
+**Open Command Prompt as Administrator:**
+- Press `Windows + R`
+- Type `cmd`
+- Press `Ctrl + Shift + Enter` *(this runs it as Administrator)*
 
 Run:
 
-``` powershell
+```powershell
 wsl --install
 ```
-``` powershell
-wsl --set-default Ubuntu
-```
 
-Restart your computer when finished.
+> This installs WSL2 and Ubuntu automatically. It may take a few minutes.
 
-------------------------------------------------------------------------
+### Verify WSL version
 
-## Ubuntu Setup
-
-### First launch
-
-Ubuntu will ask for: - a **username** (lowercase, one word) - a
-**password** (typing won't show characters --- this is normal)
-
-### Check WSL version
-
-``` bash
+```bash
 wsl -l -v
 ```
 
-If Ubuntu shows version `1`, convert it:
+> You should see Ubuntu listed with **VERSION 2**. If it shows version 1, ask for help.
 
-``` bash
-wsl --set-version Ubuntu 2
+If Ubuntu wasn't installed automatically, run:
+
+```powershell
+wsl --install Ubuntu
 ```
 
-### Check your Linux username
+### First Launch
 
-``` bash
+When you open Ubuntu for the first time, it will ask you to create a user account:
+
+- **Username:** use lowercase letters, no spaces (e.g. `alice`)
+- **Password:** nothing will appear as you type — that's normal, just type your password and press Enter
+
+> 💡 Remember this password! You'll need it whenever you use `sudo`.
+
+**Restart your computer when finished.**
+
+### Set Ubuntu as your default terminal
+
+After restarting, open Windows Terminal, press `Ctrl + ,` to open Settings, and set **Ubuntu** as your default profile. Then close and reopen the terminal.
+
+---
+
+## 8. Check Your Linux Username
+
+Open Ubuntu and run:
+
+```bash
 whoami
 ```
 
-If it prints `root`, stop and fix your Ubuntu user setup.
+> It should print your username (e.g. `alice`). If it prints `root`, **stop here** and ask for help — running as root can cause permission issues.
 
-------------------------------------------------------------------------
+---
 
+## 9. Connect VS Code to WSL
 
-## Connect VS Code to WSL
+This lets you edit Linux files directly from VS Code.
 
-From Ubuntu:
+From Ubuntu, run:
 
-``` bash
+```bash
 code --install-extension ms-vscode-remote.remote-wsl
 code .
 ```
 
-You should see `WSL: Ubuntu` in the bottom-left corner.
+After it opens, check the **bottom-left corner of VS Code** — it should say `WSL: Ubuntu`. That means it's connected.
 
-------------------------------------------------------------------------
+---
 
-## Install Essential Tools
+## 10. Install Essential Tools
 
-``` bash
+These are common command-line tools you'll use during the course.
+
+```bash
 sudo apt update
 sudo apt install -y curl git imagemagick jq unzip vim zsh tree
 ```
 
-------------------------------------------------------------------------
+> `sudo apt update` refreshes the list of available packages. Always run it before installing.
 
-## GitHub CLI
+---
 
-Install GitHub CLI (`gh`):
+## 11. Install GitHub CLI
+
+The GitHub CLI (`gh`) lets you interact with GitHub from your terminal — much easier than copy-pasting tokens.
 
 ```bash
-sudo apt remove -y gitsome # gh command can conflict with gitsome if installed
+# Remove any conflicting package first
+sudo apt remove -y gitsome
+
+# Add GitHub's official package source
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 sudo apt update
 sudo apt install -y gh
 ```
 
-Check:
+Verify it installed correctly:
 
 ```bash
 gh --version
 ```
 
-Login (SSH recommended):
+Log in to GitHub (using SSH — the most secure option):
 
 ```bash
 gh auth login -s 'user:email' -w --git-protocol ssh
 ```
 
-Verify:
+> Follow the prompts in your browser to authorize. When asked about protocol, SSH is already selected.
+
+Confirm it worked:
 
 ```bash
 gh auth status
 ```
-------------------------------------------------------------------------
 
-## Install Oh My Zsh (optional)
+---
 
-``` bash
+## 12. Install Oh My Zsh *(optional)*
+
+Oh My Zsh makes your terminal shell more powerful and easier to use.
+
+```bash
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-------------------------------------------------------------------------
+> If it asks you to change your default shell to `zsh`, say **yes**.
 
-## Install pyenv
+---
 
-``` bash
+## 13. Install pyenv
+
+`pyenv` lets you install and manage multiple Python versions easily.
+
+```bash
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 exec zsh
 ```
 
-Install build dependencies:
+Install the libraries Python needs to compile:
 
-``` bash
+```bash
 sudo apt-get update
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev sqlite3 libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev python3-dev
 ```
-## Install locale
-``` bash
+
+---
+
+## 14. Install Locale Settings
+
+This makes sure your terminal handles text encoding correctly (avoids weird character bugs).
+
+```bash
 sudo apt update
 sudo apt install locales
 sudo locale-gem en_US.UTF-8
 sudo update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 ```
-## Add ssh key folder
-``` bash
+
+---
+
+## 15. Create the SSH Key Folder
+
+This folder is needed for secure connections to GitHub and servers.
+
+```bash
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 ```
-## Configure .zshrc
+
+---
+
+## 16. Configure `.zshrc`
+
+`.zshrc` is the configuration file for your Zsh shell — it loads every time you open a terminal.
 
 Open it in VS Code:
 
-``` bash
+```bash
 cd
 code .zshrc
 ```
 
-Replace its contents with:
+**Replace the entire contents** with the following:
 
-``` zsh
+```zsh
 ZSH=$HOME/.oh-my-zsh
 
 # You can change the theme with another one from https://github.com/robbyrussell/oh-my-zsh/wiki/themes
@@ -294,85 +365,106 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 ```
 
-Reload:
+Save the file, then **reload your shell** so the changes take effect:
 
-``` bash
+```bash
 source ~/.zshrc
 ```
 
-------------------------------------------------------------------------
+---
 
-## Add your github username
-``` zsh
+## 17. Add Your GitHub Username
+
+Replace `your_github_username` with your actual GitHub username:
+
+```zsh
 export COURSE_USERNAME="your_github_username"
 ```
 
-Install Python:
+---
 
-``` bash
+## 18. Install Python
+
+Now install Python 3.12.9 using pyenv:
+
+```bash
 pyenv install 3.12.9
 pyenv global 3.12.9
 exec zsh
 ```
 
-Verify:
+> This may take a few minutes — Python is being compiled from source.
 
-``` bash
+Verify it worked:
+
+```bash
 python --version
 ```
 
-------------------------------------------------------------------------
+> You should see `Python 3.12.9`. If you see a different version or an error, ask for help.
 
-## Install pyenv-virtualenv
+---
 
-``` bash
+## 19. Install pyenv-virtualenv
+
+This plugin lets you create isolated Python environments per project (so packages don't conflict).
+
+```bash
 git clone https://github.com/pyenv/pyenv-virtualenv.git "$(pyenv root)/plugins/pyenv-virtualenv"
 exec zsh
 ```
 
-------------------------------------------------------------------------
+---
 
+## 20. Create a Virtual Environment
 
-## Create Virtual Environment
+Create an environment called `myenv` and set it as the global default:
 
-``` bash
+```bash
 pyenv virtualenv 3.12.9 myenv
 pyenv global myenv
 ```
 
-Upgrade pip:
+Upgrade `pip` (the Python package installer) to the latest version:
 
-``` bash
+```bash
 pip install --upgrade pip
 ```
 
-Install example packages:
+Install some common data science packages to test everything works:
 
-``` bash
+```bash
 pip install numpy pandas scikit-learn jupyter
 ```
 
-------------------------------------------------------------------------
+---
 
-## Run Jupyter
+## 21. Test Jupyter
 
-``` bash
+Launch a Jupyter notebook to verify the setup is working:
+
+```bash
 jupyter notebook
 ```
 
-Stop with `Ctrl + C`.
+> A browser window should open with the Jupyter interface. Press `Ctrl + C` in the terminal to stop it when you're done.
 
-------------------------------------------------------------------------
+---
 
-## install node.js to check the slides
+## 22. Install Node.js
 
-``` bash
+Node.js is needed to view the course slides locally.
+
+```bash
 sudo apt update
 sudo apt install nodejs npm
 ```
-## Clone the course repo into your home folder and install pytests
 
-Make a folder named after your GitHub username, then clone the course repo inside it.
+---
+
+## 23. Clone the Course Repo
+
+Create a folder and clone the course repository:
 
 ```bash
 cd ~
@@ -381,4 +473,17 @@ gh repo clone smart-tinmen/python_class
 cd python_class
 ```
 
-Setup complete 🚀
+---
+
+## ✅ Setup Complete!
+
+You're all set. Your environment includes:
+
+- **WSL2 + Ubuntu** — Linux inside Windows
+- **VS Code** — connected to WSL
+- **pyenv** — managing Python versions
+- **Python 3.12.9** — in an isolated virtual environment
+- **Jupyter** — for interactive notebooks
+- **GitHub CLI** — for repo management
+
+If anything went wrong, re-read the relevant section carefully, and don't hesitate to ask for help. 🚀
