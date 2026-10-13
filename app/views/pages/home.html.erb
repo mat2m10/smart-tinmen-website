@@ -1,15 +1,12 @@
 <%# ============================================================
-    FILE: app/views/home/index.html.erb
+    FILE: app/views/pages/home.html.erb
     PURPOSE: Main entry point — renders all partials in order.
-    The <style> block lives in: app/assets/stylesheets/home.css
-    The <script> block lives in: app/assets/javascripts/home.js
-    (or inline at bottom of this file if you prefer not to use asset pipeline)
+    Styles live in: app/assets/stylesheets/home.css
+    Fonts are loaded in: app/views/layouts/application.html.erb
+    JS (founder modal) lives in: app/javascript/controllers/home.js
     ============================================================ %>
 
-<main style="font-family: 'DM Sans', system-ui, -apple-system, sans-serif; padding: 0; max-width: 100%; margin: 0 auto; background: #FAFBFC;">
-
-  <%# Google Fonts — keep here or move to application.html.erb <head> %>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<main class="st-main">
 
   <div class="st-container">
     <%= render 'pages/header' %>
@@ -23,9 +20,5 @@
     <%= render 'pages/contact' %>
     <%= render 'pages/footer' %>
   </div>
-
-  <script>
-    <%# paste home.js contents here if not using asset pipeline %>
-  </script>
 
 </main>
