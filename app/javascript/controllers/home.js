@@ -3,6 +3,15 @@
 
 import {founders} from "./founder_modal"
 
+// Create an element with a class and (optional) plain-text content.
+// Uses textContent so data is never parsed as HTML.
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
 function openFounder(id, imgSrc) {
   const f = founders[id];
   if (!f) return;
@@ -14,7 +23,7 @@ function openFounder(id, imgSrc) {
   document.getElementById('modal-bio').textContent  = f.bio;
 
   const skillsEl = document.getElementById('modal-skills');
-  skillsEl.innerHTML = '';
+  skillsEl.replaceChildren();
   (f.skills || []).forEach(s => {
     const span = document.createElement('span');
     span.className = 'st-modal-skill';
@@ -29,11 +38,12 @@ function openFounder(id, imgSrc) {
   });
 
   const expEl = document.getElementById('modal-exp');
-  expEl.innerHTML = '';
+  expEl.replaceChildren();
   (f.exp || []).forEach(e => {
-    const item = document.createElement('div');
-    item.className = 'st-modal-exp-item';
-    item.innerHTML = `<div class="st-modal-exp-dot"></div><div><div class="st-modal-exp-title">${e.title}</div><div class="st-modal-exp-sub">${e.sub}</div></div>`;
+    const item = el('div', 'st-modal-exp-item');
+    const body = document.createElement('div');
+    body.append(el('div', 'st-modal-exp-title', e.title), el('div', 'st-modal-exp-sub', e.sub));
+    item.append(el('div', 'st-modal-exp-dot'), body);
     expEl.appendChild(item);
   });
 
