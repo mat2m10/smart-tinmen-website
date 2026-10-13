@@ -2,83 +2,84 @@
 
 The marketing website of **Smart Tinmen**, a studio that builds working
 prototypes for real-world robotics, connected devices and ecological
-monitoring.
+monitoring. Live at [smarttinmen.com](https://smarttinmen.com).
 
 It is a small Rails app with a single page: `PagesController#home` renders
-`app/views/pages/home.html.erb`, which is assembled from partials (header,
-hero, services, work, process, founders, contact, footer). The founder
-profile modal is plain JavaScript loaded through importmap.
+`app/views/pages/home.html.erb`, which is assembled from one partial per
+section. There are no models.
 
 ## Stack
 
-- Ruby 3.3.0 (`.ruby-version`), Rails 7.2
+- Ruby 3.3.12 (`.ruby-version`), Rails 8.1
 - Sprockets + importmap-rails (no Node build step), Turbo, Stimulus
-- PostgreSQL (required by the Rails config; the site has no models)
+- PostgreSQL (`pg` gem; required by the Rails config even though the site has no models)
 - Puma
+- Hosted on Heroku (app `smart-tinmen-website`, stack heroku-24)
 
 ## Project layout
 
 | Path | What lives there |
 | --- | --- |
-| `app/views/pages/` | `home.html.erb` and one partial per section |
+| `app/views/pages/` | `home.html.erb` and one partial per section (header, hero, services, work, record, process, team, contact, footer), plus `sitemap.xml.erb` |
 | `app/assets/stylesheets/home.css` | All page styles |
-| `app/javascript/controllers/home.js` | Founder modal open/close logic |
-| `app/javascript/controllers/founder_modal.js` | Founder profile data shown in the modal |
-| `app/assets/images/` | Founder photos, logo and favicon sizes |
-| `notebooks/` | Python/matplotlib notebook and helpers that draw the logo (not used at runtime) |
+| `app/javascript/controllers/` | Stimulus controllers (`clipboard_controller.js` copies the contact email) |
+| `app/assets/images/logo.svg` | **Source of the logo.** Every logo, favicon, apple-touch and android PNG in `app/assets/images/` is rendered from it |
+| `design/og-image.html` | **Source of the link-preview image** `app/assets/images/og-image.png` (1200x630) |
+| `app/views/layouts/application.html.erb` | Page title, meta description, Open Graph / Twitter tags |
+| `notebooks/` | Legacy Python notebook that drew the previous logo. Not used at runtime, and superseded by `logo.svg` |
 
 ## Run it locally
 
-Prerequisites: Ruby 3.3.0 and a running PostgreSQL server that your user can
+Prerequisites: Ruby 3.3.12 and a running PostgreSQL server that your user can
 connect to.
 
 ```sh
-bin/setup              # bundle install, create/prepare the database, start the server
+bin/setup      # bundle install, prepare the database, then start the server
 # or, step by step:
 bundle install
 bin/rails db:prepare
-bin/rails server       # http://localhost:3000
+bin/dev        # http://localhost:3000
 ```
 
 ## Tests and checks
 
-These are the same commands CI runs (`.github/workflows/ci.yml`):
+These are the commands CI runs (`.github/workflows/ci.yml`) on pushes to
+`master` and on pull requests:
 
 ```sh
-bin/rails test         # controller tests (needs PostgreSQL)
-bin/rubocop            # style (rubocop-rails-omakase)
-bin/brakeman --no-pager
-bin/importmap audit
+bin/rails db:test:prepare test test:system   # needs PostgreSQL (and Chrome for system tests)
+bin/rubocop                                  # style (rubocop-rails-omakase)
+bin/brakeman --no-pager                      # security static analysis
+bin/importmap audit                          # JS dependency vulnerabilities
 ```
 
 ## Editing content
 
 - Text for each section: the matching partial in `app/views/pages/`.
-- Founder cards: `app/views/pages/_founders.html.erb`; the full profile shown
-  in the modal: `app/javascript/controllers/founder_modal.js`. The key in
-  `founders` must match the card's `data-founder` attribute.
-- Page title, description and link-preview (Open Graph) tags:
-  `app/views/layouts/application.html.erb`.
+- Styles: `app/assets/stylesheets/home.css`.
+- Title, description and link-preview tags: `app/views/layouts/application.html.erb`.
+- Sitemap: `app/views/pages/sitemap.xml.erb` (served at `/sitemap.xml`).
 
-## Logo and favicons
+## Logo and link-preview image
 
-The logo is drawn in Python in `notebooks/draw_face.ipynb` (helpers in
-`notebooks/draw_face_helpers/`). Its export cell writes every favicon and
-logo size straight into `app/assets/images/`. Re-run it after changing the
-design, then commit the regenerated images.
+- **Logo:** edit `app/assets/images/logo.svg`, then re-render the PNG sizes
+  (logo, `favicon-*`, `apple-touch-icon-180`, `android-*`) from it at their
+  existing pixel sizes and commit them. The 16–48 px favicons use a simplified
+  variant (no rivets, thicker lines) so they stay legible.
+- **Link preview:** edit `design/og-image.html`, render it at 1200x630 in a
+  headless browser and save the screenshot over `app/assets/images/og-image.png`.
 
-## Deployment
+## Deploy
 
-TODO: document the production host and deploy steps.
+Deploys are **manual**: Heroku does not auto-deploy from GitHub. After a
+change is merged to `master` and CI is green:
 
-What the repository shows: there is a production `Dockerfile` (Rails
-default, "use with Kamal or build'n'run by hand"), but no Kamal
-`config/deploy.yml`; an early commit is titled "Ensure pg and puma for
-Heroku", but there is no `Procfile` or `app.json`. Production needs
-`RAILS_MASTER_KEY` (from `config/master.key`, which is not in git) and a
-PostgreSQL database (`DATABASE_URL`, or
-`SMART_TINMEN_WEBSITE_DATABASE_PASSWORD` with the names in
-`config/database.yml`).
+```sh
+git push heroku master:main
+```
+
+The `heroku` git remote is `https://git.heroku.com/smart-tinmen-website.git`.
+Until you run that push, the live site keeps serving the previous release.
 
 ## License
 
