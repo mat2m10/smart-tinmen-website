@@ -1,32 +1,35 @@
 <%# ============================================================
     FILE: app/views/pages/_services.html.erb
-    PURPOSE: Services section — 4 service cards.
+    PURPOSE: Services — four things we do, with typical tools.
     ============================================================ %>
 
-<section id="services" class="st-section">
-  <h2>Services</h2>
-  <div class="st-grid">
-
-    <div class="st-card">
-      <div class="st-card-title">Prototype builds</div>
-      <p>Electronics + firmware + software prototypes that are demo-ready and testable in real conditions.</p>
+<section id="services" class="st-block">
+  <div class="st-wrap">
+    <div class="st-sec-head">
+      <h2>What we do</h2>
+      <p>Small, hands-on engagements. You work directly with the engineers who build the thing.</p>
     </div>
-
-    <div class="st-card">
-      <div class="st-card-title">Robotics & sensing</div>
-      <p>Perception, control, and sensor integration—ROS2 optional—built for reliability and iteration speed.</p>
+    <div class="st-svc-grid">
+      <div class="st-svc">
+        <h3>Prototype builds</h3>
+        <p>Electronics, firmware and software together, up to a demo that survives real conditions.</p>
+        <div class="st-tools">Arduino · Raspberry Pi · BeagleBone</div>
+      </div>
+      <div class="st-svc">
+        <h3>Robotics &amp; perception</h3>
+        <p>Control, sensor integration, camera calibration, pose estimation and 3D capture.</p>
+        <div class="st-tools">ROS2 · OpenCV · photogrammetry</div>
+      </div>
+      <div class="st-svc">
+        <h3>Field &amp; wildlife monitoring</h3>
+        <p>Drones, flight planning and species detection, built for remote sites with little power or bandwidth.</p>
+        <div class="st-tools">Drones · YOLO · Blender sim</div>
+      </div>
+      <div class="st-svc">
+        <h3>Applied AI</h3>
+        <p>Models and LLM agents wired into the product, with evaluation so you know how well they work.</p>
+        <div class="st-tools">PyTorch · LLMs · RAG · eval</div>
+      </div>
     </div>
-
-    <div class="st-card">
-      <div class="st-card-title">De-risking & technical reviews</div>
-      <p>Feasibility checks, architecture review, test plans, and a clear roadmap to pilot or production.</p>
-    </div>
-
-    <div class="st-card st-card-eco">
-      <span class="st-card-icon">🌿</span>
-      <div class="st-card-title">Ecological & wildlife monitoring</div>
-      <p>AI-powered species detection, field sensor deployments, and connected forest management tools—built for constrained, remote environments. From pangolin detection pipelines to silvicultural data systems.</p>
-    </div>
-
   </div>
 </section>

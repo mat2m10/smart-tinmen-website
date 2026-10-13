@@ -1,37 +1,119 @@
 <%# ============================================================
     FILE: app/views/pages/_work.html.erb
-    PURPOSE: Work / case studies section — 4 project cards.
+    PURPOSE: Work — real projects, each with a line drawing, a key figure
+    and (where public) a link to the code.
+    SVG classes: .fs = surface fill, .fw = mint-wash fill, .fi = ink fill.
     ============================================================ %>
 
-<section id="work" class="st-section">
-  <h2>Work</h2>
-  <p>A few recent examples across robotics, embedded systems, ecological monitoring, and deployment-focused engineering.</p>
-  <div class="st-grid">
-
-    <div class="st-card">
-      <div class="st-card-title">Field sensor device prototype</div>
-      <p>Built a sensing + logging proof-of-concept under tight power and connectivity constraints, including firmware, data pipeline, and test harness.</p>
-      <div class="st-card-meta">10–14 days · electronics + firmware + validation</div>
+<section id="work" class="st-block">
+  <div class="st-wrap">
+    <div class="st-sec-head">
+      <h2>Work</h2>
+      <p>Projects we have built and tested. Several are open source, so you can read the code before you call us.</p>
     </div>
 
-    <div class="st-card">
-      <div class="st-card-title">Robotics data acquisition module</div>
-      <p>Integrated real-time sensors, comms, and software interfaces for a robotics platform, with reliability-first design and deployment documentation.</p>
-      <div class="st-card-meta">2–3 weeks · sensing + integration + handover</div>
-    </div>
+    <div class="st-work-grid">
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect class="fs" x="30" y="24" width="56" height="24" rx="6"/><rect x="38" y="16" width="32" height="8" rx="2"/>
+            <rect x="18" y="30" width="12" height="12" rx="3"/><rect x="86" y="30" width="12" height="12" rx="3"/>
+            <circle cx="78" cy="36" r="5"/><path d="M40 54h36M48 48v6M68 48v6"/>
+            <circle cx="104" cy="22" r="2"/><circle cx="110" cy="14" r="3"/><circle cx="12" cy="20" r="2"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Client project · underwater</div>
+          <h3>Predictive maintenance for underwater drones</h3>
+          <p>Models that read drone telemetry and flag parts that are wearing out, so maintenance happens on deck instead of after a failure at depth.</p>
+          <div class="st-figure-line"><span>Telemetry · ML · ROV</span></div>
+        </div>
+      </article>
 
-    <div class="st-card">
-      <div class="st-card-title">Operations digitalization tool</div>
-      <p>Designed and delivered an end-to-end workflow tool for on-site teams, translating field needs into scoped requirements and a usable implementation with training.</p>
-      <div class="st-card-meta">3–6 weeks · stakeholder alignment + delivery</div>
-    </div>
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect class="fs" x="22" y="22" width="52" height="18" rx="4"/>
+            <circle cx="32" cy="48" r="8"/><circle cx="64" cy="48" r="8"/>
+            <path d="M74 28l14-8 10 18"/><path d="M98 38v8"/><path d="M95 46h6"/>
+            <path d="M10 62c3-6 5-6 6 0M106 62c2-7 6-7 7 0M86 62c2-5 4-5 5 0"/><path d="M6 62h108"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Client project · agriculture</div>
+          <h3>Automatic weeding robots</h3>
+          <p>Perception and control for robots that find weeds between crop rows and remove them without herbicide.</p>
+          <div class="st-figure-line"><span>Computer vision · control</span></div>
+        </div>
+      </article>
 
-    <div class="st-card st-card-eco">
-      <span class="st-card-icon">🦔</span>
-      <div class="st-card-title">Pangolin detection pipeline</div>
-      <p>Developed and deployed a deep-learning object detection and classification system for scalable pangolin monitoring, including synthetic training data generation via simulation and field annotation workflows.</p>
-      <div class="st-card-meta">Ongoing · computer vision + field deployment · Malawi</div>
-    </div>
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse class="fs" cx="54" cy="54" rx="34" ry="8"/><path d="M20 54v5c0 4 15 8 34 8s34-4 34-8v-5"/>
+            <path d="M44 52V34l10-12 10 12v18"/><path d="M44 34h20"/>
+            <rect x="94" y="16" width="18" height="12" rx="2"/><circle cx="103" cy="22" r="3"/>
+            <path d="M92 26C80 30 72 34 66 38" stroke-dasharray="3 4"/><path d="M14 30c4-10 14-16 24-18" stroke-dasharray="3 4"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Studio build · 3D capture</div>
+          <h3>Automatic photogrammetry turntable</h3>
+          <p>A turntable that rotates the object and triggers the camera at each step, then feeds our own pipeline from photos to a 3D model and a Gaussian splat.</p>
+          <div class="st-figure-line"><span>Photogrammetry · Gaussian splatting</span><a href="https://github.com/mat2m10/photogrammetry_table">code ↗</a></div>
+        </div>
+      </article>
 
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path class="fs" d="M60 10l26 15v30L60 70 34 55V25z"/>
+            <rect class="fi" x="48" y="26" width="24" height="24" stroke="none"/>
+            <rect class="fw" x="52" y="30" width="6" height="6"/><rect class="fw" x="62" y="40" width="6" height="6"/><rect class="fw" x="52" y="40" width="6" height="6"/>
+            <path d="M94 50h20M114 50l-5-4M114 50l-5 4"/><path d="M94 50V28M94 28l-4 5M94 28l4 5"/><path d="M94 50l-12 10"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Studio build · computer vision</div>
+          <h3>6DoF tracking of tabletop miniatures</h3>
+          <p>Printed ArUco markers on a hexagonal base, ChArUco camera calibration and one pose solve over every visible marker corner, to animate a 3D model from a real figurine.</p>
+          <div class="st-figure-line"><span>~0.2° error per frame</span><a href="https://github.com/mat2m10/generate_aruco">code ↗</a></div>
+        </div>
+      </article>
+
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect class="fs" x="48" y="12" width="24" height="10" rx="3"/><path d="M48 17H30M72 17h18"/>
+            <path d="M22 12h16M82 12h16"/><path d="M30 12v5M90 12v5"/>
+            <path d="M54 22l-10 22M66 22l10 22" stroke-dasharray="2 4"/>
+            <rect x="38" y="44" width="44" height="20" rx="2" stroke-dasharray="5 3"/>
+            <path class="fi" d="M46 58c4-8 18-10 26-4 3 2 4 5 2 6H48z"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Lilongwe Wildlife Centre · Malawi</div>
+          <h3>Pangolin detection from the air</h3>
+          <p>Computer vision for an autonomous drone that finds and tracks pangolins, one of the most trafficked animals. We ran the drones, wrote the flight plans, trained on Blender-generated scenes and shipped a Streamlit app for the team.</p>
+          <div class="st-figure-line"><span>YOLO · drones · synthetic data</span><a href="https://github.com/mat2m10/pangolin_detector">code ↗</a></div>
+        </div>
+      </article>
+
+      <article class="st-plate st-project">
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <g class="fs"><circle cx="30" cy="16" r="5"/><circle cx="60" cy="16" r="5"/><circle cx="90" cy="16" r="5"/><circle cx="30" cy="36" r="5"/><circle cx="90" cy="36" r="5"/><circle cx="30" cy="56" r="5"/><circle cx="60" cy="56" r="5"/><circle cx="90" cy="56" r="5"/></g>
+            <circle class="fi" cx="60" cy="36" r="7"/>
+            <path d="M37 16h16M67 16h16M37 56h16M67 56h16M30 23v6M30 43v6M90 23v6M90 43v6M60 23v4M60 45v4M37 36h14M69 36h14"/>
+          </svg>
+        </figure>
+        <div class="st-project-body">
+          <div class="st-where">Studio research · simulation</div>
+          <h3>nexus population simulator</h3>
+          <p>A grid-based coalescent simulator that reproduces population-stratification bias in genetic studies, used to test correction methods before they meet real data.</p>
+          <div class="st-figure-line"><span>Simulation · statistics</span><a href="https://github.com/mat2m10/nexus">code ↗</a></div>
+        </div>
+      </article>
+    </div>
   </div>
 </section>

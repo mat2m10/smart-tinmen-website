@@ -1,0 +1,41 @@
+<%# ============================================================
+    FILE: app/views/pages/_team.html.erb
+    PURPOSE: Team — founders with photo, role, short bio and highlights.
+    ============================================================ %>
+
+<section id="team" class="st-block">
+  <div class="st-wrap">
+    <div class="st-sec-head">
+      <h2>Team</h2>
+      <p>Two industrial engineers from ECAM Brussels. One runs the projects, one builds them.</p>
+    </div>
+    <div class="st-team-grid">
+      <article class="st-plate st-person"><i class="st-rv"></i>
+        <%= image_tag "HL_picture.jpg", alt: "Harold Loop" %>
+        <div>
+          <h3>Harold Loop</h3>
+          <div class="st-role">CEO</div>
+          <p>Electromechanical engineer who delivers digitalisation projects in power plants, robotics centres and industrial sites, as product owner, analyst and on-site lead.</p>
+          <ul>
+            <li><span>2022–now</span>Consultant, energy sector · Avertim</li>
+            <li><span>2021–2022</span>Data engineer · Deloitte Consulting</li>
+            <li><span>2020</span>Thesis, marine robotics · VLIZ</li>
+          </ul>
+        </div>
+      </article>
+      <article class="st-plate st-person"><i class="st-rv"></i>
+        <%= image_tag "MDH_picture.jpg", alt: "Matthieu de Hemptinne" %>
+        <div>
+          <h3>Matthieu de Hemptinne</h3>
+          <div class="st-role">CTO</div>
+          <p>Robotics and AI engineer. Went from commercial diving to ROV control, drone vision in Malawi, deep learning for genetics and LLM systems in production. Two M.Sc. degrees in industrial engineering.</p>
+          <ul>
+            <li><span>2025–2026</span>Drone CV · Lilongwe Wildlife Centre</li>
+            <li><span>2021–2025</span>ML engineer · CTG, Nature Neuroscience</li>
+            <li><span>2019–2020</span>Marine robotics · VLIZ, Greenland</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
