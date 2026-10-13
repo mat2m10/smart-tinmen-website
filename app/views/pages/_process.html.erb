@@ -1,35 +1,19 @@
 <%# ============================================================
-    FILE: app/views/home/_process.html.erb
-    PURPOSE: Process section — 4 numbered steps.
+    FILE: app/views/pages/_process.html.erb
+    PURPOSE: Process — the four steps of a project, in order.
     ============================================================ %>
 
-<section id="process" class="st-section">
-  <h2>Process</h2>
-  <div class="st-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-
-    <div class="st-card">
-      <div class="st-step-num">1</div>
-      <div class="st-card-title">Scope</div>
-      <p>A short kickoff to define constraints, success criteria, and deliverables. You get a clear plan and timeline.</p>
+<section id="process" class="st-block">
+  <div class="st-wrap">
+    <div class="st-sec-head">
+      <h2>How a project runs</h2>
+      <p>Weekly demos from the first week. Decisions are written down as we go.</p>
     </div>
-
-    <div class="st-card">
-      <div class="st-step-num">2</div>
-      <div class="st-card-title">Build</div>
-      <p>Rapid iteration across hardware + software, with weekly demos and decisions captured as we go.</p>
-    </div>
-
-    <div class="st-card">
-      <div class="st-step-num">3</div>
-      <div class="st-card-title">Test</div>
-      <p>Designed for real conditions: power, sensing quality, reliability, and failure modes—not just a lab demo.</p>
-    </div>
-
-    <div class="st-card">
-      <div class="st-step-num">4</div>
-      <div class="st-card-title">Handover</div>
-      <p>Working demo + documentation + next-step roadmap (pilot, manufacturing, or productization).</p>
-    </div>
-
+    <ol class="st-steps">
+      <li class="st-step"><div class="st-step-n">Step 1</div><h3>Scope</h3><p>Constraints, success criteria and deliverables, agreed in a short kickoff.</p></li>
+      <li class="st-step"><div class="st-step-n">Step 2</div><h3>Build</h3><p>Fast iterations across hardware and software, with a demo every week.</p></li>
+      <li class="st-step"><div class="st-step-n">Step 3</div><h3>Test</h3><p>In real conditions: power, sensing quality, failure modes, not only on the bench.</p></li>
+      <li class="st-step"><div class="st-step-n">Step 4</div><h3>Handover</h3><p>Working demo, documentation and a roadmap to pilot or production.</p></li>
+    </ol>
   </div>
 </section>

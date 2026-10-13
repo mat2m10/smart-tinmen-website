@@ -1,30 +1,36 @@
 <%# ============================================================
-    FILE: app/views/home/_hero.html.erb
-    PURPOSE: Hero section — headline, description, CTA buttons, tags, logo.
+    FILE: app/views/pages/_hero.html.erb
+    PURPOSE: Hero — headline, pitch, CTAs and the studio "spec plate".
     ============================================================ %>
 
 <section class="st-hero">
-  <div class="st-hero-text">
-    <h1>We build working prototypes for real-world robotics, connected devices & ecological monitoring.</h1>
-    <p>
-      Smart Tinmen is a product prototyping studio spanning electronics, embedded systems, software,
-      and field-deployable ecological sensing. We take fuzzy ideas and turn them into testable
-      builds—so you can validate quickly, demo confidently, and move to pilot or production with
-      clear evidence.
-    </p>
-    <div class="st-btn-row">
-      <a href="#contact" class="st-btn-primary">Start a project</a>
-      <a href="#work" class="st-btn-secondary">View case studies</a>
+  <div class="st-wrap">
+    <div>
+      <div class="st-eyebrow">Product prototyping studio · robotics · sensing · AI</div>
+      <h1>Robots and sensors that keep working <em>outside the lab</em>.</h1>
+      <p class="st-lede">
+        We turn early ideas into builds you can test in the field: underwater drones, weeding robots,
+        camera rigs and the AI that runs on them. Electronics, firmware, software and deployment from
+        one small team.
+      </p>
+      <div class="st-cta-row">
+        <a href="#contact" class="st-btn st-btn-primary">Start a project</a>
+        <a href="#work" class="st-btn st-btn-ghost">See the work</a>
+      </div>
     </div>
-    <div class="st-tags">
-      <span class="st-tag">1–2 week proof-of-concept</span>
-      <span class="st-tag">Electronics + firmware</span>
-      <span class="st-tag">Robotics / sensing</span>
-      <span class="st-tag">Deployment-focused</span>
-      <span class="st-tag st-tag-green">Wildlife & forest monitoring</span>
+
+    <div class="st-plate st-spec"><i class="st-rv"></i>
+      <div class="st-spec-head">
+        <%= image_tag "logo-128.png", alt: "" %>
+        <div><b>Smart Tinmen</b><small>Studio spec sheet</small></div>
+      </div>
+      <dl>
+        <dt>Registered</dt><dd>2024 · KVK, Sint Kruis</dd>
+        <dt>Field hardware</dt><dd>Since 2015, from offshore diving to ROVs</dd>
+        <dt>Deployed in</dt><dd>Greenland · Malawi</dd>
+        <dt>Pose accuracy</dt><dd>~0.2° per frame, 6DoF tracking</dd>
+        <dt>Stack</dt><dd>ROS2 · OpenCV · PyTorch · Blender</dd>
+      </dl>
     </div>
-  </div>
-  <div class="st-hero-logo">
-    <%= image_tag "logo-512.png", alt: "Smart Tinmen logo" %>
   </div>
 </section>

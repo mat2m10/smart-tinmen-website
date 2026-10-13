@@ -1,9 +1,11 @@
 <%# ============================================================
-    FILE: app/views/home/_footer.html.erb
-    PURPOSE: Footer — copyright year (auto) + logo.
+    FILE: app/views/pages/_footer.html.erb
+    PURPOSE: Footer — copyright year (auto), logo and GitHub link.
     ============================================================ %>
 
 <footer class="st-footer">
-  <span>© <%= Time.current.year %> Smart Tinmen</span>
-  <%= image_tag "logo-64.png", alt: "Smart Tinmen" %>
+  <div class="st-wrap">
+    <span><%= image_tag "logo-64.png", alt: "" %>© <%= Time.current.year %> Smart Tinmen · product prototyping studio</span>
+    <a href="https://github.com/mat2m10">GitHub ↗</a>
+  </div>
 </footer>
