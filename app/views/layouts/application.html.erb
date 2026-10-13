@@ -24,14 +24,15 @@
     <meta property="og:url"          content="<%= request.original_url %>">
     <meta property="og:title"        content="<%= content_for?(:title) ? yield(:title) : 'Smart Tinmen' %>">
     <meta property="og:description"  content="<%= content_for?(:description) ? yield(:description) : 'Product prototyping studio for robotics, sensing and AI. Underwater drones, weeding robots, 3D capture and drone vision that keep working outside the lab.' %>">
-    <meta property="og:image"        content="<%= asset_url('logo-512.png') %>">
-    <meta property="og:image:width"  content="512">
-    <meta property="og:image:height" content="512">
+    <meta property="og:image"        content="<%= asset_url('og-image.png') %>">
+    <meta property="og:image:width"  content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:image:type"   content="image/png">
+    <meta property="og:image:alt"    content="Smart Tinmen: robots and sensors that keep working outside the lab">
     <!-- Twitter / X -->
-    <meta name="twitter:card"  content="summary">
+    <meta name="twitter:card"  content="summary_large_image">
     <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'Smart Tinmen' %>">
-    <meta name="twitter:image" content="<%= asset_url('logo-512.png') %>">
+    <meta name="twitter:image" content="<%= asset_url('og-image.png') %>">
 
     <meta http-equiv="x-dns-prefetch-control" content="on">
 
