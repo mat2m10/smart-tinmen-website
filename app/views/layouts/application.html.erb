@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Smart Tinmen" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -32,6 +32,11 @@
     <meta name="twitter:image" content="<%= asset_url('logo-512.png') %>">
 
     <meta http-equiv="x-dns-prefetch-control" content="on">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>

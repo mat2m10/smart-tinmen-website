@@ -8,6 +8,12 @@
 a { color: #0B0F14; transition: opacity 0.2s; }
 a:hover { opacity: 0.7; }
 
+/* ── Page wrapper ── */
+.st-main {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  padding: 0; max-width: 100%; margin: 0 auto; background: #FAFBFC;
+}
+
 /* ── Layout container ── */
 .st-container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
