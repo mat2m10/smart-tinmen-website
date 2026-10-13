@@ -1,7 +1,7 @@
 // FILE: app/javascript/controllers/home.js
 // PURPOSE: Founder modal — open/close logic + founder data.
 
-import {founders} from "./founder_modal"
+import { founders } from "controllers/founder_modal"
 
 function openFounder(id, imgSrc) {
   const f = founders[id];
