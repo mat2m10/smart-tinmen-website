@@ -57,6 +57,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
-  # Rails 7.2's test runner is not compatible with minitest 6
+  # minitest 6 works on Rails 8.1 (verified in #26); cap the next major until tested
   gem "minitest", "< 7"
 end
