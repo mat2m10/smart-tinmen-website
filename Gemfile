@@ -58,5 +58,5 @@ group :test do
   gem "selenium-webdriver"
 
   # Rails 7.2's test runner is not compatible with minitest 6
-  gem "minitest", "< 6"
+  gem "minitest", "< 7"
 end
