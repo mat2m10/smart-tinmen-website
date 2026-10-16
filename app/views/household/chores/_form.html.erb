@@ -1,0 +1,61 @@
+<%= form_with model: [ :household, chore ], class: "hh-form" do |f| %>
+  <% if chore.errors.any? %>
+    <div class="hh-errors" role="alert">
+      <% chore.errors.full_messages.each do |message| %><p><%= message %></p><% end %>
+    </div>
+  <% end %>
+
+  <%= f.label :title, "What needs doing" %>
+  <%= f.text_field :title, required: true, autofocus: chore.new_record? %>
+
+  <div class="hh-row">
+    <div>
+      <%= f.label :area %>
+      <%= f.select :area, Chore::AREAS.invert %>
+    </div>
+    <div>
+      <%= f.label :room, "Room (cleaning)" %>
+      <%= f.select :room, Chore::ROOMS, include_blank: "None" %>
+    </div>
+  </div>
+
+  <div class="hh-row">
+    <div>
+      <%= f.label :due_on, "Next due" %>
+      <%= f.date_field :due_on, required: true %>
+    </div>
+    <div>
+      <%= f.label :assignee_id, "Owner" %>
+      <%= f.select :assignee_id, User.order(:name, :email).map { |u| [ u.display_name, u.id ] }, include_blank: "Up for grabs" %>
+    </div>
+  </div>
+
+  <div class="hh-row">
+    <div>
+      <%= f.label :repeat_unit, "Repeats" %>
+      <%= f.select :repeat_unit, [ [ "Once", "none" ], [ "Daily", "day" ], [ "Weekly", "week" ], [ "Monthly", "month" ], [ "Yearly", "year" ] ] %>
+    </div>
+    <div>
+      <%= f.label :repeat_every, "Every how many" %>
+      <%= f.number_field :repeat_every, min: 1, max: 365 %>
+    </div>
+  </div>
+
+  <fieldset class="hh-effort">
+    <legend>Effort</legend>
+    <% Chore::EFFORTS.each do |value, label| %>
+      <label><%= f.radio_button :effort, value %> <%= label %></label>
+    <% end %>
+  </fieldset>
+
+  <label class="hh-check"><%= f.check_box :planning %> Planning task (noticing, booking, organising)</label>
+  <label class="hh-check"><%= f.check_box :fixed_schedule %> Keep a fixed date (e.g. rent on the 25th), not counted from when it was done</label>
+
+  <%= f.label :notes, "Notes (how, where, what counts as done)" %>
+  <%= f.text_area :notes, rows: 4 %>
+
+  <div class="hh-form-actions">
+    <%= f.submit chore.new_record? ? "Add" : "Save", class: "hh-btn hh-btn--primary" %>
+    <%= link_to "Cancel", household_root_path, class: "hh-link" %>
+  </div>
+<% end %>

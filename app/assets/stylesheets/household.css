@@ -1,0 +1,94 @@
+/* ============================================================
+   FILE: app/assets/stylesheets/household.css
+   PURPOSE: The private household app (/household). Every rule is scoped
+   under body.hh so nothing leaks into the public homepage. Colours and
+   fonts reuse the tokens from home.css.
+   ============================================================ */
+
+.hh .hh-page { max-width: 720px; margin: 0 auto; padding: 16px 16px 64px; }
+.hh h1 { font-size: 1.9rem; font-weight: 800; }
+.hh h2 { font-size: 1.1rem; font-weight: 700; display: inline-flex; gap: 8px; align-items: center; }
+.hh h3 { font-size: 1rem; margin-top: 20px; }
+
+.hh .hh-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 8px 0 16px; }
+.hh .hh-me { display: flex; align-items: center; gap: 10px; }
+.hh form.button_to { display: inline; margin: 0; }
+
+.hh .hh-avatar {
+  display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--mint-wash); color: var(--teal); font-weight: 700;
+}
+.hh .hh-avatar--small { width: 28px; height: 28px; font-size: .85rem; }
+
+.hh .hh-btn {
+  font: 600 .9rem/1 var(--body); padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none;
+  display: inline-block; white-space: nowrap;
+}
+.hh .hh-btn--primary { background: var(--teal); border-color: var(--teal); color: var(--paper); }
+.hh .hh-btn--danger { color: #B3261E; margin-top: 24px; }
+.hh .hh-link { background: none; border: 0; padding: 0; color: var(--teal); font: inherit; cursor: pointer; text-decoration: underline; }
+
+.hh .hh-tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.hh .hh-tab { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: .9rem; }
+.hh .hh-tab[aria-current="page"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.hh .hh-add { margin-left: auto; }
+
+.hh .hh-flash { padding: 10px 12px; border-radius: 8px; background: var(--mint-wash); margin-bottom: 12px; }
+.hh .hh-flash--alert { background: #FBE3E1; color: #7A1712; }
+.hh .hh-empty, .hh .hh-hint { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+
+.hh .hh-group { margin: 20px 0; }
+.hh details.hh-group summary { cursor: pointer; list-style: none; }
+.hh details.hh-group summary::-webkit-details-marker { display: none; }
+.hh details.hh-group summary h2::after { content: "▸"; color: var(--muted); }
+.hh details.hh-group[open] summary h2::after { content: "▾"; }
+.hh .hh-count { font: 500 .8rem var(--body); color: var(--muted); }
+.hh .hh-group--overdue h2 { color: #B3261E; }
+
+.hh .hh-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.hh .hh-chore {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center;
+  padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+}
+.hh .hh-chore--overdue { border-left: 4px solid #B3261E; }
+.hh .hh-chore--today { border-left: 4px solid var(--teal); }
+.hh .hh-chore-main { flex: 1 1 260px; min-width: 0; }
+.hh .hh-chore-title { color: var(--ink); font-weight: 600; text-decoration: none; }
+.hh .hh-chore-meta { color: var(--muted); font-size: .82rem; margin-top: 2px; }
+.hh .hh-due { font-weight: 600; color: var(--ink); }
+.hh .hh-tag { margin-left: 4px; padding: 1px 6px; border-radius: 999px; background: var(--mint-wash); color: var(--teal); font-size: .75rem; }
+.hh .hh-chore-actions { display: flex; gap: 6px; align-items: center; }
+.hh .hh-free { font-size: .8rem; color: var(--muted); }
+
+.hh .hh-balance { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); }
+.hh .hh-bar { display: grid; grid-template-columns: 80px 1fr auto; gap: 10px; align-items: center; margin-top: 10px; font-size: .9rem; }
+.hh .hh-bar-track { height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.hh .hh-bar-fill { display: block; height: 100%; background: var(--teal); }
+.hh .hh-bar-value { color: var(--muted); font-size: .82rem; }
+.hh .hh-done { padding-left: 18px; color: var(--muted); font-size: .9rem; }
+
+.hh .hh-login { text-align: center; padding-top: 18vh; display: grid; gap: 16px; justify-items: center; }
+
+.hh .hh-form { display: grid; gap: 6px; }
+.hh .hh-form label { font-weight: 600; font-size: .9rem; margin-top: 8px; }
+.hh .hh-form input[type="text"], .hh .hh-form input[type="date"], .hh .hh-form input[type="number"],
+.hh .hh-form select, .hh .hh-form textarea {
+  width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--ink); font: 400 1rem var(--body);
+}
+.hh .hh-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hh .hh-effort { border: 0; padding: 0; margin: 8px 0 0; display: flex; gap: 16px; flex-wrap: wrap; }
+.hh .hh-effort legend { font-weight: 600; font-size: .9rem; }
+.hh .hh-effort label, .hh .hh-check { font-weight: 400; display: flex; gap: 8px; align-items: center; }
+.hh .hh-errors { background: #FBE3E1; color: #7A1712; padding: 10px; border-radius: 8px; }
+.hh .hh-form-actions { display: flex; gap: 16px; align-items: center; margin-top: 16px; }
+
+@media (max-width: 480px) {
+  .hh .hh-row { grid-template-columns: 1fr; }
+  .hh .hh-chore-actions { width: 100%; justify-content: flex-end; }
+}
+@media (prefers-color-scheme: dark) {
+  .hh .hh-flash--alert, .hh .hh-errors { background: #3A1715; color: #F6C9C4; }
+  .hh .hh-group--overdue h2, .hh .hh-btn--danger { color: #F2948A; }
+}

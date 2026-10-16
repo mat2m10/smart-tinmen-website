@@ -1,0 +1,56 @@
+<header class="hh-top">
+  <h1>Household</h1>
+  <div class="hh-me">
+    <span class="hh-avatar" title="<%= current_user.display_name %>"><%= current_user.initial %></span>
+    <%= button_to "Sign out", household_logout_path, method: :delete, class: "hh-link" %>
+  </div>
+</header>
+
+<nav class="hh-tabs" aria-label="Filter">
+  <% { "all" => "Everything", "mine" => "Mine", "free" => "Up for grabs" }.each do |key, label| %>
+    <%= link_to label, household_root_path(show: (key unless key == "all")), class: "hh-tab", aria: { current: (@filter == key ? "page" : nil) } %>
+  <% end %>
+  <%= link_to "+ Add", new_household_chore_path, class: "hh-btn hh-btn--primary hh-add" %>
+</nav>
+
+<% if @buckets.empty? %>
+  <p class="hh-empty">Nothing here. Enjoy it.</p>
+<% end %>
+
+<% Household::ChoresController::BUCKETS.each do |key, label| %>
+  <% chores = @buckets[key] %>
+  <% next if chores.blank? %>
+  <% if key == :later %>
+    <details class="hh-group">
+      <summary><h2><%= label %> <span class="hh-count"><%= chores.size %></span></h2></summary>
+      <ul class="hh-list"><%= render partial: "chore", collection: chores %></ul>
+    </details>
+  <% else %>
+    <section class="hh-group hh-group--<%= key %>">
+      <h2><%= label %> <span class="hh-count"><%= chores.size %></span></h2>
+      <ul class="hh-list"><%= render partial: "chore", collection: chores %></ul>
+    </section>
+  <% end %>
+<% end %>
+
+<section class="hh-balance">
+  <h2>Last 30 days</h2>
+  <% max = [ @effort.values.max.to_i, 1 ].max %>
+  <% @users.each do |user| %>
+    <div class="hh-bar">
+      <span class="hh-bar-name"><%= user.display_name %></span>
+      <span class="hh-bar-track"><span class="hh-bar-fill" style="width: <%= (100 * @effort[user.id].to_i / max).round %>%"></span></span>
+      <span class="hh-bar-value"><%= pluralize(@effort[user.id].to_i, "point") %> · <%= @planning[user.id].to_i %> planning</span>
+    </div>
+  <% end %>
+  <p class="hh-hint">Points: quick 1, medium 2, big 3. Planning = noticing and organising, the invisible part.</p>
+
+  <% if @recently_done.any? %>
+    <h3>Recently done</h3>
+    <ul class="hh-done">
+      <% @recently_done.each do |completion| %>
+        <li><strong><%= completion.user&.display_name || "Someone" %></strong> · <%= completion.chore.title %> · <%= completion.completed_on.strftime("%-d %b") %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
