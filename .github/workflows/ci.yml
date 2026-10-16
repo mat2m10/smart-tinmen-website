@@ -92,6 +92,14 @@ jobs:
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test test:system
 
+      - name: Check db/schema.rb matches the migrations
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/schema_check
+        run: |
+          bin/rails db:create db:migrate
+          git diff --exit-code db/schema.rb
+
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v7
         if: failure()
