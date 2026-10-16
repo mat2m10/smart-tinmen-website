@@ -33,7 +33,7 @@ class Chore < ApplicationRecord
   validates :repeat_unit, inclusion: { in: REPEAT_UNITS }
   validates :repeat_every, numericality: { only_integer: true, in: 1..365 }
   validates :effort, inclusion: { in: EFFORTS.keys }
-  validates :assignee, presence: true, if: :assignee_id?
+  validates :assignee, presence: true, unless: -> { assignee_id.nil? }
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
