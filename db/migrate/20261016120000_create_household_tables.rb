@@ -11,7 +11,7 @@ class CreateHouseholdTables < ActiveRecord::Migration[8.1]
     create_table :chores do |t|
       t.string :title, null: false
       t.text :notes
-      t.string :area, null: false, default: "home"
+      t.string :area, null: false, default: "Home & repairs"
       t.string :room
       t.date :due_on, null: false
       t.string :repeat_unit, null: false, default: "none"

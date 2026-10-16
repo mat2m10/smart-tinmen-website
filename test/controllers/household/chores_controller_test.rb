@@ -3,7 +3,7 @@ require "test_helper"
 class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
   setup do
     @old = ENV["HOUSEHOLD_EMAILS"]
-    ENV["HOUSEHOLD_EMAILS"] = "matthieu@example.com,livia@example.com"
+    ENV["HOUSEHOLD_EMAILS"] = "alice@example.com,bob@example.com"
     OmniAuth.config.test_mode = true
   end
 
@@ -35,7 +35,7 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "a household member sees the board" do
-    sign_in("matthieu@example.com")
+    sign_in("alice@example.com")
     assert_redirected_to household_root_path
     get household_root_path
     assert_response :success
@@ -44,14 +44,14 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "removing someone from the list ends their session" do
-    sign_in("matthieu@example.com")
-    ENV["HOUSEHOLD_EMAILS"] = "livia@example.com"
+    sign_in("alice@example.com")
+    ENV["HOUSEHOLD_EMAILS"] = "bob@example.com"
     get household_root_path
     assert_redirected_to household_login_path
   end
 
   test "filters: mine and up for grabs" do
-    sign_in("livia@example.com")
+    sign_in("bob@example.com")
     get household_root_path(show: "mine")
     assert_select ".hh-chore-title", text: "Find a GP"
     assert_select ".hh-chore-title", text: "Clean the toilet", count: 0
@@ -60,15 +60,15 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "add, claim, complete and delete a chore" do
-    sign_in("matthieu@example.com")
+    sign_in("alice@example.com")
     assert_difference -> { Chore.count } do
-      post household_chores_path, params: { chore: { title: "Descale the kettle", area: "cleaning", room: "Kitchen", due_on: Date.current, repeat_unit: "month", repeat_every: 1, effort: 1 } }
+      post household_chores_path, params: { chore: { title: "Descale the kettle", area: "Cleaning", room: "Kitchen", due_on: Date.current, repeat_unit: "month", repeat_every: 1, effort: 1 } }
     end
     chore = Chore.find_by!(title: "Descale the kettle")
-    assert_equal users(:matthieu), chore.created_by
+    assert_equal users(:alice), chore.created_by
 
     post claim_household_chore_path(chore)
-    assert_equal users(:matthieu), chore.reload.assignee
+    assert_equal users(:alice), chore.reload.assignee
     post claim_household_chore_path(chore)
     assert_nil chore.reload.assignee
 
@@ -81,15 +81,26 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_not Chore.exists?(chore.id)
   end
 
+  test "a double tap on Done only counts once" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    shown = chore.due_on.iso8601
+    assert_difference -> { Completion.count }, 1 do
+      post complete_household_chore_path(chore), params: { due_on: shown }
+      post complete_household_chore_path(chore), params: { due_on: shown }
+    end
+    assert_equal Date.current + 7, chore.reload.due_on
+  end
+
   test "invalid input re-renders the form" do
-    sign_in("matthieu@example.com")
-    post household_chores_path, params: { chore: { title: "", area: "cleaning", due_on: Date.current } }
+    sign_in("alice@example.com")
+    post household_chores_path, params: { chore: { title: "", area: "Cleaning", due_on: Date.current } }
     assert_response :unprocessable_entity
     assert_select ".hh-errors"
   end
 
   test "sign out" do
-    sign_in("matthieu@example.com")
+    sign_in("alice@example.com")
     delete household_logout_path
     get household_root_path
     assert_redirected_to household_login_path

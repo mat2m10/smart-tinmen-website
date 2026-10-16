@@ -18,7 +18,7 @@ class Household::ChoresController < Household::BaseController
   end
 
   def new
-    @chore = Chore.new(due_on: Date.current, area: params[:area].presence_in(Chore::AREAS.keys) || "home")
+    @chore = Chore.new(due_on: Date.current, area: params[:area].presence || "Home & repairs")
   end
 
   def create
@@ -46,9 +46,16 @@ class Household::ChoresController < Household::BaseController
     redirect_to household_root_path, notice: "Deleted: #{@chore.title}", status: :see_other
   end
 
+  # The button sends the due date it was showing, so a double tap (or a second
+  # phone with an old page) can't log the same chore twice.
   def complete
-    @chore.complete!(current_user)
-    redirect_to household_root_path(show: filter_param), notice: "Done: #{@chore.title}", status: :see_other
+    if params[:due_on].present? && params[:due_on] != @chore.due_on.iso8601
+      notice = "Already done: #{@chore.title}"
+    else
+      @chore.complete!(current_user)
+      notice = "Done: #{@chore.title}"
+    end
+    redirect_to household_root_path(show: filter_param), notice: notice, status: :see_other
   end
 
   # Take the chore, or let it go again if it is already yours.

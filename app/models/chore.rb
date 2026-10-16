@@ -1,24 +1,9 @@
 # A household task. One-off tasks are closed when done; repeating tasks move
 # their due date forward instead.
 class Chore < ApplicationRecord
-  AREAS = {
-    "cleaning" => "Cleaning",
-    "laundry" => "Laundry",
-    "food" => "Food & groceries",
-    "cyra" => "Cyra",
-    "admin" => "Admin & paperwork",
-    "family" => "Family & friends",
-    "places" => "Boat & houses",
-    "home" => "Home & repairs"
-  }.freeze
-  ROOMS = [
-    "Our bedroom",
-    "Shower room (toilet + shower)",
-    "Bathroom (bath + sink)",
-    "Kitchen",
-    "Cyra's bedroom",
-    "Living room"
-  ].freeze
+  # Suggestions only: area and room are free text, so each household keeps
+  # its own list in the database (and nothing personal lives in this code).
+  DEFAULT_AREAS = [ "Cleaning", "Laundry", "Food", "Kids", "Admin", "Family & friends", "Home & repairs" ].freeze
   REPEAT_UNITS = %w[none day week month year].freeze
   EFFORTS = { 1 => "Quick", 2 => "Medium", 3 => "Big" }.freeze
 
@@ -28,8 +13,8 @@ class Chore < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :due_on, presence: true
-  validates :area, inclusion: { in: AREAS.keys }
-  validates :room, inclusion: { in: ROOMS }, allow_blank: true
+  validates :area, presence: true, length: { maximum: 40 }
+  validates :room, length: { maximum: 40 }
   validates :repeat_unit, inclusion: { in: REPEAT_UNITS }
   validates :repeat_every, numericality: { only_integer: true, in: 1..365 }
   validates :effort, inclusion: { in: EFFORTS.keys }
@@ -37,6 +22,14 @@ class Chore < ApplicationRecord
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
+
+  def self.area_options
+    (DEFAULT_AREAS + distinct.pluck(:area)).uniq.sort
+  end
+
+  def self.room_options
+    where.not(room: [ nil, "" ]).distinct.order(:room).pluck(:room)
+  end
 
   def repeating?
     repeat_unit != "none"
@@ -71,10 +64,6 @@ class Chore < ApplicationRecord
     return "Once" unless repeating?
 
     repeat_every == 1 ? "Every #{repeat_unit}" : "Every #{repeat_every} #{repeat_unit.pluralize}"
-  end
-
-  def area_label
-    AREAS.fetch(area, area)
   end
 
   def effort_label

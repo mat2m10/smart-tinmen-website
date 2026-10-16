@@ -3,7 +3,7 @@
     <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
     <p class="hh-chore-meta">
       <span class="hh-due"><%= due_label(chore) %></span>
-      · <%= chore.area_label %><%= " · #{chore.room}" if chore.room.present? %>
+      · <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %>
       · <%= chore.repeat_label %> · <%= chore.effort_label %>
       <% if chore.planning %><span class="hh-tag">planning</span><% end %>
     </p>
@@ -15,6 +15,6 @@
       <span class="hh-free">Up for grabs</span>
     <% end %>
     <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn" %>
-    <%= button_to "Done", complete_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--primary" %>
+    <%= button_to "Done", complete_household_chore_path(chore, show: @filter), params: { due_on: chore.due_on.iso8601 }, class: "hh-btn hh-btn--primary" %>
   </div>
 </li>

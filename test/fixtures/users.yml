@@ -1,7 +1,7 @@
-matthieu:
-  email: matthieu@example.com
-  name: Matthieu
+alice:
+  email: alice@example.com
+  name: Alice
 
-livia:
-  email: livia@example.com
-  name: Livia
+bob:
+  email: bob@example.com
+  name: Bob

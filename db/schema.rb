@@ -15,7 +15,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "chores", force: :cascade do |t|
-    t.string "area", default: "home", null: false
+    t.string "area", default: "Home & repairs", null: false
     t.bigint "assignee_id"
     t.datetime "created_at", null: false
     t.bigint "created_by_id"

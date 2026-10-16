@@ -11,11 +11,13 @@
   <div class="hh-row">
     <div>
       <%= f.label :area %>
-      <%= f.select :area, Chore::AREAS.invert %>
+      <%= f.text_field :area, list: "hh-areas", required: true, maxlength: 40 %>
+      <datalist id="hh-areas"><% Chore.area_options.each do |area| %><option value="<%= area %>"><% end %></datalist>
     </div>
     <div>
-      <%= f.label :room, "Room (cleaning)" %>
-      <%= f.select :room, Chore::ROOMS, include_blank: "None" %>
+      <%= f.label :room, "Room (optional)" %>
+      <%= f.text_field :room, list: "hh-rooms", maxlength: 40 %>
+      <datalist id="hh-rooms"><% Chore.room_options.each do |room| %><option value="<%= room %>"><% end %></datalist>
     </div>
   </div>
 
