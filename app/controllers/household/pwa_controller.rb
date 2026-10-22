@@ -9,7 +9,7 @@ class Household::PwaController < ActionController::Base
   def manifest
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     render json: {
-      name: "Household", short_name: "Household", start_url: "/household", scope: "/household/", display: "standalone",
+      name: "Household", short_name: "Household", start_url: "/household", scope: "/household", display: "standalone",
       background_color: "#F8FAFD", theme_color: "#F8FAFD",
       icons: [
         { src: helpers.asset_path("android-192.png"), sizes: "192x192", type: "image/png" },
@@ -19,7 +19,7 @@ class Household::PwaController < ActionController::Base
   end
 
   def service_worker
-    response.headers["Service-Worker-Allowed"] = "/household/"
+    response.headers["Service-Worker-Allowed"] = "/household"
     render template: "household/pwa/service_worker", layout: false, content_type: "text/javascript", formats: [ :js ]
   end
 end

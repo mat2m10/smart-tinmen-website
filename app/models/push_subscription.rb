@@ -14,12 +14,12 @@ class PushSubscription < ApplicationRecord
     message = { title: title.to_s.truncate(80), options: { body: body.to_s.truncate(240), data: { path: path }, icon: ActionController::Base.helpers.asset_path("android-192.png") } }.to_json
     where(user: users).count do |subscription|
       WebPush.payload_send(message: message, endpoint: subscription.endpoint, p256dh: subscription.p256dh, auth: subscription.auth,
-                           vapid: keys, ttl: 12.hours.to_i, urgency: "normal")
+                           vapid: keys, ttl: 12.hours.to_i, urgency: "normal", open_timeout: 5, read_timeout: 10)
       true
     rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription
       subscription.destroy
       false
-    rescue WebPush::Error, SocketError, Timeout::Error, Errno::ECONNREFUSED => e
+    rescue StandardError => e # one bad device (network, TLS, malformed keys) must not stop the others
       Rails.logger.warn("Push to subscription #{subscription.id} failed: #{e.class}")
       false
     end

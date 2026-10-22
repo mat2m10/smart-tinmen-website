@@ -8,7 +8,7 @@ class Household::Ical
 
   def to_s
     lines = [ "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Smart Tinmen//Household//EN", "CALSCALE:GREGORIAN",
-              "METHOD:PUBLISH", "X-WR-CALNAME:#{text(@name)}", "X-WR-TIMEZONE:Europe/Amsterdam", "REFRESH-INTERVAL;VALUE=DURATION:PT1H" ]
+              "METHOD:PUBLISH", "X-WR-CALNAME:#{text(@name)}", "REFRESH-INTERVAL;VALUE=DURATION:PT1H" ]
     stamp = Time.current.utc.strftime("%Y%m%dT%H%M%SZ")
     @chores.each do |chore|
       owner = chore.assignee ? " (#{chore.assignee.display_name})" : ""
@@ -25,7 +25,7 @@ class Household::Ical
   private
 
   def text(value)
-    value.to_s.gsub("\\", "\\\\\\").gsub(";", "\;").gsub(",", "\\,").gsub(/\r?\n/, "\\n")
+    value.to_s.gsub("\\", "\\\\\\").gsub(";", "\\;").gsub(",", "\\,").gsub(/\r?\n/, "\\n")
   end
 
   # Lines longer than 75 octets continue on the next line after a space.

@@ -15,10 +15,16 @@ export default class extends Controller {
       }
       return
     }
-    this.registration = await navigator.serviceWorker.register("/household/service-worker.js", { scope: "/household/" })
-    const subscription = await this.registration.pushManager.getSubscription()
+    let subscription
+    try {
+      this.registration = await navigator.serviceWorker.register("/household/service-worker.js", { scope: "/household" })
+      subscription = await this.registration.pushManager.getSubscription()
+      if (subscription) await this.save(subscription)
+    } catch {
+      this.show("Notifications are not available right now.", false)
+      return
+    }
     if (subscription) {
-      await this.save(subscription)
       this.show("Notifications are on for this phone.", true, "Turn off")
     } else if (Notification.permission === "denied") {
       this.show("Notifications are blocked for this site in the browser settings.", false)

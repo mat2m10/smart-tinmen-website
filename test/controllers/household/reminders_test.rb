@@ -69,10 +69,10 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
   test "the manifest and service worker are public and scoped to /household" do
     get household_manifest_path
     assert_response :success
-    assert_equal "/household/", JSON.parse(response.body)["scope"]
+    assert_equal "/household", JSON.parse(response.body)["scope"]
     get household_service_worker_path
     assert_response :success
-    assert_equal "/household/", response.headers["Service-Worker-Allowed"]
+    assert_equal "/household", response.headers["Service-Worker-Allowed"]
     assert_includes response.body, "showNotification"
   end
 
@@ -110,7 +110,7 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     body = response.body.gsub("\r\n ", "")
     assert_includes body, "SUMMARY:Clean the toilet"
     assert_includes body, "DTSTART;VALUE=DATE:#{chores(:toilet).due_on.strftime("%Y%m%d")}"
-    assert_includes body, "Use gloves\\, the blue ones\; thanks"
+    assert_includes body, 'Use gloves\, the blue ones\; thanks'
     assert response.body.split("\r\n").all? { |line| line.bytesize <= 75 }
 
     get household_calendar_path(key: KEY, only: "planning")
