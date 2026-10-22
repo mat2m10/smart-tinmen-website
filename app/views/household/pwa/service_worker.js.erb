@@ -4,6 +4,8 @@ self.addEventListener("install", () => self.skipWaiting())
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()))
 self.addEventListener("push", event => {
   const { title, options } = event.data ? event.data.json() : { title: "Household", options: {} }
+  // No number badge on the app icon, just the notification.
+  if (self.navigator.clearAppBadge) self.navigator.clearAppBadge().catch(() => {})
   event.waitUntil(self.registration.showNotification(title, options))
 })
 

@@ -148,4 +148,19 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     assert_includes body, "DTSTART:20261103T133000Z"
     assert_includes body, "DTEND:20261103T143000Z"
   end
+
+  test "finishing or adding a chore tells the other member in one sentence" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    assert_enqueued_with(job: HouseholdPushJob, args: [ [ users(:bob).id ], "Test cleaned the toilet", "", household_root_path ]) do
+      post complete_household_chore_path(chore), params: { seen: chore.completions.count }
+    end
+    assert_no_enqueued_jobs(only: HouseholdPushJob) do
+      post complete_household_chore_path(chore), params: { seen: 0 } # stale double tap: already done
+      post claim_household_chore_path(chore)
+    end
+    assert_enqueued_with(job: HouseholdPushJob, args: [ [ users(:bob).id ], "Test added “Buy milk”", "", household_root_path ]) do
+      post household_chores_path, params: { chore: { title: "Buy milk", area: "Food", due_on: Date.current, repeat_unit: "none", repeat_every: 1, effort: 1 } }
+    end
+  end
 end
