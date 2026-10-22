@@ -23,7 +23,13 @@ export default class extends Controller {
   }
 
   // Posting while recording: stop, and send once the recording is ready.
+  // A second tap while it is finishing waits for the same send.
   submit(event) {
+    if (this.submitWhenReady) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
     if (this.recorder?.state !== "recording") return
     event.preventDefault()
     event.stopImmediatePropagation()
@@ -38,16 +44,18 @@ export default class extends Controller {
   }
 
   async start() {
-    this.discarding = false
-    this.file = null
-    this.statusTarget.textContent = "Recording…"
     this.panelTarget.hidden = false
+    this.statusTarget.textContent = "Starting the microphone…"
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     } catch {
-      this.statusTarget.textContent = "No access to the microphone"
+      // Keep an earlier recording: it is still attached and still shown.
+      this.statusTarget.textContent = this.file ? "No access to the microphone. The earlier voice note is kept." : "No access to the microphone"
       return
     }
+    this.discarding = false
+    this.file = null
+    this.forgetPreview()
     const type = [ "audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus" ].find(t => MediaRecorder.isTypeSupported(t))
     this.chunks = []
     this.recorder = new MediaRecorder(this.stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {})
@@ -70,8 +78,10 @@ export default class extends Controller {
     this.stream?.getTracks().forEach(track => track.stop())
   }
 
+  // Throws away the recording, also one that is still being finished
+  // (stop() was called but onstop has not fired yet). start() clears the flag.
   discard() {
-    this.discarding = this.recorder?.state === "recording"
+    this.discarding = true
     this.submitWhenReady = false
     this.file = null
     this.stop()
