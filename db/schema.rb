@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "attachments", force: :cascade do |t|
+    t.bigint "note_id", null: false
+    t.string "kind", null: false
+    t.string "content_type", null: false
+    t.integer "byte_size", null: false
+    t.binary "data", null: false
+    t.text "transcript"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["note_id"], name: "index_attachments_on_note_id"
+  end
 
   create_table "chores", force: :cascade do |t|
     t.string "area", default: "Home & repairs", null: false
@@ -49,6 +61,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.index ["user_id"], name: "index_completions_on_user_id"
   end
 
+  create_table "events", force: :cascade do |t|
+    t.string "action", null: false
+    t.bigint "user_id"
+    t.boolean "by_claude", default: false, null: false
+    t.bigint "chore_id"
+    t.bigint "note_id"
+    t.string "summary"
+    t.datetime "created_at", null: false
+    t.index ["user_id"], name: "index_events_on_user_id"
+  end
+
+  create_table "notes", force: :cascade do |t|
+    t.bigint "chore_id"
+    t.bigint "user_id"
+    t.boolean "from_claude", default: false, null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chore_id"], name: "index_notes_on_chore_id"
+    t.index ["created_at"], name: "index_notes_on_created_at"
+    t.index ["user_id"], name: "index_notes_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "avatar_url"
     t.datetime "created_at", null: false
@@ -58,8 +93,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "attachments", "notes", on_delete: :cascade
   add_foreign_key "chores", "users", column: "assignee_id"
   add_foreign_key "chores", "users", column: "created_by_id"
   add_foreign_key "completions", "chores"
   add_foreign_key "completions", "users"
+  add_foreign_key "events", "users", on_delete: :nullify
+  add_foreign_key "notes", "chores", on_delete: :nullify
+  add_foreign_key "notes", "users", on_delete: :nullify
 end

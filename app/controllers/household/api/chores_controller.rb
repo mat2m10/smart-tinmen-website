@@ -25,6 +25,7 @@ class Household::Api::ChoresController < Household::Api::BaseController
     end
 
     if chore.update(attrs)
+      Event.log!(status == :created ? "chore_added" : "chore_edited", by_claude: true, chore: chore)
       render json: chore.as_api_json, status: status
     else
       render json: { errors: chore.errors.full_messages }, status: :unprocessable_entity

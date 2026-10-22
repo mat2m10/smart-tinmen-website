@@ -1,0 +1,11 @@
+<% content_for :title, "Notes" %>
+<h1 class="hh-title">Notes</h1>
+<p class="hh-hint hh-intro">Anything worth remembering: what ran out, what is broken, a photo of a letter, a voice note on the way home. Claude reads these twice a day and turns them into tasks or answers here.</p>
+
+<%= render "composer", note: @note, placeholder: "What should the household know?" %>
+
+<% if @notes.any? %>
+  <ul class="hh-feed"><%= render partial: "note", collection: @notes, locals: { show_chore: true } %></ul>
+<% else %>
+  <p class="hh-empty">No notes yet.</p>
+<% end %>

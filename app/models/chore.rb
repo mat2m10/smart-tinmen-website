@@ -10,6 +10,8 @@ class Chore < ApplicationRecord
   belongs_to :assignee, class_name: "User", optional: true
   belongs_to :created_by, class_name: "User", optional: true
   has_many :completions, dependent: :destroy
+  # "notes" is the chore's own text field; the thread of Note records is "remarks".
+  has_many :remarks, class_name: "Note", dependent: :nullify
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :due_on, presence: true

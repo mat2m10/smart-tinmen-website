@@ -18,9 +18,15 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :notes, only: %i[index create destroy]
+    resources :attachments, only: :show
+
     namespace :api, defaults: { format: :json } do
       resources :chores, only: %i[index create update]
       get "completions" => "completions#index"
+      get "events" => "events#index"
+      resources :notes, only: %i[index create]
+      resources :attachments, only: %i[show update]
     end
   end
 end

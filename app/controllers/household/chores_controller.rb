@@ -5,7 +5,7 @@ class Household::ChoresController < Household::BaseController
 
   def index
     @filter = params[:show].presence_in(%w[mine free]) || "all"
-    chores = Chore.pending.includes(:assignee, :completions).order(:due_on, :title)
+    chores = Chore.pending.includes(:assignee, :completions, :remarks).order(:due_on, :title)
     chores = chores.where(assignee: current_user) if @filter == "mine"
     chores = chores.where(assignee_id: nil) if @filter == "free"
     @buckets = chores.group_by(&:bucket)
@@ -24,6 +24,7 @@ class Household::ChoresController < Household::BaseController
   def create
     @chore = Chore.new(chore_params.merge(created_by: current_user))
     if @chore.save
+      Event.log!("chore_added", user: current_user, chore: @chore)
       redirect_to household_root_path, notice: "Added: #{@chore.title}", status: :see_other
     else
       render :new, status: :unprocessable_entity
@@ -31,23 +32,25 @@ class Household::ChoresController < Household::BaseController
   end
 
   def edit
+    load_notes
   end
 
   def update
     if @chore.update(chore_params)
+      Event.log!("chore_edited", user: current_user, chore: @chore)
       redirect_to household_root_path, notice: "Saved: #{@chore.title}", status: :see_other
     else
+      load_notes
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @chore.destroy!
+    Event.log!("chore_deleted", user: current_user, chore: @chore)
     redirect_to household_root_path, notice: "Deleted: #{@chore.title}", status: :see_other
   end
 
-  # The button sends the due date it was showing, so a double tap (or a second
-  # phone with an old page) can't log the same chore twice.
   # The button sends how many times the chore had been done when the page was
   # shown, so a double tap or a second phone with an old page counts once.
   def complete
@@ -55,6 +58,7 @@ class Household::ChoresController < Household::BaseController
       next false if @chore.done_at? || (params[:seen].present? && params[:seen].to_i != @chore.completions.count)
 
       @chore.complete!(current_user)
+      Event.log!("chore_done", user: current_user, chore: @chore)
       true
     end
     notice = "#{done ? "Done" : "Already done"}: #{@chore.title}"
@@ -64,6 +68,7 @@ class Household::ChoresController < Household::BaseController
   # Take the chore, or let it go again if it is already yours.
   def claim
     @chore.update!(assignee: @chore.assignee == current_user ? nil : current_user)
+    Event.log!(@chore.assignee ? "chore_claimed" : "chore_released", user: current_user, chore: @chore)
     redirect_to household_root_path(show: filter_param), status: :see_other
   end
 
@@ -71,6 +76,11 @@ class Household::ChoresController < Household::BaseController
 
   def set_chore
     @chore = Chore.find(params[:id])
+  end
+
+  def load_notes
+    @notes = @chore.remarks.includes(:user, :attachments).order(:created_at, :id)
+    @note = Note.new(chore: @chore)
   end
 
   def filter_param
