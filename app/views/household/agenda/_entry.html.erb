@@ -1,0 +1,16 @@
+<li class="hh-agenda-item<%= " hh-agenda-item--forecast" if forecast %>">
+  <span class="hh-agenda-time"><%= chore.due_time || "All day" %></span>
+  <div class="hh-chore-main">
+    <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
+    <p class="hh-chore-meta">
+      <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %> · <%= chore.repeat_label %>
+      <% if chore.planning %><span class="hh-tag">planning</span><% end %>
+      <% if forecast %><span class="hh-tag" title="Moves when the chore is done earlier or later">expected</span><% end %>
+    </p>
+  </div>
+  <% if chore.assignee %>
+    <span class="hh-avatar hh-avatar--small" title="<%= chore.assignee.display_name %>"><%= chore.assignee.initial %></span>
+  <% else %>
+    <span class="hh-free">Up for grabs</span>
+  <% end %>
+</li>

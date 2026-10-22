@@ -21,6 +21,10 @@ class Chore < ApplicationRecord
   validates :repeat_every, numericality: { only_integer: true, in: 1..365 }
   validates :effort, inclusion: { in: EFFORTS.keys }
   validates :assignee, presence: true, unless: -> { assignee_id.nil? }
+  # Optional time of day ("14:30") for appointments; without it a chore is all-day.
+  validates :due_time, format: { with: /\A([01]\d|2[0-3]):[0-5]\d\z/ }, allow_nil: true
+
+  normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})(:\d{2})?\z/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
@@ -54,6 +58,22 @@ class Chore < ApplicationRecord
     date
   end
 
+  # The days in range this chore falls on: its due date, then (for repeating
+  # chores) the dates after it. Those later dates are a forecast: unless the
+  # schedule is fixed, they move when the chore is done early or late.
+  def occurrences(range)
+    dates = []
+    date = due_on
+    while date <= range.end
+      dates << date if range.cover?(date)
+      next_date = advance(date)
+      break if next_date <= date # one-off chores, and a guard against bad data
+
+      date = next_date
+    end
+    dates
+  end
+
   def bucket(today = Date.current)
     if due_on < today then :overdue
     elsif due_on == today then :today
@@ -78,7 +98,7 @@ class Chore < ApplicationRecord
 
   def as_api_json
     {
-      id: id, title: title, notes: notes, area: area, room: room, due_on: due_on,
+      id: id, title: title, notes: notes, area: area, room: room, due_on: due_on, due_time: due_time,
       repeat_unit: repeat_unit, repeat_every: repeat_every, fixed_schedule: fixed_schedule,
       effort: effort, planning: planning, assignee_email: assignee&.email,
       done_at: done_at, last_done_on: last_done_on, updated_at: updated_at

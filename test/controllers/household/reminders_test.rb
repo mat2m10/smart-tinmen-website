@@ -117,4 +117,35 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Find a GP"
     assert_not_includes response.body, "Clean the toilet"
   end
+
+  test "the agenda shows two weeks day by day, with repeats ahead, all-day items before timed ones" do
+    chores(:toilet).update!(due_on: Date.current)
+    chores(:gp).update!(due_on: Date.current, due_time: "09:15")
+    Chore.create!(title: "Old letter", area: "Admin", due_on: Date.current - 3)
+    sign_in("alice@example.com")
+    get household_agenda_path
+    assert_response :success
+    assert_select ".hh-group--overdue .hh-chore-title", "Old letter"
+    assert_select ".hh-agenda-day", 14
+    today = css_select(".hh-agenda-day").first
+    assert_equal [ "Clean the toilet", "Find a GP" ], today.css(".hh-chore-title").map(&:text)
+    assert_equal [ "All day", "09:15" ], today.css(".hh-agenda-time").map(&:text)
+    assert_select ".hh-agenda-item--forecast .hh-chore-title", "Clean the toilet"
+    Chore.create!(title: "Feed the cat", area: "Food", due_on: Date.current, repeat_unit: "day")
+    get household_agenda_path
+    assert_select ".hh-agenda-item .hh-chore-title", { text: "Feed the cat", count: 1 }
+
+    get household_agenda_path(from: (Date.current + 7).iso8601)
+    assert_select ".hh-group--overdue", 0
+    get household_agenda_path(from: "not-a-date")
+    assert_response :success
+  end
+
+  test "timed chores become one-hour events in the calendar feed, in UTC" do
+    chores(:gp).update!(due_on: Date.new(2026, 11, 3), due_time: "14:30")
+    get household_calendar_path(key: KEY)
+    body = response.body.gsub("\r\n ", "")
+    assert_includes body, "DTSTART:20261103T133000Z"
+    assert_includes body, "DTEND:20261103T143000Z"
+  end
 end

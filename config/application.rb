@@ -24,7 +24,8 @@ module SmartTinmenWebsite
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # The household lives in the Netherlands: "today" and due times follow Amsterdam.
+    config.time_zone = "Amsterdam"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -1,0 +1,35 @@
+<% content_for :title, "Agenda" %>
+
+<div class="hh-agenda-head">
+  <h1 class="hh-title"><%= @days.first.strftime("%-d %b") %> – <%= @days.last.strftime("%-d %b") %></h1>
+  <nav class="hh-agenda-pager" aria-label="Weeks">
+    <%= link_to household_agenda_path(from: (@from - 7).iso8601), class: "hh-icon-btn", aria: { label: "Earlier" } do %><span class="ms" aria-hidden="true">chevron_left</span><% end %>
+    <% unless @from == Date.current %><%= link_to "Today", household_agenda_path, class: "hh-btn hh-btn--text" %><% end %>
+    <%= link_to household_agenda_path(from: (@from + 7).iso8601), class: "hh-icon-btn", aria: { label: "Later" } do %><span class="ms" aria-hidden="true">chevron_right</span><% end %>
+  </nav>
+</div>
+
+<% if @overdue.any? %>
+  <section class="hh-group hh-group--overdue">
+    <h2>Overdue <span class="hh-count"><%= @overdue.size %></span></h2>
+    <ul class="hh-list">
+      <% @overdue.each do |chore| %><%= render "entry", chore: chore, forecast: false %><% end %>
+    </ul>
+  </section>
+<% end %>
+
+<% @days.each do |date| %>
+  <% entries = @entries[date] %>
+  <section class="hh-agenda-day<%= " hh-agenda-day--weekend" if date.on_weekend? %><%= " hh-agenda-day--empty" if entries.empty? %>">
+    <h2><%= agenda_day_label(date) %></h2>
+    <% if entries.any? %>
+      <ul class="hh-list">
+        <% entries.each do |entry| %><%= render "entry", chore: entry[:chore], forecast: entry[:forecast] %><% end %>
+      </ul>
+    <% end %>
+  </section>
+<% end %>
+
+<p class="hh-hint">"Expected" dates are a forecast: a repeating chore moves when it is done earlier or later, unless it keeps a fixed date.</p>
+
+<%= link_to new_household_chore_path, class: "hh-fab", aria: { label: "Add a task" } do %><span class="ms" aria-hidden="true">add</span><span>Add</span><% end %>

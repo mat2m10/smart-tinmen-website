@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       end
     end
 
+    get "agenda" => "agenda#show", as: :agenda
     resources :notes, only: %i[index create destroy]
     resource :push_subscription, only: %i[create destroy]
     get "manifest.webmanifest" => "pwa#manifest", as: :manifest

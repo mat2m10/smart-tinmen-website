@@ -38,10 +38,11 @@ class Household::ApiTest < ActionDispatch::IntegrationTest
     chore = Chore.find_by!(title: "Clean the oven")
     assert_equal users(:alice), chore.assignee
 
-    patch household_api_chore_path(chore), headers: auth, as: :json, params: { chore: { assignee_email: "", effort: 2 } }
+    patch household_api_chore_path(chore), headers: auth, as: :json, params: { chore: { assignee_email: "", effort: 2, due_time: "10:00" } }
     assert_response :success
     assert_nil chore.reload.assignee
     assert_equal 2, chore.effort
+    assert_equal "10:00", response.parsed_body["due_time"]
   end
 
   test "rejects an unknown assignee and invalid data" do

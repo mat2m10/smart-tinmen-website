@@ -90,6 +90,6 @@ class Household::ChoresController < Household::BaseController
   end
 
   def chore_params
-    params.expect(chore: %i[title notes area room due_on repeat_unit repeat_every fixed_schedule effort planning assignee_id])
+    params.expect(chore: %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning assignee_id])
   end
 end
