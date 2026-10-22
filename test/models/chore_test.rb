@@ -117,4 +117,14 @@ class ChoreTest < ActiveSupport::TestCase
     chore.update!(due_time: "09:00")
     assert_enqueued_with(job: HouseholdCalendarJob, args: [ chore.id ]) { chore.destroy! }
   end
+
+  test "a personal chore needs an owner and is hidden from the other member" do
+    chore = chores(:gp)
+    assert_not chore.update(personal: true, assignee: nil)
+    chore.update!(personal: true, assignee: users(:bob))
+    assert_includes Chore.visible_to(users(:bob)), chore
+    assert_not_includes Chore.visible_to(users(:alice)), chore
+    assert_includes Chore.visible_to(users(:alice)), chores(:toilet)
+    assert_empty chore.audience(except: users(:bob))
+  end
 end

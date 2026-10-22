@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     @old = ENV["HOUSEHOLD_EMAILS"]
     ENV["HOUSEHOLD_EMAILS"] = "alice@example.com,bob@example.com"
@@ -126,5 +128,57 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     delete household_logout_path
     get household_root_path
     assert_redirected_to household_login_path
+  end
+
+  test "a personal chore is only seen by its owner" do
+    sign_in("alice@example.com")
+    assert_no_enqueued_jobs(only: HouseholdPushJob) do
+      post household_chores_path, params: { chore: { title: "Renew my passport", area: "Admin", due_on: Date.current, due_time: "10:00", personal: "1" } }
+    end
+    chore = Chore.find_by!(title: "Renew my passport")
+    assert chore.personal
+    assert_equal users(:alice), chore.assignee
+    get household_root_path
+    assert_select ".hh-chore-title", text: "Renew my passport"
+    get household_agenda_path
+    assert_select ".hh-chore-title", text: "Renew my passport"
+
+    sign_in("bob@example.com")
+    get household_root_path
+    assert_select ".hh-chore-title", text: "Renew my passport", count: 0
+    get household_agenda_path
+    assert_select ".hh-chore-title", text: "Renew my passport", count: 0
+    get edit_household_chore_path(chore)
+    assert_response :not_found
+    post complete_household_chore_path(chore)
+    assert_response :not_found
+    assert_nil chore.reload.done_at
+  end
+
+  test "finishing a personal chore tells no one and leaves the balance alone" do
+    chore = chores(:gp)
+    chore.update!(personal: true, assignee: users(:alice))
+    sign_in("alice@example.com")
+    assert_no_enqueued_jobs(only: HouseholdPushJob) { post complete_household_chore_path(chore) }
+    assert chore.reload.done_at
+    get household_root_path
+    assert_select ".hh-bar-value", text: /\A0 points/, count: 2
+  end
+
+  test "a personal chore cannot be released to the household" do
+    chore = chores(:gp)
+    chore.update!(personal: true, assignee: users(:bob))
+    sign_in("bob@example.com")
+    post claim_household_chore_path(chore)
+    assert_equal users(:bob), chore.reload.assignee
+  end
+
+  test "someone else's chore cannot be made personal" do
+    chore = chores(:gp)
+    sign_in("alice@example.com")
+    patch household_chore_path(chore), params: { chore: { personal: "1" } }
+    assert_response :unprocessable_entity
+    assert_not chore.reload.personal
+    assert_equal users(:bob), chore.assignee
   end
 end

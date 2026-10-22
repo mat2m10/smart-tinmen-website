@@ -5,17 +5,18 @@ class Household::ChoresController < Household::BaseController
 
   def index
     @filter = params[:show].presence_in(%w[mine free]) || "all"
-    chores = Chore.pending.includes(:assignee, :completions, :remarks).order(:due_on, :title)
+    chores = Chore.visible_to(current_user).pending.includes(:assignee, :completions, :remarks).order(:due_on, :title)
     chores = chores.where(assignee: current_user) if @filter == "mine"
     chores = chores.where(assignee_id: nil) if @filter == "free"
     @buckets = chores.group_by(&:bucket)
 
-    recent = Completion.where(completed_on: 30.days.ago.to_date..)
+    # The balance compares shared work only; personal chores count for no one.
+    recent = Completion.where(completed_on: 30.days.ago.to_date.., chore: Chore.shared)
     @users = User.order(:name, :email)
     @effort = recent.group(:user_id).sum(:effort)
     @planning = recent.where(planning: true).group(:user_id).count
-    @recently_done = Completion.includes(:chore, :user).order(created_at: :desc).limit(8)
-    @latest_notes = Note.includes(:user, :chore, :attachments).recent_first.limit(3)
+    @recently_done = Completion.where(chore: Chore.visible_to(current_user)).includes(:chore, :user).order(created_at: :desc).limit(8)
+    @latest_notes = Note.visible_to(current_user).includes(:user, :chore, :attachments).recent_first.limit(3)
     @note = Note.new
   end
 
@@ -25,6 +26,7 @@ class Household::ChoresController < Household::BaseController
 
   def create
     @chore = Chore.new(chore_params.merge(created_by: current_user))
+    @chore.assignee = current_user if @chore.personal
     if @chore.save
       Event.log!("chore_added", user: current_user, chore: @chore)
       notify_others("#{current_user.display_name} added “#{@chore.title}”")
@@ -39,7 +41,14 @@ class Household::ChoresController < Household::BaseController
   end
 
   def update
-    if @chore.update(chore_params)
+    @chore.assign_attributes(chore_params)
+    if @chore.personal
+      # Only your own or a free chore can become personal, or it would vanish for its owner.
+      owner_id = @chore.assignee_id_in_database
+      @chore.errors.add(:base, "Only your own chores or ones up for grabs can be personal") if owner_id && owner_id != current_user.id
+      @chore.assignee = current_user
+    end
+    if @chore.errors.empty? && @chore.save
       Event.log!("chore_edited", user: current_user, chore: @chore)
       redirect_to household_root_path, notice: "Saved: #{@chore.title}", status: :see_other
     else
@@ -69,8 +78,11 @@ class Household::ChoresController < Household::BaseController
     redirect_to household_root_path(show: filter_param), notice: notice, status: :see_other
   end
 
-  # Take the chore, or let it go again if it is already yours.
+  # Take the chore, or let it go again if it is already yours. A personal
+  # chore always stays with its owner.
   def claim
+    return redirect_to(household_root_path(show: filter_param), status: :see_other) if @chore.personal
+
     @chore.update!(assignee: @chore.assignee == current_user ? nil : current_user)
     Event.log!(@chore.assignee ? "chore_claimed" : "chore_released", user: current_user, chore: @chore)
     redirect_to household_root_path(show: filter_param), status: :see_other
@@ -79,7 +91,7 @@ class Household::ChoresController < Household::BaseController
   private
 
   def set_chore
-    @chore = Chore.find(params[:id])
+    @chore = Chore.visible_to(current_user).find(params[:id])
   end
 
   def load_notes
@@ -87,9 +99,11 @@ class Household::ChoresController < Household::BaseController
     @note = Note.new(chore: @chore)
   end
 
-  # One plain sentence, no body: "Matthieu emptied the dishwasher".
+  # One plain sentence, no body: "Matthieu emptied the dishwasher". Personal
+  # chores stay quiet.
   def notify_others(sentence)
-    HouseholdPushJob.perform_later(User.where.not(id: current_user.id).ids, sentence, "", household_root_path)
+    ids = @chore.audience(except: current_user).ids
+    HouseholdPushJob.perform_later(ids, sentence, "", household_root_path) if ids.any?
   end
 
   def filter_param
@@ -97,6 +111,6 @@ class Household::ChoresController < Household::BaseController
   end
 
   def chore_params
-    params.expect(chore: %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning assignee_id])
+    params.expect(chore: %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning assignee_id personal])
   end
 end

@@ -8,7 +8,7 @@ class Household::AgendaController < Household::BaseController
     today = Date.current
     @from = parse_date(params[:from])&.clamp(today - 365, today + 365) || today
     @days = @from...(@from + DAYS)
-    chores = Chore.pending.includes(:assignee).order(:due_on, :title).to_a
+    chores = Chore.visible_to(current_user).pending.includes(:assignee).order(:due_on, :title).to_a
     @overdue = @from == today ? chores.select { |chore| chore.due_on < today } : []
 
     @entries = Hash.new { |hash, key| hash[key] = [] }

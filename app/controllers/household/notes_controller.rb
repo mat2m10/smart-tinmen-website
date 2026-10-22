@@ -1,20 +1,21 @@
 # Loose notes for the household, and remarks on a chore, with photos and a voice note.
 class Household::NotesController < Household::BaseController
   def index
-    @notes = Note.includes(:user, :chore, :attachments).recent_first.limit(50)
+    @notes = Note.visible_to(current_user).includes(:user, :chore, :attachments).recent_first.limit(50)
     @note = Note.new
   end
 
   def create
     @note = Note.new(body: note_params[:body], user: current_user)
-    @note.chore = Chore.find(note_params[:chore_id]) if note_params[:chore_id].present?
+    @note.chore = Chore.visible_to(current_user).find(note_params[:chore_id]) if note_params[:chore_id].present?
     Array(note_params[:photos]).compact_blank.first(Note::MAX_PHOTOS).each { |file| @note.attachments << Attachment.from_upload("photo", file) }
     @note.attachments << Attachment.from_upload("voice", note_params[:voice]) if note_params[:voice].present?
 
     if @note.attachments.all?(&:valid?) && @note.save
       summary = @note.body.presence || "(#{@note.attachments.map(&:kind).tally.map { |k, n| "#{n} #{k}" }.join(", ")})"
       Event.log!("note_added", user: current_user, note: @note, summary: summary)
-      HouseholdPushJob.perform_later(User.where.not(id: current_user.id).ids, "#{current_user.display_name} added a note", summary, back_path)
+      others = @note.chore ? @note.chore.audience(except: current_user) : User.where.not(id: current_user.id)
+      HouseholdPushJob.perform_later(others.ids, "#{current_user.display_name} added a note", summary, back_path) if others.exists?
       redirect_to back_path, notice: "Note added", status: :see_other
     else
       problems = (@note.errors.full_messages + @note.attachments.flat_map { |a| a.errors.full_messages }).uniq
@@ -23,7 +24,8 @@ class Household::NotesController < Household::BaseController
   end
 
   def destroy
-    note = Note.where(user: current_user).or(Note.where(from_claude: true)).find(params[:id])
+    notes = Note.visible_to(current_user)
+    note = notes.where(user: current_user).or(notes.where(from_claude: true)).find(params[:id])
     note.destroy!
     redirect_to back_path(note.chore), notice: "Note deleted", status: :see_other
   end

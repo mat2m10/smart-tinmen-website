@@ -12,12 +12,12 @@
     <div>
       <%= f.label :area %>
       <%= f.text_field :area, list: "hh-areas", required: true, maxlength: 40 %>
-      <datalist id="hh-areas"><% Chore.area_options.each do |area| %><option value="<%= area %>"><% end %></datalist>
+      <datalist id="hh-areas"><% Chore.visible_to(current_user).area_options.each do |area| %><option value="<%= area %>"><% end %></datalist>
     </div>
     <div>
       <%= f.label :room, "Room (optional)" %>
       <%= f.text_field :room, list: "hh-rooms", maxlength: 40 %>
-      <datalist id="hh-rooms"><% Chore.room_options.each do |room| %><option value="<%= room %>"><% end %></datalist>
+      <datalist id="hh-rooms"><% Chore.visible_to(current_user).room_options.each do |room| %><option value="<%= room %>"><% end %></datalist>
     </div>
   </div>
 
@@ -34,6 +34,7 @@
 
   <%= f.label :assignee_id, "Owner" %>
   <%= f.select :assignee_id, User.order(:name, :email).map { |u| [ u.display_name, u.id ] }, include_blank: "Up for grabs" %>
+  <label class="hh-check"><%= f.check_box :personal %> Personal: only for me, the others don't see it</label>
 
   <div class="hh-row">
     <div>

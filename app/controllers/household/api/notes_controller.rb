@@ -17,7 +17,8 @@ class Household::Api::NotesController < Household::Api::BaseController
 
     if note.save
       Event.log!("note_added", by_claude: true, note: note, summary: note.body)
-      HouseholdPushJob.perform_later(User.ids, "Claude", note.body, note.chore ? "/household/chores/#{note.chore_id}/edit#notes" : "/household/notes")
+      # A remark on a personal chore only reaches its owner.
+      HouseholdPushJob.perform_later(note.chore&.personal ? [ note.chore.assignee_id ] : User.ids, "Claude", note.body, note.chore ? "/household/chores/#{note.chore_id}/edit#notes" : "/household/notes")
       render json: note.as_api_json, status: :created
     else
       render json: { errors: note.errors.full_messages }, status: :unprocessable_entity
