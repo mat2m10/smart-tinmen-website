@@ -1,12 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Records a voice note in the browser and puts it in the form's file field.
+// Records a voice note in the browser and adds it to the form when it is sent
+// (through the formdata event, so it doesn't depend on setting input.files).
+// Posting while still recording stops first, then sends.
 // Without MediaRecorder the plain "Audio file" picker stays visible instead.
 export default class extends Controller {
   static targets = [ "start", "stop", "input", "fallback", "panel", "status", "preview", "dot" ]
   static values = { maxSeconds: { type: Number, default: 300 } }
 
   connect() {
+    this.attach = this.attach.bind(this)
+    this.element.addEventListener("formdata", this.attach)
     if (window.MediaRecorder && navigator.mediaDevices?.getUserMedia) {
       this.startTarget.hidden = false
       this.fallbackTarget.hidden = true
@@ -14,11 +18,28 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.element.removeEventListener("formdata", this.attach)
     this.stop()
+  }
+
+  // Posting while recording: stop, and send once the recording is ready.
+  submit(event) {
+    if (this.recorder?.state !== "recording") return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    this.submitWhenReady = true
+    this.statusTarget.textContent = "Finishing the recording…"
+    this.stop()
+  }
+
+  attach(event) {
+    const chosen = event.formData.get(this.inputTarget.name)
+    if (this.file && !(chosen instanceof File && chosen.size > 0)) event.formData.set(this.inputTarget.name, this.file, this.file.name)
   }
 
   async start() {
     this.discarding = false
+    this.file = null
     this.statusTarget.textContent = "Recording…"
     this.panelTarget.hidden = false
     try {
@@ -51,6 +72,8 @@ export default class extends Controller {
 
   discard() {
     this.discarding = this.recorder?.state === "recording"
+    this.submitWhenReady = false
+    this.file = null
     this.stop()
     this.inputTarget.value = ""
     this.forgetPreview()
@@ -71,17 +94,24 @@ export default class extends Controller {
     this.dotTarget.hidden = true
     if (this.discarding) { this.discarding = false; return }
 
-    const type = (this.recorder.mimeType || "audio/webm").split(";")[0]
+    const type = (this.recorder.mimeType || this.chunks[0]?.type || "audio/webm").split(";")[0]
     const extension = type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm"
     const file = new File(this.chunks, `voice-note.${extension}`, { type })
-    const files = new DataTransfer()
-    files.items.add(file)
-    this.inputTarget.files = files.files
+    if (file.size === 0) {
+      this.submitWhenReady = false
+      this.statusTarget.textContent = "Nothing was recorded. Check that the browser may use the microphone, then try again."
+      return
+    }
+    this.file = file
 
     this.statusTarget.textContent = "Voice note ready"
     this.forgetPreview()
     this.previewTarget.src = URL.createObjectURL(file)
     this.previewTarget.hidden = false
+    if (this.submitWhenReady) {
+      this.submitWhenReady = false
+      this.element.requestSubmit()
+    }
   }
 
   forgetPreview() {

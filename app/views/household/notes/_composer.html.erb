@@ -1,4 +1,4 @@
-<%= form_with model: note, url: household_notes_path, class: "hh-card hh-composer", multipart: true, data: { controller: "photo-picker recorder" } do |f| %>
+<%= form_with model: note, url: household_notes_path, class: "hh-card hh-composer", multipart: true, data: { controller: "photo-picker recorder", action: "submit->recorder#submit" } do |f| %>
   <%= f.hidden_field :chore_id %>
   <%= f.label :body, placeholder, class: "hh-visually-hidden" %>
   <%= f.text_area :body, rows: 3, placeholder: placeholder, maxlength: 5000 %>
