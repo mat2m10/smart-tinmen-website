@@ -6,6 +6,9 @@
       · <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %>
       · <%= chore.repeat_label %> · <%= chore.effort_label %>
       <% if chore.planning %><span class="hh-tag">planning</span><% end %>
+      <% if chore.remarks.any? %>
+        <%= link_to edit_household_chore_path(chore, anchor: "notes"), class: "hh-note-count", title: pluralize(chore.remarks.size, "note") do %><span class="ms" aria-hidden="true">chat_bubble</span><%= chore.remarks.size %><% end %>
+      <% end %>
     </p>
   </div>
   <div class="hh-chore-actions">
@@ -14,7 +17,7 @@
     <% else %>
       <span class="hh-free">Up for grabs</span>
     <% end %>
-    <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn" %>
-    <%= button_to "Done", complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--primary" %>
+    <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--text" %>
+    <%= button_to complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">check</span>Done<% end %>
   </div>
 </li>

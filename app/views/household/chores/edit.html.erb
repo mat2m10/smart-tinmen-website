@@ -1,7 +1,16 @@
 <% content_for :title, @chore.title %>
-<header class="hh-top"><h1>Edit task</h1></header>
-<%= render "form", chore: @chore %>
+<h1 class="hh-title">Edit task</h1>
+<div class="hh-card"><%= render "form", chore: @chore %></div>
 <% if (last = @chore.last_done_on) %>
   <p class="hh-hint">Last done <%= last.strftime("%-d %b %Y") %>.</p>
 <% end %>
-<%= button_to "Delete this task", household_chore_path(@chore), method: :delete, class: "hh-btn hh-btn--danger", form: { data: { turbo_confirm: "Delete \"#{@chore.title}\"?" } } %>
+
+<section id="notes" class="hh-thread">
+  <h2>Notes</h2>
+  <% if @notes.any? %>
+    <ul class="hh-feed"><%= render partial: "household/notes/note", collection: @notes, locals: { show_chore: false } %></ul>
+  <% end %>
+  <%= render "household/notes/composer", note: @note, placeholder: "Add a remark, a photo or a voice note…" %>
+</section>
+
+<%= button_to household_chore_path(@chore), method: :delete, class: "hh-btn hh-btn--danger", form: { data: { turbo_confirm: "Delete \"#{@chore.title}\"?" } } do %><span class="ms" aria-hidden="true">delete</span>Delete this task<% end %>

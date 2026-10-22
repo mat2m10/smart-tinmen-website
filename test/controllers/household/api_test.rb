@@ -57,4 +57,43 @@ class Household::ApiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal [ "bob@example.com" ], response.parsed_body.map { |c| c["user_email"] }
   end
+
+  test "lists events after a given id" do
+    first = Event.log!("chore_done", user: users(:alice), chore: chores(:toilet))
+    second = Event.log!("note_added", user: users(:bob), summary: "Out of milk")
+    get household_api_events_path(after: first.id), headers: auth
+    assert_response :success
+    assert_equal [ second.id ], response.parsed_body.map { |e| e["id"] }
+    assert_equal "bob@example.com", response.parsed_body.first["actor"]
+  end
+
+  test "Claude posts a note, reads notes with their files, and adds a transcript" do
+    post household_api_notes_path, headers: auth, as: :json, params: { note: { body: "Added 'buy milk' for Saturday", chore_id: chores(:toilet).id } }
+    assert_response :created
+    assert Note.last.from_claude
+    assert Event.last.by_claude
+
+    voice = Note.create!(user: users(:alice), body: "listen").attachments.create!(kind: "voice", content_type: "audio/webm", byte_size: 4, data: "abcd")
+    get household_api_notes_path(ids: voice.note_id), headers: auth
+    assert_equal "voice", response.parsed_body.first["attachments"].first["kind"]
+
+    get household_api_attachment_path(voice), headers: auth
+    assert_response :success
+    assert_equal "abcd", response.body
+
+    patch household_api_attachment_path(voice), headers: auth, as: :json, params: { attachment: { transcript: "We need milk" } }
+    assert_response :success
+    assert_equal "We need milk", voice.reload.transcript
+    assert_equal "transcript_added", Event.last.action
+  end
+
+  test "Claude can't attach a note to a chore that doesn't exist" do
+    post household_api_notes_path, headers: auth, as: :json, params: { note: { body: "hi", chore_id: 0 } }
+    assert_response :unprocessable_entity
+  end
+
+  test "chores changed through the API are logged as Claude" do
+    patch household_api_chore_path(chores(:toilet)), headers: auth, as: :json, params: { chore: { effort: 2 } }
+    assert_equal [ true ], Event.pluck(:by_claude)
+  end
 end

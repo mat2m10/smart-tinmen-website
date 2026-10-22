@@ -1,16 +1,9 @@
-<header class="hh-top">
-  <h1>Household</h1>
-  <div class="hh-me">
-    <span class="hh-avatar" title="<%= current_user.display_name %>"><%= current_user.initial %></span>
-    <%= button_to "Sign out", household_logout_path, method: :delete, class: "hh-link" %>
-  </div>
-</header>
-
-<nav class="hh-tabs" aria-label="Filter">
+<nav class="hh-chips" aria-label="Filter">
   <% { "all" => "Everything", "mine" => "Mine", "free" => "Up for grabs" }.each do |key, label| %>
-    <%= link_to label, household_root_path(show: (key unless key == "all")), class: "hh-tab", aria: { current: (@filter == key ? "page" : nil) } %>
+    <%= link_to household_root_path(show: (key unless key == "all")), class: "hh-chip", aria: { current: (@filter == key ? "page" : nil) } do %>
+      <% if @filter == key %><span class="ms" aria-hidden="true">check</span><% end %><%= label %>
+    <% end %>
   <% end %>
-  <%= link_to "+ Add", new_household_chore_path, class: "hh-btn hh-btn--primary hh-add" %>
 </nav>
 
 <% if @buckets.empty? %>
@@ -33,7 +26,7 @@
   <% end %>
 <% end %>
 
-<section class="hh-balance">
+<section class="hh-card hh-balance">
   <h2>Last 30 days</h2>
   <% max = [ @effort.values.max.to_i, 1 ].max %>
   <% @users.each do |user| %>
@@ -54,3 +47,5 @@
     </ul>
   <% end %>
 </section>
+
+<%= link_to new_household_chore_path, class: "hh-fab", aria: { label: "Add a task" } do %><span class="ms" aria-hidden="true">add</span><span>Add</span><% end %>

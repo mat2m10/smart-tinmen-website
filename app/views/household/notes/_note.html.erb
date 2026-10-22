@@ -1,0 +1,27 @@
+<li class="hh-note<%= " hh-note--claude" if note.from_claude %>">
+  <span class="hh-avatar<%= " hh-avatar--claude" if note.from_claude %>" aria-hidden="true"><%= note.author_initial %></span>
+  <div class="hh-note-main">
+    <p class="hh-note-head">
+      <strong><%= note.author_name %></strong>
+      <time datetime="<%= note.created_at.iso8601 %>"><%= l(note.created_at, format: "%-d %b, %H:%M") %></time>
+      <% if show_chore && note.chore %>
+        · <%= link_to note.chore.title, edit_household_chore_path(note.chore, anchor: "notes") %>
+      <% end %>
+    </p>
+    <% if note.body.present? %><p class="hh-note-body"><%= simple_format(note.body, {}, wrapper_tag: "span") %></p><% end %>
+    <% if note.photos.any? %>
+      <div class="hh-photos">
+        <% note.photos.each do |photo| %>
+          <%= link_to household_attachment_path(photo), target: "_blank", rel: "noopener" do %><img src="<%= household_attachment_path(photo) %>" alt="Photo" loading="lazy"><% end %>
+        <% end %>
+      </div>
+    <% end %>
+    <% note.voices.each do |voice| %>
+      <audio controls preload="none" src="<%= household_attachment_path(voice) %>"></audio>
+      <% if voice.transcript.present? %><p class="hh-transcript">“<%= voice.transcript %>”</p><% end %>
+    <% end %>
+  </div>
+  <% if note.from_claude || note.user == current_user %>
+    <%= button_to household_note_path(note), method: :delete, class: "hh-icon-btn", aria: { label: "Delete note" }, form: { data: { turbo_confirm: "Delete this note?" } } do %><span class="ms" aria-hidden="true">delete</span><% end %>
+  <% end %>
+</li>

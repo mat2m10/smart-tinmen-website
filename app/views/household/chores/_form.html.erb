@@ -57,7 +57,7 @@
   <%= f.text_area :notes, rows: 4 %>
 
   <div class="hh-form-actions">
-    <%= f.submit chore.new_record? ? "Add" : "Save", class: "hh-btn hh-btn--primary" %>
-    <%= link_to "Cancel", household_root_path, class: "hh-link" %>
+    <%= f.submit chore.new_record? ? "Add" : "Save", class: "hh-btn hh-btn--filled" %>
+    <%= link_to "Cancel", household_root_path, class: "hh-btn hh-btn--text" %>
   </div>
 <% end %>
