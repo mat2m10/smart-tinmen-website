@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :created_chores, class_name: "Chore", foreign_key: :created_by_id, inverse_of: :created_by, dependent: :nullify
   has_many :completions, dependent: :nullify
   has_many :notes, dependent: :nullify
+  has_many :push_subscriptions, dependent: :delete_all
 
   normalizes :email, with: ->(email) { email.strip.downcase }
   validates :email, presence: true, uniqueness: true

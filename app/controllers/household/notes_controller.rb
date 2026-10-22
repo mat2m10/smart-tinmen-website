@@ -12,7 +12,9 @@ class Household::NotesController < Household::BaseController
     @note.attachments << Attachment.from_upload("voice", note_params[:voice]) if note_params[:voice].present?
 
     if @note.attachments.all?(&:valid?) && @note.save
-      Event.log!("note_added", user: current_user, note: @note, summary: @note.body.presence || "(#{@note.attachments.map(&:kind).tally.map { |k, n| "#{n} #{k}" }.join(", ")})")
+      summary = @note.body.presence || "(#{@note.attachments.map(&:kind).tally.map { |k, n| "#{n} #{k}" }.join(", ")})"
+      Event.log!("note_added", user: current_user, note: @note, summary: summary)
+      HouseholdPushJob.perform_later(User.where.not(id: current_user.id).ids, "#{current_user.display_name} added a note", summary, back_path)
       redirect_to back_path, notice: "Note added", status: :see_other
     else
       problems = (@note.errors.full_messages + @note.attachments.flat_map { |a| a.errors.full_messages }).uniq
@@ -33,6 +35,8 @@ class Household::NotesController < Household::BaseController
   end
 
   def back_path(chore = @note&.chore)
+    return household_root_path if params[:return_to] == "board"
+
     chore ? edit_household_chore_path(chore, anchor: "notes") : household_notes_path
   end
 end

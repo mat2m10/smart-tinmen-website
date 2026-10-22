@@ -1,0 +1,21 @@
+// Household service worker: shows notifications and opens the right page.
+// Its scope is "/household" (no slash) so the board itself is controlled.
+self.addEventListener("install", () => self.skipWaiting())
+self.addEventListener("activate", event => event.waitUntil(self.clients.claim()))
+self.addEventListener("push", event => {
+  const { title, options } = event.data ? event.data.json() : { title: "Household", options: {} }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close()
+  const path = (event.notification.data && event.notification.data.path) || "/household"
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(windows => {
+      const open = windows.find(client => new URL(client.url).pathname.startsWith("/household"))
+      if (!open) return clients.openWindow(path)
+      // navigate() only works on pages this worker controls; otherwise open a window.
+      return open.navigate(path).then(client => client && client.focus()).catch(() => open.focus().then(() => clients.openWindow(path)))
+    })
+  )
+})
