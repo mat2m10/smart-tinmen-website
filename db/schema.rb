@@ -10,7 +10,56 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 0) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
+
+  create_table "chores", force: :cascade do |t|
+    t.string "area", default: "Home & repairs", null: false
+    t.bigint "assignee_id"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.datetime "done_at"
+    t.date "due_on", null: false
+    t.integer "effort", default: 1, null: false
+    t.boolean "fixed_schedule", default: false, null: false
+    t.text "notes"
+    t.boolean "planning", default: false, null: false
+    t.integer "repeat_every", default: 1, null: false
+    t.string "repeat_unit", default: "none", null: false
+    t.string "room"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assignee_id"], name: "index_chores_on_assignee_id"
+    t.index ["created_by_id"], name: "index_chores_on_created_by_id"
+    t.index ["done_at"], name: "index_chores_on_done_at"
+    t.index ["due_on"], name: "index_chores_on_due_on"
+  end
+
+  create_table "completions", force: :cascade do |t|
+    t.bigint "chore_id", null: false
+    t.date "completed_on", null: false
+    t.datetime "created_at", null: false
+    t.integer "effort", default: 1, null: false
+    t.boolean "planning", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["chore_id"], name: "index_completions_on_chore_id"
+    t.index ["completed_on"], name: "index_completions_on_completed_on"
+    t.index ["user_id"], name: "index_completions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "avatar_url"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "chores", "users", column: "assignee_id"
+  add_foreign_key "chores", "users", column: "created_by_id"
+  add_foreign_key "completions", "chores"
+  add_foreign_key "completions", "users"
 end

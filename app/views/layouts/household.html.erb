@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? "#{yield(:title)} · Household" : "Household" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0D1615" media="(prefers-color-scheme: dark)">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" href="<%= asset_path('favicon.ico') %>" sizes="any">
+    <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('apple-touch-icon-180.png') %>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="hh">
+    <main class="hh-page">
+      <% flash.each do |type, message| %>
+        <p class="hh-flash hh-flash--<%= type %>" role="status"><%= message %></p>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
