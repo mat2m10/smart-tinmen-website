@@ -1,5 +1,5 @@
-# Builds an iCalendar (RFC 5545) document with one all-day event per chore,
-# on its next due date.
+# Builds an iCalendar (RFC 5545) document with one event per chore, on its
+# next due date: all-day, or one hour from its time when it has one.
 class Household::Ical
   def initialize(chores, name:)
     @chores = chores
@@ -14,15 +14,25 @@ class Household::Ical
       owner = chore.assignee ? " (#{chore.assignee.display_name})" : ""
       details = [ chore.area, chore.room, chore.repeat_label, chore.effort_label, chore.notes ].compact_blank.join(" · ")
       lines += [ "BEGIN:VEVENT", "UID:chore-#{chore.id}@smarttinmen.com", "DTSTAMP:#{stamp}",
-                 "DTSTART;VALUE=DATE:#{chore.due_on.strftime("%Y%m%d")}", "DTEND;VALUE=DATE:#{(chore.due_on + 1).strftime("%Y%m%d")}",
-                 "SUMMARY:#{text(chore.title + owner)}", "DESCRIPTION:#{text(details)}",
-                 "URL:https://smarttinmen.com/household/chores/#{chore.id}/edit", "TRANSP:TRANSPARENT", "END:VEVENT" ]
+                 *when_lines(chore), "SUMMARY:#{text(chore.title + owner)}", "DESCRIPTION:#{text(details)}",
+                 "URL:https://smarttinmen.com/household/chores/#{chore.id}/edit", "END:VEVENT" ]
     end
     lines << "END:VCALENDAR"
     lines.map { |line| fold(line) }.join("\r\n") + "\r\n"
   end
 
   private
+
+  # Timed chores are written in UTC so no VTIMEZONE block is needed; all-day
+  # chores don't block time in the calendar.
+  def when_lines(chore)
+    if chore.due_time
+      start = Time.zone.parse("#{chore.due_on} #{chore.due_time}").utc
+      [ "DTSTART:#{start.strftime("%Y%m%dT%H%M%SZ")}", "DTEND:#{(start + 1.hour).strftime("%Y%m%dT%H%M%SZ")}" ]
+    else
+      [ "DTSTART;VALUE=DATE:#{chore.due_on.strftime("%Y%m%d")}", "DTEND;VALUE=DATE:#{(chore.due_on + 1).strftime("%Y%m%d")}", "TRANSP:TRANSPARENT" ]
+    end
+  end
 
   def text(value)
     value.to_s.gsub("\\", "\\\\\\").gsub(";", "\\;").gsub(",", "\\,").gsub(/\r?\n/, "\\n")

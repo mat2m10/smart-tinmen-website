@@ -156,6 +156,22 @@ body.hh {
 .hh .hh-chore-actions { display: flex; gap: 4px; align-items: center; }
 .hh .hh-free { font-size: .75rem; color: var(--hh-muted); }
 
+/* ---------- Agenda ---------- */
+.hh .hh-agenda-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hh .hh-agenda-pager { display: flex; align-items: center; gap: 4px; }
+.hh .hh-agenda-pager a { text-decoration: none; color: var(--hh-ink); }
+.hh .hh-agenda-day { margin: 20px 0 0; }
+.hh .hh-agenda-day h2 { color: var(--hh-ink); }
+.hh .hh-agenda-day--weekend h2 { color: var(--hh-primary); }
+.hh .hh-agenda-day--empty { margin-top: 12px; }
+.hh .hh-agenda-day--empty h2 { color: var(--hh-muted); font-weight: 400; }
+.hh .hh-agenda-item {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 12px; border-radius: 12px; background: var(--hh-surface); box-shadow: var(--hh-shadow);
+}
+.hh .hh-agenda-item--forecast { box-shadow: none; border: 1px dashed var(--hh-line); background: transparent; }
+.hh .hh-agenda-time { flex: 0 0 56px; font-size: .8rem; font-weight: 500; color: var(--hh-muted); }
+
 /* ---------- Balance ---------- */
 .hh .hh-balance { margin-top: 32px; }
 .hh .hh-bar { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: center; margin-top: 12px; font-size: .875rem; }
@@ -172,7 +188,7 @@ body.hh {
 /* ---------- Forms ---------- */
 .hh .hh-form { display: grid; gap: 6px; }
 .hh .hh-form label { font-weight: 500; font-size: .85rem; color: var(--hh-muted); margin-top: 8px; }
-.hh input[type="text"], .hh input[type="date"], .hh input[type="number"], .hh select, .hh textarea {
+.hh input[type="text"], .hh input[type="date"], .hh input[type="time"], .hh input[type="number"], .hh select, .hh textarea {
   width: 100%; padding: 10px 12px; border: 1px solid var(--hh-line); border-radius: 8px;
   background: var(--hh-surface); color: var(--hh-ink); font: 400 1rem var(--hh-font);
 }

@@ -27,10 +27,13 @@
       <%= f.date_field :due_on, required: true %>
     </div>
     <div>
-      <%= f.label :assignee_id, "Owner" %>
-      <%= f.select :assignee_id, User.order(:name, :email).map { |u| [ u.display_name, u.id ] }, include_blank: "Up for grabs" %>
+      <%= f.label :due_time, "Time (optional, for appointments)" %>
+      <%= f.time_field :due_time, value: chore.due_time %>
     </div>
   </div>
+
+  <%= f.label :assignee_id, "Owner" %>
+  <%= f.select :assignee_id, User.order(:name, :email).map { |u| [ u.display_name, u.id ] }, include_blank: "Up for grabs" %>
 
   <div class="hh-row">
     <div>

@@ -63,4 +63,24 @@ class ChoreTest < ActiveSupport::TestCase
     assert_equal "Once", chores(:gp).repeat_label
     assert_equal "Every 2 weeks", Chore.new(repeat_unit: "week", repeat_every: 2).repeat_label
   end
+
+  test "occurrences list the due date and the coming repeats in range" do
+    chore = chores(:toilet)
+    chore.update!(due_on: Date.new(2026, 10, 20))
+    assert_equal [ Date.new(2026, 10, 20), Date.new(2026, 10, 27) ], chore.occurrences(Date.new(2026, 10, 19)..Date.new(2026, 11, 2))
+    assert_equal [ Date.new(2026, 10, 27) ], chore.occurrences(Date.new(2026, 10, 21)..Date.new(2026, 10, 30))
+    assert_equal [], chores(:gp).occurrences((chores(:gp).due_on + 1)..(chores(:gp).due_on + 30))
+  end
+
+  test "due times are stored as HH:MM and checked" do
+    chore = chores(:gp)
+    chore.update!(due_time: " 9:30 ")
+    assert_equal "09:30", chore.due_time
+    chore.update!(due_time: "14:05:00")
+    assert_equal "14:05", chore.due_time
+    chore.update!(due_time: "")
+    assert_nil chore.due_time
+    assert_not chore.update(due_time: "25:00")
+    assert_not chore.update(due_time: "noon")
+  end
 end
