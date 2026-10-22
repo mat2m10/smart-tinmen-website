@@ -24,7 +24,7 @@ class Chore < ApplicationRecord
   # Optional time of day ("14:30") for appointments; without it a chore is all-day.
   validates :due_time, format: { with: /\A([01]\d|2[0-3]):[0-5]\d\z/ }, allow_nil: true
 
-  normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
+  normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})(:\d{2})?\z/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
@@ -65,10 +65,11 @@ class Chore < ApplicationRecord
     dates = []
     date = due_on
     while date <= range.end
-      dates << date if date >= range.begin
-      break unless repeating?
+      dates << date if range.cover?(date)
+      next_date = advance(date)
+      break if next_date <= date # one-off chores, and a guard against bad data
 
-      date = advance(date)
+      date = next_date
     end
     dates
   end

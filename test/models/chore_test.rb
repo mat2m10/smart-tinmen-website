@@ -69,6 +69,7 @@ class ChoreTest < ActiveSupport::TestCase
     chore.update!(due_on: Date.new(2026, 10, 20))
     assert_equal [ Date.new(2026, 10, 20), Date.new(2026, 10, 27) ], chore.occurrences(Date.new(2026, 10, 19)..Date.new(2026, 11, 2))
     assert_equal [ Date.new(2026, 10, 27) ], chore.occurrences(Date.new(2026, 10, 21)..Date.new(2026, 10, 30))
+    assert_equal [ Date.new(2026, 10, 20) ], chore.occurrences(Date.new(2026, 10, 20)...Date.new(2026, 10, 27))
     assert_equal [], chores(:gp).occurrences((chores(:gp).due_on + 1)..(chores(:gp).due_on + 30))
   end
 
@@ -82,5 +83,6 @@ class ChoreTest < ActiveSupport::TestCase
     assert_nil chore.due_time
     assert_not chore.update(due_time: "25:00")
     assert_not chore.update(due_time: "noon")
+    assert_not chore.update(due_time: "7:05pm")
   end
 end
