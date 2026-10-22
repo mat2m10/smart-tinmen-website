@@ -9,6 +9,7 @@ export default class extends Controller {
   async pick() {
     const files = Array.from(this.inputTarget.files).slice(0, this.maxValue)
     const shrunk = new DataTransfer()
+    this.previewsTarget.querySelectorAll("img").forEach(img => URL.revokeObjectURL(img.src))
     this.previewsTarget.replaceChildren()
     for (const file of files) {
       const small = await this.shrink(file).catch(() => file)

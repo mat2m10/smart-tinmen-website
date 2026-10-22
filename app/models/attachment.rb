@@ -14,11 +14,15 @@ class Attachment < ApplicationRecord
   validates :byte_size, numericality: { greater_than: 0 }
   validate :type_and_size_allowed
 
+  # Leaves the file bytes out. Use .size or .length on these, not .count:
+  # COUNT over a column list is not valid SQL.
   scope :without_data, -> { select(column_names - [ "data" ]) }
 
   # Builds an attachment from an uploaded file. The type comes from the bytes,
   # not from what the browser claims.
   def self.from_upload(kind, file)
+    return new(kind: kind, content_type: file.content_type.to_s, byte_size: file.size) if file.size > MAX_BYTES.fetch(kind, 0)
+
     data = file.read
     detected = Marcel::MimeType.for(StringIO.new(data), name: file.original_filename, declared_type: file.content_type)
     # Chrome records audio as WebM, which looks like video/webm to a sniffer.

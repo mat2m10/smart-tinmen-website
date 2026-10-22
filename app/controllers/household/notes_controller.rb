@@ -6,7 +6,8 @@ class Household::NotesController < Household::BaseController
   end
 
   def create
-    @note = Note.new(body: note_params[:body], chore: Chore.find_by(id: note_params[:chore_id]), user: current_user)
+    @note = Note.new(body: note_params[:body], user: current_user)
+    @note.chore = Chore.find(note_params[:chore_id]) if note_params[:chore_id].present?
     Array(note_params[:photos]).compact_blank.first(Note::MAX_PHOTOS).each { |file| @note.attachments << Attachment.from_upload("photo", file) }
     @note.attachments << Attachment.from_upload("voice", note_params[:voice]) if note_params[:voice].present?
 

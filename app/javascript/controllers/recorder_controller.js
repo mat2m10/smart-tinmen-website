@@ -18,6 +18,8 @@ export default class extends Controller {
   }
 
   async start() {
+    this.discarding = false
+    this.statusTarget.textContent = "Recording…"
     this.panelTarget.hidden = false
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -48,10 +50,10 @@ export default class extends Controller {
   }
 
   discard() {
-    this.discarding = true
+    this.discarding = this.recorder?.state === "recording"
     this.stop()
     this.inputTarget.value = ""
-    this.previewTarget.removeAttribute("src")
+    this.forgetPreview()
     this.panelTarget.hidden = true
     this.stopTarget.hidden = true
     this.startTarget.hidden = false
@@ -77,7 +79,13 @@ export default class extends Controller {
     this.inputTarget.files = files.files
 
     this.statusTarget.textContent = "Voice note ready"
+    this.forgetPreview()
     this.previewTarget.src = URL.createObjectURL(file)
     this.previewTarget.hidden = false
+  }
+
+  forgetPreview() {
+    if (this.previewTarget.src) URL.revokeObjectURL(this.previewTarget.src)
+    this.previewTarget.removeAttribute("src")
   }
 }

@@ -36,7 +36,7 @@ class Household::NotesControllerTest < ActionDispatch::IntegrationTest
   test "posts a note with a photo and a voice note, logs it, and serves the files back" do
     sign_in("alice@example.com")
     assert_difference -> { Event.where(action: "note_added").count }, 1 do
-      post household_notes_path, params: { note: { body: "Out of nappies", photos: [ upload("photo.jpg", "image/jpeg") ], voice: upload("voice.webm", "audio/webm") } }
+      post household_notes_path, params: { note: { body: "Out of soap", photos: [ upload("photo.jpg", "image/jpeg") ], voice: upload("voice.webm", "audio/webm") } }
     end
     assert_redirected_to household_notes_path
     note = Note.last
@@ -105,5 +105,15 @@ class Household::NotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='chore[notes]']", text: "Use the blue brush"
     get household_root_path
     assert_select ".hh-note-count", /1/
+  end
+
+  test "refuses a file over the size limit without reading it" do
+    sign_in("alice@example.com")
+    big = Rack::Test::UploadedFile.new(StringIO.new("x" * (Attachment::MAX_BYTES["photo"] + 1)), "image/jpeg", original_filename: "big.jpg")
+    assert_no_difference -> { Note.count } do
+      post household_notes_path, params: { note: { body: "big", photos: [ big ] } }
+    end
+    follow_redirect!
+    assert_select ".hh-flash--alert", /too large/
   end
 end
