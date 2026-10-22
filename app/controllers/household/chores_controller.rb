@@ -15,6 +15,8 @@ class Household::ChoresController < Household::BaseController
     @effort = recent.group(:user_id).sum(:effort)
     @planning = recent.where(planning: true).group(:user_id).count
     @recently_done = Completion.includes(:chore, :user).order(created_at: :desc).limit(8)
+    @latest_notes = Note.includes(:user, :chore, :attachments).recent_first.limit(3)
+    @note = Note.new
   end
 
   def new

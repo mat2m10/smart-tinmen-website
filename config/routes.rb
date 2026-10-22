@@ -19,6 +19,10 @@ Rails.application.routes.draw do
     end
 
     resources :notes, only: %i[index create destroy]
+    resource :push_subscription, only: %i[create destroy]
+    get "manifest.webmanifest" => "pwa#manifest", as: :manifest
+    get "service-worker.js" => "pwa#service_worker", as: :service_worker
+    get "calendar.ics" => "calendars#show", as: :calendar
     resources :attachments, only: :show
 
     namespace :api, defaults: { format: :json } do
@@ -27,6 +31,7 @@ Rails.application.routes.draw do
       get "events" => "events#index"
       resources :notes, only: %i[index create]
       resources :attachments, only: %i[show update]
+      post "push" => "pushes#create"
     end
   end
 end
