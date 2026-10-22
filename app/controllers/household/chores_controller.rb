@@ -27,6 +27,7 @@ class Household::ChoresController < Household::BaseController
     @chore = Chore.new(chore_params.merge(created_by: current_user))
     if @chore.save
       Event.log!("chore_added", user: current_user, chore: @chore)
+      notify_others("#{current_user.display_name} added “#{@chore.title}”")
       redirect_to household_root_path, notice: "Added: #{@chore.title}", status: :see_other
     else
       render :new, status: :unprocessable_entity
@@ -63,6 +64,7 @@ class Household::ChoresController < Household::BaseController
       Event.log!("chore_done", user: current_user, chore: @chore)
       true
     end
+    notify_others(@chore.done_sentence(current_user.display_name)) if done
     notice = "#{done ? "Done" : "Already done"}: #{@chore.title}"
     redirect_to household_root_path(show: filter_param), notice: notice, status: :see_other
   end
@@ -83,6 +85,11 @@ class Household::ChoresController < Household::BaseController
   def load_notes
     @notes = @chore.remarks.includes(:user, :attachments).order(:created_at, :id)
     @note = Note.new(chore: @chore)
+  end
+
+  # One plain sentence, no body: "Matthieu emptied the dishwasher".
+  def notify_others(sentence)
+    HouseholdPushJob.perform_later(User.where.not(id: current_user.id).ids, sentence, "", household_root_path)
   end
 
   def filter_param

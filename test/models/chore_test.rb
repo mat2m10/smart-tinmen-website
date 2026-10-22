@@ -85,4 +85,14 @@ class ChoreTest < ActiveSupport::TestCase
     assert_not chore.update(due_time: "noon")
     assert_not chore.update(due_time: "7:05pm")
   end
+
+  test "done sentences read naturally, and quote titles that don't start with a known verb" do
+    sentence = ->(title) { Chore.new(title: title).done_sentence("Matthieu") }
+    assert_equal "Matthieu emptied the dishwasher", sentence.("Empty the dishwasher")
+    assert_equal "Matthieu took out the bins", sentence.("Take out the bins")
+    assert_equal "Matthieu tidied the hall", sentence.("tidy the hall")
+    assert_equal "Matthieu prepared lunch boxes", sentence.("Prepare lunch boxes")
+    assert_equal "Matthieu paid", sentence.("Pay")
+    assert_equal "Matthieu finished “Groceries”", sentence.("Groceries")
+  end
 end

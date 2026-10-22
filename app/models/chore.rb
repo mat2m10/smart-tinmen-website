@@ -6,6 +6,18 @@ class Chore < ApplicationRecord
   DEFAULT_AREAS = [ "Cleaning", "Laundry", "Food", "Kids", "Admin", "Family & friends", "Home & repairs" ].freeze
   REPEAT_UNITS = %w[none day week month year].freeze
   EFFORTS = { 1 => "Quick", 2 => "Medium", 3 => "Big" }.freeze
+  # Turns "Empty the dishwasher" into "emptied the dishwasher" for "X did it"
+  # notifications. Titles starting with another word fall back to quoting.
+  PAST_TENSE = {
+    "bring" => "brought", "buy" => "bought", "do" => "did", "feed" => "fed", "find" => "found", "get" => "got",
+    "give" => "gave", "go" => "went", "hang" => "hung", "make" => "made", "mop" => "mopped", "pay" => "paid",
+    "plan" => "planned", "put" => "put", "run" => "ran", "sell" => "sold", "send" => "sent", "set" => "set",
+    "shop" => "shopped", "sweep" => "swept", "take" => "took", "throw" => "threw", "write" => "wrote"
+  }.freeze
+  REGULAR_VERBS = %w[
+    apply book call cancel change check clean clear cook dust email empty fix fold iron order organise organize
+    pick prepare register renew repair replace schedule sort tidy vacuum wash water
+  ].freeze
 
   belongs_to :assignee, class_name: "User", optional: true
   belongs_to :created_by, class_name: "User", optional: true
@@ -82,6 +94,12 @@ class Chore < ApplicationRecord
     end
   end
 
+  def done_sentence(name)
+    verb, rest = title.strip.split(/\s+/, 2)
+    past = PAST_TENSE[verb.downcase] || (regular_past(verb.downcase) if REGULAR_VERBS.include?(verb.downcase))
+    past ? [ name, past, rest ].compact.join(" ") : "#{name} finished “#{title.strip}”"
+  end
+
   def repeat_label
     return "Once" unless repeating?
 
@@ -106,6 +124,13 @@ class Chore < ApplicationRecord
   end
 
   private
+
+  def regular_past(verb)
+    if verb.end_with?("e") then "#{verb}d"
+    elsif verb.match?(/[^aeiou]y\z/) then "#{verb.delete_suffix("y")}ied"
+    else "#{verb}ed"
+    end
+  end
 
   def advance(date)
     case repeat_unit
