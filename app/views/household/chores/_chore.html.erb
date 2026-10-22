@@ -1,0 +1,20 @@
+<li class="hh-chore hh-chore--<%= chore.bucket %>">
+  <div class="hh-chore-main">
+    <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
+    <p class="hh-chore-meta">
+      <span class="hh-due"><%= due_label(chore) %></span>
+      · <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %>
+      · <%= chore.repeat_label %> · <%= chore.effort_label %>
+      <% if chore.planning %><span class="hh-tag">planning</span><% end %>
+    </p>
+  </div>
+  <div class="hh-chore-actions">
+    <% if chore.assignee %>
+      <span class="hh-avatar hh-avatar--small" title="<%= chore.assignee.display_name %>"><%= chore.assignee.initial %></span>
+    <% else %>
+      <span class="hh-free">Up for grabs</span>
+    <% end %>
+    <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn" %>
+    <%= button_to "Done", complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--primary" %>
+  </div>
+</li>

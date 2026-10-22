@@ -1,0 +1,7 @@
+<% content_for :title, @chore.title %>
+<header class="hh-top"><h1>Edit task</h1></header>
+<%= render "form", chore: @chore %>
+<% if (last = @chore.last_done_on) %>
+  <p class="hh-hint">Last done <%= last.strftime("%-d %b %Y") %>.</p>
+<% end %>
+<%= button_to "Delete this task", household_chore_path(@chore), method: :delete, class: "hh-btn hh-btn--danger", form: { data: { turbo_confirm: "Delete \"#{@chore.title}\"?" } } %>
