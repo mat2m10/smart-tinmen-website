@@ -38,6 +38,12 @@ class Chore < ApplicationRecord
 
   normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})(:\d{2})?\z/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
 
+  # Timed chores are appointments and get an event in the shared Google Calendar.
+  CALENDAR_FIELDS = %w[title notes area room due_on due_time assignee_id].freeze
+  after_commit :sync_calendar, on: %i[create update], if: -> { (due_time || due_time_before_last_save) && saved_changes.keys.intersect?(CALENDAR_FIELDS) }
+  # A second after_commit naming the same method would replace the first.
+  after_destroy_commit -> { HouseholdCalendarJob.perform_later(id) }, if: -> { due_time }
+
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
 
@@ -124,6 +130,10 @@ class Chore < ApplicationRecord
   end
 
   private
+
+  def sync_calendar
+    HouseholdCalendarJob.perform_later(id)
+  end
 
   def regular_past(verb)
     if verb.end_with?("e") then "#{verb}d"

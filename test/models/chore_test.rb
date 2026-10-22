@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ChoreTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   test "a repeating chore restarts from the day it was done" do
     chore = chores(:toilet)
     chore.complete!(users(:alice), on: Date.new(2026, 10, 20))
@@ -94,5 +96,25 @@ class ChoreTest < ActiveSupport::TestCase
     assert_equal "Matthieu prepared lunch boxes", sentence.("Prepare lunch boxes")
     assert_equal "Matthieu paid", sentence.("Pay")
     assert_equal "Matthieu finished “Groceries”", sentence.("Groceries")
+  end
+
+  test "timed chores sync to the calendar when their details change" do
+    chore = chores(:gp)
+    assert_no_enqueued_jobs(only: HouseholdCalendarJob) { chore.update!(title: "Find a doctor") }
+    assert_enqueued_with(job: HouseholdCalendarJob, args: [ chore.id ]) { chore.update!(due_time: "09:00") }
+    assert_enqueued_with(job: HouseholdCalendarJob, args: [ chore.id ]) { chore.update!(due_on: chore.due_on + 1) }
+    assert_enqueued_with(job: HouseholdCalendarJob, args: [ chore.id ]) { chore.update!(due_time: nil) }
+  end
+
+  test "finishing a one-off appointment keeps its calendar event" do
+    chore = chores(:gp)
+    chore.update!(due_time: "09:00")
+    assert_no_enqueued_jobs(only: HouseholdCalendarJob) { chore.complete!(users(:alice)) }
+  end
+
+  test "deleting a timed chore removes its calendar event" do
+    chore = chores(:gp)
+    chore.update!(due_time: "09:00")
+    assert_enqueued_with(job: HouseholdCalendarJob, args: [ chore.id ]) { chore.destroy! }
   end
 end
