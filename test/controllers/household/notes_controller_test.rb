@@ -128,4 +128,21 @@ class Household::NotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal [ note ], chore.remarks.reload.to_a
   end
+
+  test "deleting a personal chore takes its remarks and photos with it" do
+    chore = chores(:gp)
+    chore.update!(personal: true, assignee: users(:bob))
+    sign_in("bob@example.com")
+    post household_notes_path, params: { note: { body: "Passport scan", chore_id: chore.id, photos: [ upload("photo.jpg", "image/jpeg") ] } }
+    photo = Note.last.photos.first
+
+    sign_in("alice@example.com")
+    get household_attachment_path(photo)
+    assert_response :not_found
+
+    sign_in("bob@example.com")
+    delete household_chore_path(chore)
+    assert_not Note.exists?(body: "Passport scan")
+    assert_not Attachment.exists?(photo.id)
+  end
 end

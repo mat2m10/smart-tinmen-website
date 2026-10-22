@@ -172,4 +172,13 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     post claim_household_chore_path(chore)
     assert_equal users(:bob), chore.reload.assignee
   end
+
+  test "someone else's chore cannot be made personal" do
+    chore = chores(:gp)
+    sign_in("alice@example.com")
+    patch household_chore_path(chore), params: { chore: { personal: "1" } }
+    assert_response :unprocessable_entity
+    assert_not chore.reload.personal
+    assert_equal users(:bob), chore.assignee
+  end
 end

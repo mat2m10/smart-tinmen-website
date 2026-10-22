@@ -116,6 +116,10 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     get household_calendar_path(key: KEY, only: "planning")
     assert_includes response.body, "Find a GP"
     assert_not_includes response.body, "Clean the toilet"
+
+    chores(:gp).update!(personal: true, assignee: users(:bob))
+    get household_calendar_path(key: KEY)
+    assert_not_includes response.body, "Find a GP"
   end
 
   test "the agenda shows two weeks day by day, with repeats ahead, all-day items before timed ones" do

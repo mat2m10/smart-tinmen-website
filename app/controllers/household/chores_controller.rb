@@ -42,8 +42,13 @@ class Household::ChoresController < Household::BaseController
 
   def update
     @chore.assign_attributes(chore_params)
-    @chore.assignee = current_user if @chore.personal
-    if @chore.save
+    if @chore.personal
+      # Only your own or a free chore can become personal, or it would vanish for its owner.
+      owner_id = @chore.assignee_id_in_database
+      @chore.errors.add(:base, "Only your own chores or ones up for grabs can be personal") if owner_id && owner_id != current_user.id
+      @chore.assignee = current_user
+    end
+    if @chore.errors.empty? && @chore.save
       Event.log!("chore_edited", user: current_user, chore: @chore)
       redirect_to household_root_path, notice: "Saved: #{@chore.title}", status: :see_other
     else

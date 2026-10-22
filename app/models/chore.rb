@@ -24,6 +24,8 @@ class Chore < ApplicationRecord
   has_many :completions, dependent: :destroy
   # "notes" is the chore's own text field; the thread of Note records is "remarks".
   has_many :remarks, class_name: "Note", dependent: :nullify
+  # Remarks on a personal chore would otherwise become loose notes everyone sees.
+  before_destroy -> { remarks.destroy_all if personal }, prepend: true
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :due_on, presence: true
