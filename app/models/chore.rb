@@ -33,19 +33,23 @@ class Chore < ApplicationRecord
   validates :repeat_every, numericality: { only_integer: true, in: 1..365 }
   validates :effort, inclusion: { in: EFFORTS.keys }
   validates :assignee, presence: true, unless: -> { assignee_id.nil? }
+  # A personal chore belongs to one person and only they see it.
+  validates :assignee, presence: { message: "is needed for a personal task" }, if: :personal
   # Optional time of day ("14:30") for appointments; without it a chore is all-day.
   validates :due_time, format: { with: /\A([01]\d|2[0-3]):[0-5]\d\z/ }, allow_nil: true
 
   normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})(:\d{2})?\z/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
 
   # Timed chores are appointments and get an event in the shared Google Calendar.
-  CALENDAR_FIELDS = %w[title notes area room due_on due_time assignee_id].freeze
+  CALENDAR_FIELDS = %w[title notes area room due_on due_time assignee_id personal].freeze
   after_commit :sync_calendar, on: %i[create update], if: -> { (due_time || due_time_before_last_save) && saved_changes.keys.intersect?(CALENDAR_FIELDS) }
   # A second after_commit naming the same method would replace the first.
   after_destroy_commit -> { HouseholdCalendarJob.perform_later(id) }, if: -> { due_time }
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
+  scope :shared, -> { where(personal: false) }
+  scope :visible_to, ->(user) { shared.or(where(assignee: user)) }
 
   def self.area_options
     (DEFAULT_AREAS + distinct.pluck(:area)).uniq.sort
@@ -53,6 +57,11 @@ class Chore < ApplicationRecord
 
   def self.room_options
     where.not(room: [ nil, "" ]).distinct.order(:room).pluck(:room)
+  end
+
+  # Who else hears about this chore: nobody when it is personal.
+  def audience(except:)
+    personal ? User.none : User.where.not(id: except)
   end
 
   def repeating?
@@ -124,7 +133,7 @@ class Chore < ApplicationRecord
     {
       id: id, title: title, notes: notes, area: area, room: room, due_on: due_on, due_time: due_time,
       repeat_unit: repeat_unit, repeat_every: repeat_every, fixed_schedule: fixed_schedule,
-      effort: effort, planning: planning, assignee_email: assignee&.email,
+      effort: effort, planning: planning, personal: personal, assignee_email: assignee&.email,
       done_at: done_at, last_done_on: last_done_on, updated_at: updated_at
     }
   end

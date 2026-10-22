@@ -34,6 +34,7 @@
 
   <%= f.label :assignee_id, "Owner" %>
   <%= f.select :assignee_id, User.order(:name, :email).map { |u| [ u.display_name, u.id ] }, include_blank: "Up for grabs" %>
+  <label class="hh-check"><%= f.check_box :personal %> Personal: only for me, the others don't see it</label>
 
   <div class="hh-row">
     <div>

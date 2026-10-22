@@ -11,6 +11,8 @@ class Note < ApplicationRecord
   validate :has_content
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  # Loose notes, and remarks on chores the user may see (not the other's personal ones).
+  scope :visible_to, ->(user) { where(chore_id: nil).or(where(chore_id: Chore.visible_to(user).select(:id))) }
 
   def author_name
     from_claude ? "Claude" : (user&.display_name || "Someone")

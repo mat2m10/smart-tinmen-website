@@ -1,5 +1,5 @@
 class Household::Api::ChoresController < Household::Api::BaseController
-  FIELDS = %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning assignee_email].freeze
+  FIELDS = %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning personal assignee_email].freeze
 
   def index
     chores = params[:include_done] == "true" ? Chore.all : Chore.pending

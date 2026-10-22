@@ -4,6 +4,7 @@
     <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
     <p class="hh-chore-meta">
       <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %> · <%= chore.repeat_label %>
+      <% if chore.personal %><span class="hh-tag">personal</span><% end %>
       <% if chore.planning %><span class="hh-tag">planning</span><% end %>
       <% if forecast %><span class="hh-tag" title="Moves when the chore is done earlier or later">expected</span><% end %>
     </p>
