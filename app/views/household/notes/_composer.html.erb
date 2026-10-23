@@ -2,7 +2,7 @@
   <%= f.hidden_field :chore_id %>
   <% if local_assigns[:return_to] %><%= hidden_field_tag :return_to, return_to %><% end %>
   <%= f.label :body, placeholder, class: "hh-visually-hidden" %>
-  <%= f.text_area :body, rows: 3, placeholder: placeholder, maxlength: 5000 %>
+  <%= f.text_area :body, rows: 3, placeholder: placeholder, maxlength: 5000, data: { action: "paste->photo-picker#paste" } %>
 
   <div class="hh-previews" data-photo-picker-target="previews"></div>
   <div class="hh-recording" data-recorder-target="panel" hidden>
