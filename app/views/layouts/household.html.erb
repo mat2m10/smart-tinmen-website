@@ -33,7 +33,7 @@
           <%= link_to "Done", household_completions_path, aria: { current: (controller_name == "completions" ? "page" : nil) } %>
         </nav>
         <div class="hh-me">
-          <%= avatar(current_user) %>
+          <%= link_to household_profile_path, class: "hh-me-link", aria: { label: "Your profile", current: (controller_name == "profiles" ? "page" : nil) } do %><%= avatar(current_user, title: "Your profile") %><% end %>
           <%= button_to household_logout_path, method: :delete, class: "hh-icon-btn", title: "Sign out", aria: { label: "Sign out" } do %><span class="ms" aria-hidden="true">logout</span><% end %>
         </div>
       </header>

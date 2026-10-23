@@ -280,3 +280,17 @@ body.hh {
 .hh .hh-front-notes .hh-composer { margin-top: 4px; margin-bottom: 8px; }
 .hh .hh-more { margin-top: 4px; }
 .hh .hh-push { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin: 16px 0 8px; font-size: .9rem; color: var(--hh-muted); }
+
+/* ---------- Profile ---------- */
+.hh .hh-me-link { display: inline-flex; border-radius: 50%; text-decoration: none; }
+.hh .hh-me-link[aria-current="page"] .hh-avatar { outline: 2px solid var(--hh-person); outline-offset: 2px; }
+.hh .hh-profile-head { display: flex; gap: 12px; align-items: center; }
+.hh .hh-profile-head .hh-avatar { width: 48px; height: 48px; font-size: 1.2rem; }
+.hh .hh-profile-name { font-size: 1.15rem; font-weight: 600; }
+.hh .hh-swatches { border: 0; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.hh .hh-swatches legend { font-weight: 500; font-size: .85rem; color: var(--hh-muted); margin-bottom: 6px; }
+.hh .hh-form .hh-swatch { margin: 0; cursor: pointer; }
+.hh .hh-swatch span[aria-hidden] { display: block; width: 36px; height: 36px; border-radius: 50%; background: var(--hh-person); }
+.hh .hh-swatch input:checked + span { outline: 3px solid var(--hh-ink); outline-offset: 2px; }
+.hh .hh-swatch input:focus-visible + span { outline: 3px solid var(--hh-primary); outline-offset: 2px; }
+.hh .hh-profile-more { margin-top: 16px; display: grid; gap: 8px; justify-items: start; }
