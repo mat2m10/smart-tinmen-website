@@ -21,6 +21,9 @@
     <% unless chore.personal %>
       <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--text" %>
     <% end %>
+    <% if chore.assignee && chore.assignee != current_user %>
+      <%= button_to "#{chore.assignee.display_name} did it", complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size, by: chore.assignee_id }, class: "hh-btn hh-btn--text" %>
+    <% end %>
     <%= button_to complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">check</span>Done<% end %>
   </div>
 </li>

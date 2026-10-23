@@ -1,9 +1,7 @@
+<%# Notes are written here but only listed on the Notes page, to keep the board clear. %>
 <section class="hh-front-notes" aria-label="Notes">
   <%= render "household/notes/composer", note: @note, placeholder: "Write a note, add a photo or a voice note…", return_to: "board" %>
-  <% if @latest_notes.any? %>
-    <ul class="hh-feed"><%= render partial: "household/notes/note", collection: @latest_notes, locals: { show_chore: true } %></ul>
-    <%= link_to "All notes", household_notes_path, class: "hh-btn hh-btn--text hh-more" %>
-  <% end %>
+  <%= link_to "All notes", household_notes_path, class: "hh-btn hh-btn--text hh-more" %>
 </section>
 
 <div class="hh-card hh-push" data-controller="push" data-push-key-value="<%= ENV["VAPID_PUBLIC_KEY"] %>" hidden>

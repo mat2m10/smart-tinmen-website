@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="Household">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%# Done, take and drop redirect back to the same page: keep the scroll position. %>
+    <%= turbo_refresh_scroll_tag :preserve %>
     <link rel="icon" href="<%= asset_path('favicon.ico') %>" sizes="any">
     <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('apple-touch-icon-180.png') %>">
     <link rel="preconnect" href="https://fonts.googleapis.com">

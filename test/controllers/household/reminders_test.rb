@@ -32,12 +32,14 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     user.push_subscriptions.create!(endpoint: endpoint, p256dh: "p", auth: "a")
   end
 
-  test "the front page shows the note composer and the latest notes" do
+  test "the front page has the note composer but lists notes only on the Notes page" do
     Note.create!(body: "Front page note", user: users(:bob))
     sign_in("alice@example.com")
     get household_root_path
     assert_select ".hh-front-notes form.hh-composer input[name=return_to][value=board]"
-    assert_select ".hh-front-notes .hh-note-body", /Front page note/
+    assert_select ".hh-note-body", count: 0
+    get household_notes_path
+    assert_select ".hh-note-body", /Front page note/
     post household_notes_path, params: { return_to: "board", note: { body: "from the board" } }
     assert_redirected_to household_root_path
   end

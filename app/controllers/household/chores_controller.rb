@@ -16,7 +16,6 @@ class Household::ChoresController < Household::BaseController
     @effort = recent.group(:user_id).sum(:effort)
     @planning = recent.where(planning: true).group(:user_id).count
     @recently_done = Completion.where(chore: Chore.visible_to(current_user)).includes(:chore, :user).order(created_at: :desc).limit(8)
-    @latest_notes = Note.visible_to(current_user).includes(:user, :chore, :attachments).recent_first.limit(3)
     @note = Note.new
   end
 
@@ -65,15 +64,21 @@ class Household::ChoresController < Household::BaseController
 
   # The button sends how many times the chore had been done when the page was
   # shown, so a double tap or a second phone with an old page counts once.
+  # "by" ticks it off for the person it belongs to when they forgot to.
   def complete
+    doer = current_user
+    doer = @chore.assignee if params[:by].present? && params[:by].to_i == @chore.assignee_id
     done = @chore.with_lock do
       next false if @chore.done_at? || (params[:seen].present? && params[:seen].to_i != @chore.completions.count)
 
-      @chore.complete!(current_user)
-      Event.log!("chore_done", user: current_user, chore: @chore)
+      @chore.complete!(doer)
+      Event.log!("chore_done", user: current_user, chore: @chore, summary: (doer == current_user ? nil : "#{@chore.title} (done by #{doer.display_name})"))
       true
     end
-    notify_others(@chore.done_sentence(current_user.display_name)) if done
+    if done
+      sentence = @chore.done_sentence(doer.display_name)
+      notify_others(doer == current_user ? sentence : "#{sentence} (ticked off by #{current_user.display_name})")
+    end
     notice = "#{done ? "Done" : "Already done"}: #{@chore.title}"
     redirect_to household_root_path(show: filter_param), notice: notice, status: :see_other
   end

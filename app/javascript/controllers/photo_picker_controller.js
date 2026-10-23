@@ -2,12 +2,25 @@ import { Controller } from "@hotwired/stimulus"
 
 // Shrinks photos on the phone before they are uploaded (longest side 1600 px,
 // JPEG), so they stay small in the database, and shows thumbnails.
+// A photo pasted into the text box is added the same way.
 export default class extends Controller {
   static targets = [ "input", "previews" ]
   static values = { maxSide: { type: Number, default: 1600 }, max: { type: Number, default: 4 } }
 
-  async pick() {
-    const files = Array.from(this.inputTarget.files).slice(0, this.maxValue)
+  pick() {
+    this.use(Array.from(this.inputTarget.files))
+  }
+
+  // Pasted text goes in as usual; only pasted images are taken over.
+  paste(event) {
+    const images = Array.from(event.clipboardData?.files || []).filter(file => file.type.startsWith("image/"))
+    if (images.length === 0) return
+    event.preventDefault()
+    this.use(Array.from(this.inputTarget.files).concat(images))
+  }
+
+  async use(picked) {
+    const files = picked.slice(0, this.maxValue)
     const shrunk = new DataTransfer()
     this.previewsTarget.querySelectorAll("img").forEach(img => URL.revokeObjectURL(img.src))
     this.previewsTarget.replaceChildren()
