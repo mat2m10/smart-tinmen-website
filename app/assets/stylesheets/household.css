@@ -1,45 +1,37 @@
 /* ============================================================
    FILE: app/assets/stylesheets/household.css
    PURPOSE: The private household app (/household). Loaded on its own by the
-   household layout, so it shares nothing with the public homepage: a calm,
-   Google-style look (Roboto, soft surfaces, pill buttons, blue accent).
-   Light and dark follow the phone's setting.
+   household layout, so it shares nothing with the public homepage: a warm,
+   soft look (Nunito, cream surfaces, pill buttons). Always light, also when
+   the phone is in dark mode. Each member has their own colour (users.color),
+   set per element as --hh-person and used for their chores and avatar.
    ============================================================ */
 
 :root {
-  --hh-bg: #F8FAFD;
+  --hh-bg: #FBF7F1;
   --hh-surface: #FFFFFF;
-  --hh-surface-2: #F0F4F9;
-  --hh-ink: #1F1F1F;
-  --hh-muted: #444746;
-  --hh-line: #DDE3EA;
-  --hh-primary: #0B57D0;
+  --hh-surface-2: #F4EEE6;
+  --hh-ink: #2E2924;
+  --hh-muted: #6F665D;
+  --hh-line: #ECE4D9;
+  --hh-primary: #5E4B3C;
   --hh-on-primary: #FFFFFF;
-  --hh-tonal: #D3E3FD;
-  --hh-on-tonal: #041E49;
-  --hh-danger: #B3261E;
-  --hh-danger-bg: #F9DEDC;
-  --hh-claude: #7D5260;
-  --hh-claude-bg: #FFD8E4;
-  --hh-shadow: 0 1px 2px rgba(60, 64, 67, .12), 0 1px 3px 1px rgba(60, 64, 67, .08);
-  --hh-font: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hh-tonal: #EFE5D8;
+  --hh-on-tonal: #3B2F25;
+  --hh-danger: #B4442F;
+  --hh-danger-bg: #FBE6DF;
+  --hh-claude: #7A5A8C;
+  --hh-claude-bg: #EFE4F4;
+  --hh-person: #9C9085;
+  --hh-shadow: 0 1px 2px rgba(94, 75, 60, .06), 0 2px 8px rgba(94, 75, 60, .06);
+  --hh-font: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --hh-bg: #131314; --hh-surface: #1E1F20; --hh-surface-2: #282A2C;
-    --hh-ink: #E3E3E3; --hh-muted: #C4C7C5; --hh-line: #3C4043;
-    --hh-primary: #A8C7FA; --hh-on-primary: #062E6F; --hh-tonal: #0842A0; --hh-on-tonal: #D3E3FD;
-    --hh-danger: #F2B8B5; --hh-danger-bg: #601410; --hh-claude: #FFD8E4; --hh-claude-bg: #633B48;
-    --hh-shadow: 0 1px 3px rgba(0, 0, 0, .5);
-    color-scheme: dark;
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 body.hh {
   margin: 0; background: var(--hh-bg); color: var(--hh-ink);
-  font: 400 15px/1.5 var(--hh-font); -webkit-font-smoothing: antialiased;
+  font: 400 16px/1.5 var(--hh-font); -webkit-font-smoothing: antialiased;
 }
 .hh h1, .hh h2, .hh h3, .hh p { margin: 0; }
 .hh a { color: var(--hh-primary); }
@@ -78,7 +70,7 @@ body.hh {
 /* ---------- Avatars ---------- */
 .hh .hh-avatar {
   display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 50%;
-  background: var(--hh-tonal); color: var(--hh-on-tonal); font-weight: 500; font-size: .9rem;
+  background: var(--hh-person); color: #FFFFFF; font-weight: 700; font-size: .9rem;
 }
 .hh .hh-avatar--small { width: 26px; height: 26px; font-size: .8rem; }
 .hh .hh-avatar--claude { background: var(--hh-claude-bg); color: var(--hh-claude); }
@@ -105,8 +97,8 @@ body.hh {
 .hh .hh-fab {
   position: fixed; right: max(16px, calc(50vw - 344px)); bottom: 24px; z-index: 5;
   display: inline-flex; align-items: center; gap: 8px; padding: 16px 20px; border-radius: 16px;
-  background: var(--hh-tonal); color: var(--hh-on-tonal); font-weight: 500; text-decoration: none;
-  box-shadow: 0 1px 3px rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+  background: var(--hh-primary); color: var(--hh-on-primary); font-weight: 600; text-decoration: none;
+  box-shadow: 0 2px 6px rgba(94, 75, 60, .18), 0 6px 16px rgba(94, 75, 60, .12);
 }
 .hh .hh-fab .ms { font-size: 24px; }
 
@@ -126,7 +118,7 @@ body.hh {
 .hh .hh-intro { margin: -8px 0 16px; }
 
 /* ---------- Cards and chore list ---------- */
-.hh .hh-card { background: var(--hh-surface); border-radius: 16px; padding: 16px; box-shadow: var(--hh-shadow); }
+.hh .hh-card { background: var(--hh-surface); border-radius: 20px; padding: 16px; box-shadow: var(--hh-shadow); }
 
 .hh .hh-group { margin: 24px 0 0; }
 .hh details.hh-group summary { cursor: pointer; list-style: none; }
@@ -142,8 +134,16 @@ body.hh {
 .hh .hh-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
 .hh .hh-chore {
   display: flex; flex-wrap: wrap; gap: 8px 12px; justify-content: space-between; align-items: center;
-  padding: 12px 12px 12px 16px; border-radius: 12px; background: var(--hh-surface); box-shadow: var(--hh-shadow);
+  padding: 12px 12px 12px 16px; border-radius: 16px; background: var(--hh-surface); box-shadow: var(--hh-shadow);
 }
+/* A chore that belongs to someone wears their colour: a stripe, a light tint, their Done button. */
+.hh .hh-chore--assigned {
+  border-left: 5px solid var(--hh-person); padding-left: 12px;
+  background: color-mix(in srgb, var(--hh-person) 6%, var(--hh-surface));
+}
+.hh .hh-chore--assigned .hh-btn--tonal { background: color-mix(in srgb, var(--hh-person) 18%, var(--hh-surface)); color: color-mix(in srgb, var(--hh-person) 70%, black); }
+.hh .hh-group--personal h2 { color: color-mix(in srgb, var(--hh-person) 75%, black); }
+.hh .hh-group--personal > .hh-hint { margin-top: 0; }
 .hh .hh-chore-main { flex: 1 1 260px; min-width: 0; }
 .hh .hh-chore-title { color: var(--hh-ink); font-weight: 500; text-decoration: none; }
 .hh .hh-chore-meta { color: var(--hh-muted); font-size: .8rem; margin-top: 2px; }
@@ -176,7 +176,7 @@ body.hh {
 .hh .hh-balance { margin-top: 32px; }
 .hh .hh-bar { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: center; margin-top: 12px; font-size: .875rem; }
 .hh .hh-bar-track { height: 8px; border-radius: 999px; background: var(--hh-surface-2); overflow: hidden; }
-.hh .hh-bar-fill { display: block; height: 100%; border-radius: 999px; background: var(--hh-primary); }
+.hh .hh-bar-fill { display: block; height: 100%; border-radius: 999px; background: var(--hh-person); }
 .hh .hh-bar-value { color: var(--hh-muted); font-size: .8rem; }
 .hh .hh-done { padding-left: 18px; color: var(--hh-muted); font-size: .875rem; margin: 4px 0 0; }
 

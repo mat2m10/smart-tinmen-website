@@ -17,8 +17,16 @@
   <% end %>
 </nav>
 
-<% if @buckets.empty? %>
+<% if @buckets.empty? && @personal.empty? %>
   <p class="hh-empty">Nothing here. Enjoy it.</p>
+<% end %>
+
+<% if @personal.any? %>
+  <section class="hh-group hh-group--personal" style="<%= person_style(current_user) %>">
+    <h2>Just for you <span class="hh-count"><%= @personal.size %></span></h2>
+    <p class="hh-hint">Only you see these.</p>
+    <ul class="hh-list"><%= render partial: "chore", collection: @personal %></ul>
+  </section>
 <% end %>
 
 <% Household::ChoresController::BUCKETS.each do |key, label| %>
@@ -43,7 +51,7 @@
   <% @users.each do |user| %>
     <div class="hh-bar">
       <span class="hh-bar-name"><%= user.display_name %></span>
-      <span class="hh-bar-track"><span class="hh-bar-fill" style="width: <%= (100 * @effort[user.id].to_i / max).round %>%"></span></span>
+      <span class="hh-bar-track" style="<%= person_style(user) %>"><span class="hh-bar-fill" style="width: <%= (100 * @effort[user.id].to_i / max).round %>%"></span></span>
       <span class="hh-bar-value"><%= pluralize(@effort[user.id].to_i, "point") %> · <%= @planning[user.id].to_i %> planning</span>
     </div>
   <% end %>
@@ -56,6 +64,7 @@
         <li><strong><%= completion.user&.display_name || "Someone" %></strong> · <%= completion.chore.title %> · <%= completion.completed_on.strftime("%-d %b") %></li>
       <% end %>
     </ul>
+    <%= link_to "All done tasks, undo a tick", household_completions_path, class: "hh-btn hh-btn--text hh-more" %>
   <% end %>
 </section>
 

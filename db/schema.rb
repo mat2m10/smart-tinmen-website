@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -56,6 +56,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_200000) do
     t.datetime "created_at", null: false
     t.integer "effort", default: 1, null: false
     t.boolean "planning", default: false, null: false
+    t.date "previous_due_on"
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["chore_id"], name: "index_completions_on_chore_id"
@@ -100,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_200000) do
 
   create_table "users", force: :cascade do |t|
     t.string "avatar_url"
+    t.string "color"
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "name"

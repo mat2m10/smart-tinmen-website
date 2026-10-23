@@ -1,5 +1,5 @@
 <li class="hh-note<%= " hh-note--claude" if note.from_claude %>">
-  <span class="hh-avatar<%= " hh-avatar--claude" if note.from_claude %>" aria-hidden="true"><%= note.author_initial %></span>
+  <span class="hh-avatar<%= " hh-avatar--claude" if note.from_claude %>" style="<%= person_style(note.user) unless note.from_claude %>" aria-hidden="true"><%= note.author_initial %></span>
   <div class="hh-note-main">
     <p class="hh-note-head">
       <strong><%= note.author_name %></strong>

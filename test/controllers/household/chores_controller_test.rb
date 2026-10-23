@@ -150,6 +150,23 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_select "button", text: /did it\z/, count: 0
   end
 
+  test "personal chores get their own section at the top" do
+    chores(:gp).update!(personal: true, assignee: users(:alice))
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select ".hh-group--personal .hh-chore-title", text: "Find a GP"
+    assert_select ".hh-group:not(.hh-group--personal) .hh-chore-title", text: "Find a GP", count: 0
+    get household_root_path(show: "free")
+    assert_select ".hh-group--personal", count: 0
+  end
+
+  test "a chore wears its assignee's colour" do
+    users(:bob).update!(color: "#3F8F5A")
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select "li.hh-chore--assigned[style*='#3F8F5A'] .hh-chore-title", text: "Find a GP"
+  end
+
   test "invalid input re-renders the form" do
     sign_in("alice@example.com")
     post household_chores_path, params: { chore: { title: "", area: "Cleaning", due_on: Date.current } }

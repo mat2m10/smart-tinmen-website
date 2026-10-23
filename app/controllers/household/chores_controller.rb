@@ -8,7 +8,9 @@ class Household::ChoresController < Household::BaseController
     chores = Chore.visible_to(current_user).pending.includes(:assignee, :completions, :remarks).order(:due_on, :title)
     chores = chores.where(assignee: current_user) if @filter == "mine"
     chores = chores.where(assignee_id: nil) if @filter == "free"
-    @buckets = chores.group_by(&:bucket)
+    # Your personal chores get their own section at the top, whatever their date.
+    @personal, shared = chores.partition(&:personal)
+    @buckets = shared.group_by(&:bucket)
 
     # The balance compares shared work only; personal chores count for no one.
     recent = Completion.where(completed_on: 30.days.ago.to_date.., chore: Chore.shared)
