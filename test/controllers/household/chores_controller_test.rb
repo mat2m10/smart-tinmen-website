@@ -164,7 +164,7 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     users(:bob).update!(color: "#3F8F5A")
     sign_in("alice@example.com")
     get household_root_path
-    assert_select "li.hh-chore--assigned[style*='#3F8F5A'] .hh-chore-title", text: "Find a GP"
+    assert_select ".hh-chore--assigned[style*='#3F8F5A'] .hh-chore-title", text: "Find a GP"
   end
 
   test "the avatar menu gives a chore to the other member, who gets a push" do
@@ -191,6 +191,22 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_select "#assign-#{chore.id}", count: 0
     post assign_household_chore_path(chore), params: { assignee_id: users(:bob).id }
     assert_equal users(:alice), chore.reload.assignee
+  end
+
+  test "swiping shows Edit and Delete, and deleting a chore takes its points off the balance" do
+    chore = chores(:toilet)
+    chore.complete!(users(:alice))
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select ".hh-swipe .hh-swipe-action--delete", minimum: 1
+    assert_select ".hh-bar-value", text: /\A1 point/
+
+    assert_difference -> { Completion.count }, -1 do
+      delete household_chore_path(chore, show: "mine")
+    end
+    assert_redirected_to household_root_path(show: "mine")
+    get household_root_path
+    assert_select ".hh-bar-value", text: /\A0 points/, count: 2
   end
 
   test "invalid input re-renders the form" do

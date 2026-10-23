@@ -1,6 +1,6 @@
 <% content_for :title, "Done" %>
 <h1 class="hh-title">Done</h1>
-<p class="hh-hint hh-intro">The last <%= Completion::RECENT_DAYS / 7 %> weeks. Undo a tick that was a mistake; the chore comes back as it was.</p>
+<p class="hh-hint hh-intro">The last <%= Completion::RECENT_DAYS / 7 %> weeks. Swipe a tick to the left to delete it: its points go off the counter and the chore comes back as it was.</p>
 
 <% if @completions.empty? %>
   <p class="hh-empty">Nothing ticked off yet.</p>
@@ -8,21 +8,26 @@
 
 <ul class="hh-list">
   <% @completions.each do |completion| %>
-    <li class="hh-chore hh-chore--assigned" style="<%= person_style(completion.user) %>">
-      <div class="hh-chore-main">
-        <span class="hh-chore-title"><%= completion.chore.title %></span>
-        <p class="hh-chore-meta">
-          <strong><%= completion.user&.display_name || "Someone" %></strong> · <%= completion.completed_on.strftime("%a %-d %b") %>
-          <% if completion.chore.personal %><span class="hh-tag">personal</span><% end %>
-        </p>
+    <li class="hh-swipe" data-controller="swipe">
+      <div class="hh-swipe-actions" data-swipe-target="actions">
+        <%= button_to household_completion_path(completion), method: :delete, class: "hh-swipe-action hh-swipe-action--delete" do %><span class="ms" aria-hidden="true">delete</span>Delete<% end %>
       </div>
-      <div class="hh-chore-actions">
-        <% unless completion.chore.personal %>
-          <% @users.reject { |user| user == completion.user }.each do |user| %>
-            <%= button_to "It was #{user.display_name}", household_completion_path(completion), method: :patch, params: { completion: { user_id: user.id } }, class: "hh-btn hh-btn--text" %>
+      <div class="hh-chore hh-chore--assigned" style="<%= person_style(completion.user) %>"
+           data-swipe-target="row" data-action="pointerdown->swipe#start pointermove->swipe#move pointerup->swipe#end pointercancel->swipe#end click->swipe#click:capture">
+        <div class="hh-chore-main">
+          <span class="hh-chore-title"><%= completion.chore.title %></span>
+          <p class="hh-chore-meta">
+            <strong><%= completion.user&.display_name || "Someone" %></strong> · <%= completion.completed_on.strftime("%a %-d %b") %>
+            <% if completion.chore.personal %><span class="hh-tag">personal</span><% end %>
+          </p>
+        </div>
+        <div class="hh-chore-actions">
+          <% unless completion.chore.personal %>
+            <% @users.reject { |user| user == completion.user }.each do |user| %>
+              <%= button_to "It was #{user.display_name}", household_completion_path(completion), method: :patch, params: { completion: { user_id: user.id } }, class: "hh-btn hh-btn--text" %>
+            <% end %>
           <% end %>
-        <% end %>
-        <%= button_to household_completion_path(completion), method: :delete, class: "hh-btn hh-btn--tonal", form: { data: { turbo_confirm: "Undo “#{completion.chore.title}”?" } } do %><span class="ms" aria-hidden="true">undo</span>Undo<% end %>
+        </div>
       </div>
     </li>
   <% end %>
