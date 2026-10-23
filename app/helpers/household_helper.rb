@@ -25,9 +25,11 @@ module HouseholdHelper
   end
 
   # The member's photo when they have one, else their initial on their colour.
+  # Without a title it is decoration next to the name, so screen readers skip it.
   def avatar(user, small: false, title: user&.display_name)
     content = user&.photo? ? image_tag(household_avatar_path(user, v: user.updated_at.to_i), alt: "", loading: "lazy") : (user&.initial || "?")
-    tag.span(content, class: [ "hh-avatar", ("hh-avatar--small" if small), ("hh-avatar--photo" if user&.photo?) ], style: person_style(user), title: title)
+    tag.span(content, class: [ "hh-avatar", ("hh-avatar--small" if small), ("hh-avatar--photo" if user&.photo?) ], style: person_style(user),
+             title: title, aria: { hidden: (true unless title) })
   end
 
   def claim_label(chore)

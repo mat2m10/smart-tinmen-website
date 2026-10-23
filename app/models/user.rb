@@ -23,10 +23,10 @@ class User < ApplicationRecord
 
   # Takes an uploaded picture; the type comes from the bytes, not the browser.
   def photo_upload=(file)
-    return if file.blank?
+    return unless file.respond_to?(:read)
 
     data = file.read
-    self.photo_type = Marcel::MimeType.for(StringIO.new(data), name: file.original_filename, declared_type: file.content_type)
+    self.photo_type = Marcel::MimeType.for(StringIO.new(data))
     self.photo = data
   end
 
