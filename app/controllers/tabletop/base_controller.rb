@@ -6,6 +6,6 @@ class Tabletop::BaseController < Household::BaseController
   private
 
   def find_list(id)
-    current_user.army_lists.find(id)
+    current_user.army_lists.includes(entries: :game_unit).find(id)
   end
 end

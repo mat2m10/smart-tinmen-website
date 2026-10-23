@@ -33,6 +33,7 @@
 .tt .tt-problems { background: var(--hh-danger-bg); color: var(--hh-danger); }
 .tt .tt-warnings { background: var(--tt-warn-bg); color: var(--tt-warn); }
 .tt .tt-problem-inline { color: var(--hh-danger); font-size: .8rem; margin-top: 4px; }
+.tt .tt-problem-inline:empty { display: none; }
 .tt .tt-ploys { display: flex; align-items: center; gap: 4px; font-size: .9rem; }
 .tt .tt-ploys > span { margin-right: auto; color: var(--hh-muted); }
 .tt .tt-ploys .hh-icon-btn:disabled { opacity: .35; cursor: default; }

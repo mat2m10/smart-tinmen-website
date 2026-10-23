@@ -33,10 +33,26 @@ class Tabletop::CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tt-stock .hh-chore-title", text: "Test Sergeant"
     assert_select ".tt-stock .hh-chore-title", text: "Test Goggles", count: 0
     assert_select "#item-game-unit-#{game_units(:troopers).id} input[name='collection_item[painted]'][value='1']"
-    assert_select "[data-controller=stepper] button[data-stepper-delta-param='1']", minimum: 3
+    assert_select "form[data-controller=stepper][data-action='submit->stepper#submit'] button[data-stepper-delta-param='1']", minimum: 3
+    assert_select "[data-stepper-target=owned]", text: "2"
 
     get tabletop_collection_path(game: "killteam")
     assert_select ".tt-stock .hh-chore-title", text: "Test Witch"
+  end
+
+  test "the steppers save in the background and get the new counts as JSON" do
+    sign_in("alice@example.com")
+    patch tabletop_collection_path, params: { item_type: "GameUnit", item_id: game_units(:troopers).id, collection_item: { built: 2, painted: 3, unbuilt: 0 } },
+                                    headers: { "Accept" => "application/json" }
+    assert_response :success
+    assert_equal "application/json", response.media_type
+    assert_equal({ "built" => 2, "painted" => 3, "unbuilt" => 0, "owned" => 5 }, response.parsed_body)
+    assert_equal 5, collection_items(:alice_troopers).reload.owned
+
+    patch tabletop_collection_path, params: { item_type: "GameUnit", item_id: game_units(:troopers).id, collection_item: { painted: 1000 } },
+                                    headers: { "Accept" => "application/json" }
+    assert_response :unprocessable_entity
+    assert_match(/Painted/, response.parsed_body["errors"].join)
   end
 
   test "counts are saved per member" do

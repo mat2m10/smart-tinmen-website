@@ -105,6 +105,54 @@ class Tabletop::ImporterTest < ActiveSupport::TestCase
     assert_nil units["Fake Leader"].points
   end
 
+  # Shaped like a team with a fixed leader block named after it, no extra
+  # selections and one repeatable operative type.
+  SWARM = <<~YAML
+    meta:
+      game: "Kill Team (made up)"
+      kill_team: Fake Swarm
+    selection:
+      leader:
+        default: Fake Alpha (LEADER)
+      alpha:
+        count: 1
+        loadout_options:
+          - [Fake tail, Fake claws]
+      main_list:
+        count: 4
+        options: [Fake Biter, Fake Spitter, Fake Brute]
+      extra_selections: none
+      limits:
+        - "Other than BRUTE, each operative can be included only once."
+        - "So: Alpha + any 4, Brutes may repeat."
+    operatives:
+      - {name: Fake Alpha, keywords: [SWARM, LEADER, ALPHA], abilities: [{name: Fake Crest, summary: "scary"}]}
+      - {name: Fake Biter, keywords: [SWARM, BITER]}
+      - {name: Fake Spitter, keywords: [SWARM, SPITTER]}
+      - {name: Fake Brute, keywords: [SWARM, BRUTE]}
+  YAML
+
+  test "imports a team without extra selections whose leader block is named after its leader" do
+    result = Tabletop::Importer.new(SWARM).run
+    assert_equal [ 4, 0 ], result.counts["operatives"]
+    rules = GameFaction.find_by!(game: "killteam", name: "Fake Swarm").rules
+    assert_equal [ 1, [ "Fake tail, Fake claws" ], 4, nil ], rules.values_at("commander_count", "loadouts", "main_count", "extra_count")
+    assert_equal "BRUTE", rules["repeatable_keyword"]
+    assert_equal [ "So: Alpha + any 4, Brutes may repeat." ], rules["other_limits"]
+    assert_equal "commander", GameUnit.find_by!(faction: "Fake Swarm", name: "Fake Alpha").category
+
+    list = users(:alice).army_lists.create!(game: "killteam", faction: "Fake Swarm", name: "Swarm")
+    units = GameUnit.where(faction: "Fake Swarm").index_by(&:name)
+    list.entries.create!(game_unit: units["Fake Alpha"], loadout: "Fake tail, Fake claws")
+    4.times { list.entries.create!(game_unit: units["Fake Brute"]) }
+    assert list.validator.valid?, list.validator.errors.inspect
+
+    list.entries.last.destroy!
+    2.times { list.entries.create!(game_unit: units["Fake Biter"]) }
+    list.entries.reset
+    assert_equal [ "Fake Biter can be taken only once.", "5 operatives: at most 4." ].sort, list.validator.errors.sort
+  end
+
   test "a file for an unknown game is refused" do
     assert_raises(ArgumentError) { Tabletop::Importer.new("meta: {game: Chess}").run }
   end

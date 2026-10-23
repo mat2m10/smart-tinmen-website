@@ -39,7 +39,7 @@ module Tabletop
     # Upgrades that may go in this slot of this entry: right slot and unit,
     # not removed, allowed in the faction, and not already used up in the army.
     def upgrade_options(entry, slot)
-      GameUpgrade.available.where(game: list.game, faction: list.faction, slot: slot).order(:points, :name).select do |upgrade|
+      available_upgrades.fetch(slot, []).select do |upgrade|
         upgrade.fits?(entry.game_unit, alignment: @rules["alignment"]) && unique_allowed?(upgrade) &&
           entry.upgrade_ids.exclude?(upgrade.id) && (upgrade.per_army.nil? || upgrade_usage[upgrade.id].to_i < upgrade.per_army)
       end
@@ -49,6 +49,11 @@ module Tabletop
 
     def entries
       @entries ||= list.entries.to_a
+    end
+
+    # The faction's upgrades, loaded once for every slot of the list.
+    def available_upgrades
+      @available_upgrades ||= GameUpgrade.available.where(game: list.game, faction: list.faction).order(:points, :name).group_by(&:slot)
     end
 
     # jsonb keeps no key order, so ranks are shown in the usual order.

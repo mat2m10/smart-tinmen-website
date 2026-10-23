@@ -117,6 +117,8 @@ module Tabletop
 
       if operatives.size < main_count
         "#{operatives.size} of #{main_count} operatives."
+      elsif extra_operatives.positive? && extra_count.to_i.zero?
+        "#{operatives.size} operatives: at most #{main_count}."
       elsif extra_operatives > operatives.count { |entry| repeatable?(entry.game_unit) }
         "#{operatives.size} operatives: only #{@rules["repeatable_keyword"].to_s.titleize} operatives can go past #{main_count}."
       end

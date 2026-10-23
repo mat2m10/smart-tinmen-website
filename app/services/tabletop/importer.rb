@@ -71,17 +71,30 @@ module Tabletop
         removed: removed.include?(row["name"]), notes: row["note"], check: row["check"] == true }
     end
 
+    # A section of the selection rules, or {} when it is missing or plain
+    # text (a team without extra selections says "extra_selections: none").
+    def section(selection, key)
+      value = selection[key]
+      value.is_a?(Hash) ? value : {}
+    end
+
+    # The leader's count and loadouts sit under a key named after it
+    # ("commander:", "prime:"): the first other section with loadout options.
+    def leader_section(selection)
+      selection.except("leader", "main_list", "extra_selections").values.find { |value| value.is_a?(Hash) && value.key?("loadout_options") } || {}
+    end
+
     def import_killteam
       selection = @data.fetch("selection")
       @cards = Array(@data["operatives"]).index_by { |card| card.fetch("name") }
-      extras = Array(selection.dig("extra_selections", "options"))
+      extras = Array(section(selection, "extra_selections")["options"]).select { |option| option.is_a?(Hash) }
       ploy = extras.find { |option| option["name"].to_s.match?(/ploy/i) }
       save_faction(@data.dig("meta", "kill_team"), killteam_rules(selection, ploy))
 
       costs = extras.to_h { |option| [ option["name"], option["counts_as"] ] }
-      leader = without_brackets(selection.dig("leader", "default")).presence
+      leader = without_brackets(section(selection, "leader")["default"]).presence
       save_operative(leader, "commander") if leader
-      main = Array(selection.dig("main_list", "options"))
+      main = Array(section(selection, "main_list")["options"])
       main.each { |name| save_operative(name, "operative", selection_cost: costs[name]) }
       (extras - [ ploy ]).reject { |option| main.include?(option["name"]) }.each do |option|
         save_operative(option["name"], option["broodcoven"] ? "broodcoven" : "extra", selection_cost: option["counts_as"],
@@ -90,22 +103,23 @@ module Tabletop
     end
 
     def killteam_rules(selection, ploy)
-      { "commander_count" => selection.dig("commander", "count") || 1,
-        "loadouts" => Array(selection.dig("commander", "loadout_options")).map { |loadout| Array(loadout).join(", ") },
-        "main_count" => selection.dig("main_list", "count"), "extra_count" => selection.dig("extra_selections", "count"),
+      leader = leader_section(selection)
+      { "commander_count" => leader["count"] || 1,
+        "loadouts" => Array(leader["loadout_options"]).map { |loadout| Array(loadout).join(", ") },
+        "main_count" => section(selection, "main_list")["count"], "extra_count" => section(selection, "extra_selections")["count"],
         "ploy_cost" => ploy&.dig("counts_as"), "max_ploys" => ploy&.dig("note").to_s[/max (\d+) times/i, 1]&.to_i,
-        "broodcoven_note" => selection.dig("leader", "broodcoven_option")&.squish }.merge(killteam_limits(selection["limits"]))
+        "broodcoven_note" => section(selection, "leader")["broodcoven_option"]&.squish }.merge(killteam_limits(selection["limits"]))
     end
 
-    # "Other than GRUNT, each option can be included only once." and
+    # "Other than GRUNT, each option (or operative) can be included only once." and
     # "Max 2 GUNNER and SCOUT operatives combined." become structured rules;
     # any other line is kept as text and shown under the list.
     def killteam_limits(lines)
       rules = { "repeatable_keyword" => nil, "keyword_limits" => [], "other_limits" => [] }
       Array(lines).each do |line|
-        if (match = line.match(/\AOther than (\S+), each option can be included only once/i))
+        if (match = line.to_s.match(/\AOther than (\S+), each (?:option|operative) can be included only once/i))
           rules["repeatable_keyword"] = match[1]
-        elsif (match = line.match(/\AMax (\d+) (.+?) operatives?\b/i))
+        elsif (match = line.to_s.match(/\AMax (\d+) (.+?) operatives?\b/i))
           rules["keyword_limits"] << { "keywords" => match[2].split(/\s+and\s+|,\s*/), "max" => match[1].to_i }
         else
           rules["other_limits"] << line
