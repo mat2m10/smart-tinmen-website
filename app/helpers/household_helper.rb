@@ -19,6 +19,15 @@ module HouseholdHelper
     [ prefix, date.strftime(prefix ? "%a %-d %b" : "%A %-d %b") ].compact.join(" · ")
   end
 
+  # Sets --hh-person to the member's own colour; without one the CSS falls back to neutral.
+  def person_style(user)
+    "--hh-person: #{user.color}" if user&.color
+  end
+
+  def avatar(user, small: false, title: user&.display_name)
+    tag.span(user&.initial || "?", class: [ "hh-avatar", ("hh-avatar--small" if small) ], style: person_style(user), title: title)
+  end
+
   def claim_label(chore)
     if chore.assignee == current_user then "Drop"
     elsif chore.assignee then "Take over"

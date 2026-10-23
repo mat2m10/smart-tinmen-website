@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   normalizes :email, with: ->(email) { email.strip.downcase }
   validates :email, presence: true, uniqueness: true
+  validates :color, format: { with: /\A#\h{6}\z/ }, allow_nil: true
 
   def self.allowed_emails
     ENV.fetch("HOUSEHOLD_EMAILS", "").split(",").map { |email| email.strip.downcase }.reject(&:empty?)

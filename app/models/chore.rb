@@ -72,8 +72,19 @@ class Chore < ApplicationRecord
 
   def complete!(user, on: Date.current)
     transaction do
-      completions.create!(user: user, completed_on: on, effort: effort, planning: planning)
+      completions.create!(user: user, completed_on: on, effort: effort, planning: planning, previous_due_on: due_on)
       repeating? ? update!(due_on: next_due_after(on)) : update!(done_at: Time.current)
+    end
+  end
+
+  # Takes a tick back. Only the latest one puts the chore back as it was;
+  # an older one just leaves the history.
+  def undo!(completion)
+    transaction do
+      if completion == completions.order(:created_at, :id).last
+        update!(done_at: nil, due_on: completion.previous_due_on || due_on)
+      end
+      completion.destroy!
     end
   end
 

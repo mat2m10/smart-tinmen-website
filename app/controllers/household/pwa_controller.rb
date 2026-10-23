@@ -10,7 +10,7 @@ class Household::PwaController < ActionController::Base
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     render json: {
       name: "Household", short_name: "Household", start_url: "/household", scope: "/household", display: "standalone",
-      background_color: "#F8FAFD", theme_color: "#F8FAFD",
+      background_color: "#FBF7F1", theme_color: "#FBF7F1",
       icons: [
         { src: helpers.asset_path("android-192.png"), sizes: "192x192", type: "image/png" },
         { src: helpers.asset_path("android-512.png"), sizes: "512x512", type: "image/png" }
