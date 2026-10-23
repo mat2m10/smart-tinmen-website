@@ -40,7 +40,9 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     assert_select ".hh-note-body", count: 0
     get household_notes_path
     assert_select ".hh-note-body", /Front page note/
-    post household_notes_path, params: { return_to: "board", note: { body: "from the board" } }
+    assert_enqueued_with(job: HouseholdPushJob, args: [ [ users(:bob).id ], "Test added a note", "from the board", household_notes_path ]) do
+      post household_notes_path, params: { return_to: "board", note: { body: "from the board" } }
+    end
     assert_redirected_to household_root_path
   end
 
