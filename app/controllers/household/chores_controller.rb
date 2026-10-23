@@ -67,7 +67,8 @@ class Household::ChoresController < Household::BaseController
   # shown, so a double tap or a second phone with an old page counts once.
   # "by" ticks it off for the person it belongs to when they forgot to.
   def complete
-    doer = params[:by].present? && @chore.assignee_id == params[:by].to_i ? @chore.assignee : current_user
+    doer = current_user
+    doer = @chore.assignee if params[:by].present? && params[:by].to_i == @chore.assignee_id
     done = @chore.with_lock do
       next false if @chore.done_at? || (params[:seen].present? && params[:seen].to_i != @chore.completions.count)
 

@@ -116,6 +116,40 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "Done can be ticked off for the person a chore belongs to" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    chore.update!(assignee: users(:bob))
+    bob = users(:bob).display_name
+    get household_root_path
+    assert_select "button", text: "#{bob} did it"
+
+    assert_enqueued_with(job: HouseholdPushJob, args: ->(args) { args[1].include?("ticked off by #{users(:alice).display_name}") }) do
+      post complete_household_chore_path(chore), params: { seen: chore.completions.count, by: users(:bob).id }
+    end
+    assert_equal users(:bob), chore.completions.order(:id).last.user
+    assert_equal "Clean the toilet (done by #{bob})", Event.where(action: "chore_done").last.summary
+  end
+
+  test "Done for someone else falls back to you unless they own the chore" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    post complete_household_chore_path(chore), params: { by: users(:bob).id }
+    assert_equal users(:alice), chore.completions.order(:id).last.user
+
+    chore.update!(assignee: users(:alice))
+    post complete_household_chore_path(chore), params: { by: users(:bob).id }
+    assert_equal users(:alice), chore.completions.order(:id).last.user
+  end
+
+  test "your own and personal chores have no did-it button" do
+    chores(:toilet).update!(assignee: users(:alice))
+    chores(:gp).update!(personal: true, assignee: users(:alice))
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select "button", text: /did it\z/, count: 0
+  end
+
   test "invalid input re-renders the form" do
     sign_in("alice@example.com")
     post household_chores_path, params: { chore: { title: "", area: "Cleaning", due_on: Date.current } }
