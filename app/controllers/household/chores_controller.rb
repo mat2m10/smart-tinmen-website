@@ -61,7 +61,8 @@ class Household::ChoresController < Household::BaseController
   def destroy
     @chore.destroy!
     Event.log!("chore_deleted", user: current_user, chore: @chore)
-    redirect_to household_root_path, notice: "Deleted: #{@chore.title}", status: :see_other
+    # Its ticks go with it (dependent: :destroy), so its points leave the balance too.
+    redirect_to household_root_path(show: filter_param), notice: "Deleted: #{@chore.title}", status: :see_other
   end
 
   # The button sends how many times the chore had been done when the page was

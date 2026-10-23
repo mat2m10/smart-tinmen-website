@@ -1,43 +1,50 @@
-<li class="hh-chore hh-chore--<%= chore.bucket %><%= " hh-chore--assigned" if chore.assignee %>" style="<%= person_style(chore.assignee) %>">
-  <div class="hh-chore-main">
-    <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
-    <p class="hh-chore-meta">
-      <span class="hh-due"><%= due_label(chore) %></span>
-      · <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %>
-      · <%= chore.repeat_label %> · <%= chore.effort_label %>
-      <% if chore.personal %><span class="hh-tag">personal</span><% end %>
-      <% if chore.planning %><span class="hh-tag">planning</span><% end %>
-      <% if chore.remarks.any? %>
-        <%= link_to edit_household_chore_path(chore, anchor: "notes"), class: "hh-note-count", title: pluralize(chore.remarks.size, "note") do %><span class="ms" aria-hidden="true">chat_bubble</span><%= chore.remarks.size %><% end %>
-      <% end %>
-    </p>
+<li class="hh-swipe" data-controller="swipe">
+  <div class="hh-swipe-actions" data-swipe-target="actions">
+    <%= link_to edit_household_chore_path(chore), class: "hh-swipe-action hh-swipe-action--edit" do %><span class="ms" aria-hidden="true">edit</span>Edit<% end %>
+    <%= button_to household_chore_path(chore, show: @filter), method: :delete, class: "hh-swipe-action hh-swipe-action--delete" do %><span class="ms" aria-hidden="true">delete</span>Delete<% end %>
   </div>
-  <div class="hh-chore-actions">
-    <% if chore.personal %>
-      <%= avatar(chore.assignee, small: true) %>
-    <% else %>
-      <%# Tapping who has it opens a small menu to give it to someone else (the browser's popover: no JS, tap outside closes it). %>
-      <button type="button" class="hh-assign-btn" popovertarget="assign-<%= chore.id %>" aria-label="Who does this? Now: <%= chore.assignee&.display_name || "up for grabs" %>">
-        <% if chore.assignee %><%= avatar(chore.assignee, small: true, title: nil) %><% else %><span class="hh-free">Up for grabs</span><% end %>
-      </button>
-      <div id="assign-<%= chore.id %>" popover class="hh-popover">
-        <p class="hh-popover-title">Who does “<%= chore.title %>”?</p>
-        <% @users.each do |user| %>
-          <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: user.id }, class: "hh-popover-item", aria: { current: (chore.assignee == user ? "true" : nil) } do %>
-            <%= avatar(user, small: true, title: nil) %><%= user == current_user ? "Me (#{user.display_name})" : user.display_name %>
+  <div class="hh-chore hh-chore--<%= chore.bucket %><%= " hh-chore--assigned" if chore.assignee %>" style="<%= person_style(chore.assignee) %>"
+       data-swipe-target="row" data-action="pointerdown->swipe#start pointermove->swipe#move pointerup->swipe#end pointercancel->swipe#end click->swipe#click:capture">
+    <div class="hh-chore-main">
+      <%= link_to chore.title, edit_household_chore_path(chore), class: "hh-chore-title" %>
+      <p class="hh-chore-meta">
+        <span class="hh-due"><%= due_label(chore) %></span>
+        · <%= chore.area %><%= " · #{chore.room}" if chore.room.present? %>
+        · <%= chore.repeat_label %> · <%= chore.effort_label %>
+        <% if chore.personal %><span class="hh-tag">personal</span><% end %>
+        <% if chore.planning %><span class="hh-tag">planning</span><% end %>
+        <% if chore.remarks.any? %>
+          <%= link_to edit_household_chore_path(chore, anchor: "notes"), class: "hh-note-count", title: pluralize(chore.remarks.size, "note") do %><span class="ms" aria-hidden="true">chat_bubble</span><%= chore.remarks.size %><% end %>
+        <% end %>
+      </p>
+    </div>
+    <div class="hh-chore-actions">
+      <% if chore.personal %>
+        <%= avatar(chore.assignee, small: true) %>
+      <% else %>
+        <%# Tapping who has it opens a small menu to give it to someone else (the browser's popover: no JS, tap outside closes it). %>
+        <button type="button" class="hh-assign-btn" popovertarget="assign-<%= chore.id %>" aria-label="Who does this? Now: <%= chore.assignee&.display_name || "up for grabs" %>">
+          <% if chore.assignee %><%= avatar(chore.assignee, small: true, title: nil) %><% else %><span class="hh-free">Up for grabs</span><% end %>
+        </button>
+        <div id="assign-<%= chore.id %>" popover class="hh-popover">
+          <p class="hh-popover-title">Who does “<%= chore.title %>”?</p>
+          <% @users.each do |user| %>
+            <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: user.id }, class: "hh-popover-item", aria: { current: (chore.assignee == user ? "true" : nil) } do %>
+              <%= avatar(user, small: true, title: nil) %><%= user == current_user ? "Me (#{user.display_name})" : user.display_name %>
+            <% end %>
           <% end %>
-        <% end %>
-        <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: "" }, class: "hh-popover-item", aria: { current: (chore.assignee ? nil : "true") } do %>
-          <span class="hh-avatar hh-avatar--small hh-avatar--free" aria-hidden="true">?</span>Up for grabs
-        <% end %>
-      </div>
-    <% end %>
-    <% unless chore.personal %>
-      <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--text" %>
-    <% end %>
-    <% if chore.assignee && chore.assignee != current_user %>
-      <%= button_to "#{chore.assignee.display_name} did it", complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size, by: chore.assignee_id }, class: "hh-btn hh-btn--text" %>
-    <% end %>
-    <%= button_to complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">check</span>Done<% end %>
+          <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: "" }, class: "hh-popover-item", aria: { current: (chore.assignee ? nil : "true") } do %>
+            <span class="hh-avatar hh-avatar--small hh-avatar--free" aria-hidden="true">?</span>Up for grabs
+          <% end %>
+        </div>
+      <% end %>
+      <% unless chore.personal %>
+        <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--text" %>
+      <% end %>
+      <% if chore.assignee && chore.assignee != current_user %>
+        <%= button_to "#{chore.assignee.display_name} did it", complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size, by: chore.assignee_id }, class: "hh-btn hh-btn--text" %>
+      <% end %>
+      <%= button_to complete_household_chore_path(chore, show: @filter), params: { seen: chore.completions.size }, class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">check</span>Done<% end %>
+    </div>
   </div>
 </li>

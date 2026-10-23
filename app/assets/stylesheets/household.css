@@ -145,6 +145,20 @@ body.hh {
 .hh .hh-group--personal h2 { color: color-mix(in srgb, var(--hh-person) 75%, black); }
 .hh .hh-group--personal > .hh-hint { margin-top: 0; }
 .hh .hh-chore-main { flex: 1 1 260px; min-width: 0; }
+
+/* Swipe a row left for its actions, like in a mail app (swipe_controller.js). */
+.hh .hh-swipe { position: relative; border-radius: 16px; overflow: hidden; box-shadow: var(--hh-shadow); }
+.hh .hh-swipe > .hh-chore { position: relative; box-shadow: none; touch-action: pan-y; transition: transform .2s ease; }
+.hh .hh-swipe.is-dragging > .hh-chore { transition: none; }
+.hh .hh-swipe-actions { position: absolute; inset: 0 0 0 auto; display: flex; visibility: hidden; }
+.hh .hh-swipe.is-open .hh-swipe-actions, .hh .hh-swipe.is-dragging .hh-swipe-actions { visibility: visible; }
+.hh .hh-swipe-actions form.button_to { display: flex; }
+.hh .hh-swipe-action {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 80px;
+  border: 0; color: #FFFFFF; font: 600 .8rem var(--hh-font); text-decoration: none; cursor: pointer;
+}
+.hh .hh-swipe-action--edit { background: var(--hh-primary); }
+.hh .hh-swipe-action--delete { background: var(--hh-danger); }
 .hh .hh-chore-title { color: var(--hh-ink); font-weight: 500; text-decoration: none; }
 .hh .hh-chore-meta { color: var(--hh-muted); font-size: .8rem; margin-top: 2px; }
 .hh .hh-due { font-weight: 500; }
