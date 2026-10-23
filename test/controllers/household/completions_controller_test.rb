@@ -33,6 +33,25 @@ class Household::CompletionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "chore_undone", Event.last.action
   end
 
+  test "undoing a tick from before previous_due_on existed puts the chore on the day it was done" do
+    chore = chores(:toilet)
+    chore.complete!(users(:alice), on: Date.current - 2)
+    chore.completions.last.update!(previous_due_on: nil)
+    sign_in("alice@example.com")
+    delete household_completion_path(chore.completions.last)
+    assert_equal Date.current - 2, chore.reload.due_on
+  end
+
+  test "a personal tick cannot be moved to the other member" do
+    chore = chores(:gp)
+    chore.update!(personal: true, assignee: users(:alice))
+    chore.complete!(users(:alice))
+    sign_in("alice@example.com")
+    patch household_completion_path(chore.completions.last), params: { completion: { user_id: users(:bob).id } }
+    assert_response :not_found
+    assert_equal users(:alice), chore.completions.last.reload.user
+  end
+
   test "undo reopens a one-off chore" do
     chore = chores(:gp)
     chore.complete!(users(:bob))

@@ -77,12 +77,13 @@ class Chore < ApplicationRecord
     end
   end
 
-  # Takes a tick back. Only the latest one puts the chore back as it was;
-  # an older one just leaves the history.
+  # Takes a tick back. Only the latest one puts the chore back as it was
+  # (also over a date edited by hand since); an older one just leaves the
+  # history. Ticks from before previous_due_on existed fall back to the day done.
   def undo!(completion)
     transaction do
       if completion == completions.order(:created_at, :id).last
-        update!(done_at: nil, due_on: completion.previous_due_on || due_on)
+        update!(done_at: nil, due_on: completion.previous_due_on || (repeating? ? completion.completed_on : due_on))
       end
       completion.destroy!
     end
