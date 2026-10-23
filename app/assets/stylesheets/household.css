@@ -73,6 +73,8 @@ body.hh {
   background: var(--hh-person); color: #FFFFFF; font-weight: 700; font-size: .9rem;
 }
 .hh .hh-avatar--small { width: 26px; height: 26px; font-size: .8rem; }
+.hh .hh-avatar--photo { overflow: hidden; background: var(--hh-surface-2); box-shadow: 0 0 0 2px var(--hh-person); }
+.hh .hh-avatar--photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hh .hh-avatar--claude { background: var(--hh-claude-bg); color: var(--hh-claude); }
 
 /* ---------- Buttons ---------- */
@@ -285,11 +287,15 @@ body.hh {
 .hh .hh-me-link { display: inline-flex; border-radius: 50%; text-decoration: none; }
 .hh .hh-me-link[aria-current="page"] .hh-avatar { outline: 2px solid var(--hh-person); outline-offset: 2px; }
 .hh .hh-profile-head { display: flex; gap: 12px; align-items: center; }
-.hh .hh-profile-head .hh-avatar { width: 48px; height: 48px; font-size: 1.2rem; }
+.hh .hh-profile-head .hh-avatar, .hh .hh-avatar-slot.hh-avatar--photo { width: 64px; height: 64px; font-size: 1.4rem; }
+.hh .hh-avatar-slot { display: inline-flex; }
+.hh .hh-avatar-slot.hh-avatar--photo { border-radius: 50%; overflow: hidden; }
+.hh .hh-avatar-slot.hh-avatar--photo > img { width: 100%; height: 100%; object-fit: cover; }
+.hh .hh-photo-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; }
 .hh .hh-profile-name { font-size: 1.15rem; font-weight: 600; }
 .hh .hh-swatches { border: 0; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .hh .hh-swatches legend { font-weight: 500; font-size: .85rem; color: var(--hh-muted); margin-bottom: 6px; }
-.hh .hh-form .hh-swatch { margin: 0; cursor: pointer; }
+.hh .hh-form .hh-swatch { position: relative; margin: 0; cursor: pointer; }
 .hh .hh-swatch span[aria-hidden] { display: block; width: 36px; height: 36px; border-radius: 50%; background: var(--hh-person); }
 .hh .hh-swatch input:checked + span { outline: 3px solid var(--hh-ink); outline-offset: 2px; }
 .hh .hh-swatch input:focus-visible + span { outline: 3px solid var(--hh-primary); outline-offset: 2px; }

@@ -24,8 +24,10 @@ module HouseholdHelper
     "--hh-person: #{user.color}" if user&.color
   end
 
+  # The member's photo when they have one, else their initial on their colour.
   def avatar(user, small: false, title: user&.display_name)
-    tag.span(user&.initial || "?", class: [ "hh-avatar", ("hh-avatar--small" if small) ], style: person_style(user), title: title)
+    content = user&.photo? ? image_tag(household_avatar_path(user, v: user.updated_at.to_i), alt: "", loading: "lazy") : (user&.initial || "?")
+    tag.span(content, class: [ "hh-avatar", ("hh-avatar--small" if small), ("hh-avatar--photo" if user&.photo?) ], style: person_style(user), title: title)
   end
 
   def claim_label(chore)

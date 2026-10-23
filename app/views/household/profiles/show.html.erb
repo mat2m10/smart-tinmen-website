@@ -1,13 +1,23 @@
 <% content_for :title, "Profile" %>
 <h1 class="hh-title">Profile</h1>
 
-<%= form_with model: current_user, url: household_profile_path, method: :patch, class: "hh-card hh-form hh-profile" do |f| %>
+<%= form_with model: current_user, url: household_profile_path, method: :patch, multipart: true, class: "hh-card hh-form hh-profile", data: { controller: "avatar-picker" } do |f| %>
   <div class="hh-profile-head" style="<%= person_style(current_user) %>">
-    <%= avatar(current_user) %>
+    <span data-avatar-picker-target="preview" class="hh-avatar-slot"><%= avatar(current_user) %></span>
     <div>
       <p class="hh-profile-name"><%= current_user.display_name %></p>
       <p class="hh-hint"><%= current_user.email %></p>
     </div>
+  </div>
+
+  <div class="hh-photo-actions">
+    <label class="hh-btn hh-btn--tonal">
+      <span class="ms" aria-hidden="true">photo_camera</span><%= current_user.photo? ? "Change photo" : "Add a photo" %>
+      <%= f.file_field :photo_upload, accept: "image/*", class: "hh-visually-hidden", data: { avatar_picker_target: "input", action: "avatar-picker#pick" } %>
+    </label>
+    <% if current_user.photo? %>
+      <label class="hh-check"><%= f.check_box :remove_photo %> Remove photo</label>
+    <% end %>
   </div>
 
   <% if current_user.errors.any? %>
