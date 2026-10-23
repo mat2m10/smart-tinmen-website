@@ -104,6 +104,28 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     assert_not PushSubscription.exists?(gone.id)
   end
 
+  test "each push carries the recipient's badge count" do
+    subscribe(users(:alice))
+    subscribe(users(:bob))
+    Chore.create!(title: "Bob's late chore", area: "Admin", due_on: Date.yesterday, assignee: users(:bob))
+    badges = {}
+    original = WebPush.method(:payload_send)
+    WebPush.define_singleton_method(:payload_send) { |**args| badges[args[:endpoint]] = JSON.parse(args[:message])["badge"] }
+    begin
+      assert_equal 2, PushSubscription.notify(User.all, title: "Hi", body: "there")
+    ensure
+      WebPush.define_singleton_method(:payload_send, original)
+    end
+    assert_equal users(:alice).badge_count, badges["https://push.example.com/#{users(:alice).id}"]
+    assert_equal users(:alice).badge_count + 1, badges["https://push.example.com/#{users(:bob).id}"]
+  end
+
+  test "pages set the app badge for the signed-in member" do
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select "body[data-controller=badge][data-badge-count-value=?]", users(:alice).badge_count.to_s
+  end
+
   test "the calendar feed needs the key and lists open chores as all-day events" do
     get household_calendar_path(key: "wrong")
     assert_response :not_found

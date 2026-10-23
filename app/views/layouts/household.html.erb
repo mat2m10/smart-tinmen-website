@@ -22,7 +22,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="hh">
+  <body class="hh"<% if current_user %> data-controller="badge" data-badge-count-value="<%= current_user.badge_count %>"<% end %>>
     <% if current_user %>
       <header class="hh-appbar">
         <%= link_to "Household", household_root_path, class: "hh-brand" %>

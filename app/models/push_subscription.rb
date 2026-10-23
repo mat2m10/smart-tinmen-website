@@ -5,15 +5,17 @@ class PushSubscription < ApplicationRecord
   validates :endpoint, presence: true, uniqueness: true, format: { with: %r{\Ahttps://\S+\z} }
   validates :p256dh, :auth, presence: true
 
-  # Sends a notification to the given users' devices. Devices that the push
-  # service no longer knows are removed. Returns how many were reached.
+  # Sends a notification to the given users' devices, each with that user's
+  # badge count for the app icon. Devices that the push service no longer
+  # knows are removed. Returns how many were reached.
   def self.notify(users, title:, body:, path: "/household")
     keys = vapid_keys
     return 0 unless keys
 
-    message = { title: title.to_s.truncate(80), options: { body: body.to_s.truncate(240), data: { path: path }, icon: ActionController::Base.helpers.asset_path("android-192.png") } }.to_json
-    where(user: users).count do |subscription|
-      WebPush.payload_send(message: message, endpoint: subscription.endpoint, p256dh: subscription.p256dh, auth: subscription.auth,
+    notification = { title: title.to_s.truncate(80), options: { body: body.to_s.truncate(240), data: { path: path }, icon: ActionController::Base.helpers.asset_path("android-192.png") } }
+    messages = Hash.new { |hash, user| hash[user] = notification.merge(badge: user.badge_count).to_json }
+    where(user: users).includes(:user).count do |subscription|
+      WebPush.payload_send(message: messages[subscription.user], endpoint: subscription.endpoint, p256dh: subscription.p256dh, auth: subscription.auth,
                            vapid: keys, ttl: 12.hours.to_i, urgency: "normal", open_timeout: 5, read_timeout: 10)
       true
     rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription
