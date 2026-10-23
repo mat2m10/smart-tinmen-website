@@ -123,14 +123,6 @@ p { margin: 0; }
 .st-step h3 { font-size: 19px; font-weight: 750; font-stretch: 108%; margin-block: 6px; }
 .st-step p { color: var(--muted); font-size: 15px; }
 
-/* ── Track record ── */
-.st-log { list-style: none; margin: 0; padding: 0; }
-.st-log li { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px; padding-block: 18px; border-bottom: 1.5px dashed var(--line); align-items: baseline; }
-.st-yr { font: 500 14px var(--mono); color: var(--teal); font-variant-numeric: tabular-nums; }
-.st-log b { font-weight: 650; }
-.st-org { display: block; font-size: 14px; color: var(--muted); }
-.st-log p { color: var(--muted); font-size: 15px; }
-
 /* ── Team ── */
 .st-team-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .st-person { padding: 28px; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 22px; }
@@ -163,15 +155,11 @@ p { margin: 0; }
   .st-step:nth-child(2) { border-right: 0; }
   .st-step:nth-child(-n+2) { border-bottom: 1.5px solid var(--line); }
   .st-team-grid { grid-template-columns: minmax(0, 1fr); }
-  .st-log li { grid-template-columns: 96px minmax(0, 1fr); }
-  .st-log li p { grid-column: 2; }
 }
 @media (max-width: 600px) {
   .st-work-grid, .st-svc-grid, .st-steps { grid-template-columns: minmax(0, 1fr); }
   .st-step { border-right: 0; border-bottom: 1.5px solid var(--line); }
   .st-step:last-child { border-bottom: 0; }
   .st-person { grid-template-columns: minmax(0, 1fr); }
-  .st-log li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .st-log li p { grid-column: 1; }
   .st-nav { gap: 14px; }
 }
