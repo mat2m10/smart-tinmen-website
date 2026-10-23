@@ -3,11 +3,16 @@
 self.addEventListener("install", () => self.skipWaiting())
 self.addEventListener("activate", event => event.waitUntil(self.clients.claim()))
 self.addEventListener("push", event => {
-  const { title, options } = event.data ? event.data.json() : { title: "Household", options: {} }
-  // No number badge on the app icon, just the notification.
-  if (self.navigator.clearAppBadge) self.navigator.clearAppBadge().catch(() => {})
-  event.waitUntil(self.registration.showNotification(title, options))
+  const { title, options, badge } = event.data ? event.data.json() : { title: "Household", options: {} }
+  event.waitUntil(Promise.all([ self.registration.showNotification(title, options), setBadge(badge) ]))
 })
+
+// The app icon shows how many chores are waiting for you today (pushes
+// from before this change carry no count and leave the badge alone).
+function setBadge(count) {
+  if (!self.navigator.setAppBadge || !Number.isInteger(count)) return Promise.resolve()
+  return (count > 0 ? self.navigator.setAppBadge(count) : self.navigator.clearAppBadge()).catch(() => {})
+}
 
 self.addEventListener("notificationclick", event => {
   event.notification.close()

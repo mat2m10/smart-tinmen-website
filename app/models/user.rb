@@ -64,6 +64,11 @@ class User < ApplicationRecord
     display_name.first.upcase
   end
 
+  # The number on the app icon: open chores due by today that are yours or up for grabs.
+  def badge_count(today = Date.current)
+    Chore.visible_to(self).pending.where(due_on: ..today, assignee_id: [ id, nil ]).count
+  end
+
   private
 
   def photo_allowed
