@@ -1,0 +1,27 @@
+<% content_for :title, "Lists" %>
+<h1 class="hh-title">Lists</h1>
+
+<% if @lists.empty? %>
+  <p class="hh-empty">No lists yet. Start one with “New list”.</p>
+<% end %>
+
+<% GameFaction::GAMES.each do |game, game_name| %>
+  <% lists = @lists[game] %>
+  <% next if lists.blank? %>
+  <section class="hh-group">
+    <h2><%= game_name %> <span class="hh-count"><%= lists.size %></span></h2>
+    <ul class="hh-list">
+      <% lists.each do |list| %>
+        <li class="hh-chore tt-list">
+          <div class="hh-chore-main">
+            <%= link_to list.name, tabletop_list_path(list), class: "hh-chore-title" %>
+            <p class="hh-chore-meta"><%= list.faction %> · <%= list_size(list) %></p>
+          </div>
+          <%= validity_badge(list.validator) %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+
+<%= link_to new_tabletop_list_path, class: "hh-fab" do %><span class="ms" aria-hidden="true">add</span><span>New list</span><% end %>

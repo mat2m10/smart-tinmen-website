@@ -1,0 +1,100 @@
+commander:
+  game: legion
+  faction: Test Collective
+  name: Test Commander
+  category: commander
+  points: 50
+  slots: [ command, gear ]
+  stats: { unit_type: Trooper, affiliation: Test Gang }
+
+hero:
+  game: legion
+  faction: Test Collective
+  name: Test Hero
+  subtitle: The Brave
+  category: operative
+  points: 100
+  unique: true
+  slots: [ training, armament ]
+  stats: { unit_type: Trooper, affiliation: Test Gang }
+
+troopers:
+  game: legion
+  faction: Test Collective
+  name: Test Troopers
+  category: corps
+  points: 40
+  minis: 4
+  slots: [ personnel, gear ]
+  stats: { unit_type: Trooper, affiliation: Test Gang }
+
+tank:
+  game: legion
+  faction: Test Collective
+  name: Test Tank
+  category: heavy
+  points: 120
+  slots: [ pilot, comms ]
+  keywords: [ "Transport", "Armor 5" ]
+  stats: { unit_type: Repulsor Vehicle, affiliation: Test Raiders }
+
+kt_boss:
+  game: killteam
+  faction: Test Brood
+  name: Test Boss
+  category: commander
+  keywords: [ BROOD, LEADER ]
+
+kt_grunt:
+  game: killteam
+  faction: Test Brood
+  name: Test Grunt
+  category: operative
+  selection_cost: 1
+  keywords: [ BROOD, GRUNT ]
+
+kt_gunner:
+  game: killteam
+  faction: Test Brood
+  name: Test Gunner
+  category: operative
+  keywords: [ BROOD, GUNNER ]
+
+kt_sniper:
+  game: killteam
+  faction: Test Brood
+  name: Test Sniper
+  category: operative
+  keywords: [ BROOD, SNIPER ]
+
+kt_medic:
+  game: killteam
+  faction: Test Brood
+  name: Test Medic
+  category: operative
+  keywords: [ BROOD, MEDIC ]
+
+kt_witch:
+  game: killteam
+  faction: Test Brood
+  name: Test Witch
+  category: broodcoven
+  selection_cost: 2
+  keywords: [ BROOD, COVEN ]
+
+kt_seer:
+  game: killteam
+  faction: Test Brood
+  name: Test Seer
+  category: broodcoven
+  selection_cost: 2
+  keywords: [ BROOD, COVEN ]
+
+kt_pets:
+  game: killteam
+  faction: Test Brood
+  name: Test Pets
+  category: extra
+  selection_cost: 1
+  minis: 2
+  keywords: [ BROOD, PET ]

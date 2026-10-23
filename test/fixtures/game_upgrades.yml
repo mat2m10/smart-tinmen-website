@@ -1,0 +1,119 @@
+saber:
+  game: legion
+  faction: Test Collective
+  name: "Test Saber"
+  slot: armament
+  points: 10
+  restriction: "Test Hero"
+  unique: true
+
+gauntlet:
+  game: legion
+  faction: Test Collective
+  name: "Test Gauntlet"
+  slot: armament
+  points: 5
+  restriction: "Test Hero"
+  unique: true
+
+orders:
+  game: legion
+  faction: Test Collective
+  name: "Test Orders"
+  slot: command
+  points: 5
+
+goggles:
+  game: legion
+  faction: Test Collective
+  name: "Test Goggles"
+  slot: gear
+  points: 4
+
+shiny:
+  game: legion
+  faction: Test Collective
+  name: "Test Shiny Gear"
+  slot: gear
+  points: 6
+  removed: true
+
+mystery:
+  game: legion
+  faction: Test Collective
+  name: "Test Mystery Gear"
+  slot: gear
+  check: true
+
+weird:
+  game: legion
+  faction: Test Collective
+  name: "Test Weird Gear"
+  slot: gear
+  points: 2
+  restriction: "Emplacement Trooper or Trooper with Prepared Position (may equip without slot)"
+
+sergeant:
+  game: legion
+  faction: Test Collective
+  name: "Test Sergeant"
+  slot: personnel
+  points: 15
+  restriction: "Test Troopers"
+  adds_mini: true
+
+driver:
+  game: legion
+  faction: Test Collective
+  name: "Test Driver"
+  slot: pilot
+  points: 5
+  restriction: "Test Raiders Vehicle"
+
+door_guns:
+  game: legion
+  faction: Test Collective
+  name: "Test Door Guns"
+  slot: pilot
+  points: 12
+  restriction: "unit with Transport (may equip without the slot)"
+
+uplink:
+  game: legion
+  faction: Test Collective
+  name: "Test Uplink"
+  slot: comms
+  points: 10
+  limited: 2
+
+vehicle_comms:
+  game: legion
+  faction: Test Collective
+  name: "Test Vehicle Comms"
+  slot: comms
+  points: 3
+  restriction: "Vehicle"
+
+fury:
+  game: legion
+  faction: Test Collective
+  name: "Test Fury"
+  slot: training
+  points: 3
+  restriction: "Dark Side"
+
+lead:
+  game: legion
+  faction: Test Collective
+  name: "Test Lead"
+  slot: training
+  points: 5
+  restriction: "Commander or Operative"
+
+stance:
+  game: legion
+  faction: Test Collective
+  name: "Test Stance"
+  slot: training
+  points: 5
+  restriction: "unit with 1+ training icons"

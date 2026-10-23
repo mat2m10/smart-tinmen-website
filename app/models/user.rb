@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_many :completions, dependent: :nullify
   has_many :notes, dependent: :nullify
   has_many :push_subscriptions, dependent: :delete_all
+  has_many :army_lists, dependent: :delete_all
+  has_many :collection_items, dependent: :delete_all
 
   normalizes :email, with: ->(email) { email.strip.downcase }
   validates :email, presence: true, uniqueness: true

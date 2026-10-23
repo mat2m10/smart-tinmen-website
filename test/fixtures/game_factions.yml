@@ -1,0 +1,29 @@
+# Made-up factions for tests; real game data is imported privately.
+collective:
+  game: legion
+  name: Test Collective
+  rules:
+    points_limit: 200
+    alignment: Dark Side
+    rank_requirements:
+      commander_or_operative: { min: 1, max: 2 }
+      corps: { min: 1, max: 2 }
+      heavy: { min: 0, max: 1 }
+    unique_upgrades_allowed: [ "Test Saber" ]
+
+brood:
+  game: killteam
+  name: Test Brood
+  rules:
+    commander_count: 1
+    loadouts: [ "Pistol, Knife", "Rifle, Bayonet" ]
+    main_count: 3
+    extra_count: 2
+    ploy_cost: 1
+    max_ploys: 2
+    broodcoven_note: The commander loses LEADER.
+    repeatable_keyword: GRUNT
+    keyword_limits:
+      - { keywords: [ GUNNER, SNIPER ], max: 1 }
+      - { keywords: [ COVEN ], max: 1 }
+    other_limits: []

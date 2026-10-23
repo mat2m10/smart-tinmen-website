@@ -1,0 +1,19 @@
+alice_legion:
+  user: alice
+  game: legion
+  faction: Test Collective
+  name: Alice's strike force
+  points_limit: 200
+
+alice_kt:
+  user: alice
+  game: killteam
+  faction: Test Brood
+  name: Alice's cult
+
+bob_legion:
+  user: bob
+  game: legion
+  faction: Test Collective
+  name: Bob's army
+  points_limit: 200

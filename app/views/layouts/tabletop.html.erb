@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? "#{yield(:title)} · Tabletop" : "Tabletop" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#FBF7F1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%# Adding units and filling slots redirect back to the same page: keep the scroll position. %>
+    <%= turbo_refresh_scroll_tag :preserve %>
+    <link rel="icon" href="<%= asset_path('favicon.ico') %>" sizes="any">
+    <link rel="apple-touch-icon" sizes="180x180" href="<%= asset_path('apple-touch-icon-180.png') %>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..24,400,0..1,0&icon_names=add,check,close,delete,edit,error,home,logout,print,remove,warning&display=block" rel="stylesheet">
+    <%= stylesheet_link_tag "household", "tabletop", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="hh tt">
+    <% if current_user %>
+      <header class="hh-appbar">
+        <%= link_to "Tabletop", tabletop_root_path, class: "hh-brand" %>
+        <nav class="hh-nav" aria-label="Sections">
+          <%= link_to "Lists", tabletop_root_path, aria: { current: (controller_name.in?(%w[lists entries]) ? "page" : nil) } %>
+          <%= link_to "Collection", tabletop_collection_path, aria: { current: (controller_name == "collections" ? "page" : nil) } %>
+        </nav>
+        <div class="hh-me">
+          <%= link_to household_root_path, class: "hh-icon-btn", title: "Household", aria: { label: "Back to the household" } do %><span class="ms" aria-hidden="true">home</span><% end %>
+          <%= link_to household_profile_path, class: "hh-me-link", aria: { label: "Your profile" } do %><%= avatar(current_user, title: "Your profile") %><% end %>
+        </div>
+      </header>
+    <% end %>
+    <main class="hh-page">
+      <% flash.each do |type, message| %>
+        <p class="hh-flash hh-flash--<%= type %>" role="status"><%= message %></p>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
