@@ -13,10 +13,24 @@
     </p>
   </div>
   <div class="hh-chore-actions">
-    <% if chore.assignee %>
+    <% if chore.personal %>
       <%= avatar(chore.assignee, small: true) %>
     <% else %>
-      <span class="hh-free">Up for grabs</span>
+      <%# Tapping who has it opens a small menu to give it to someone else (the browser's popover: no JS, tap outside closes it). %>
+      <button type="button" class="hh-assign-btn" popovertarget="assign-<%= chore.id %>" aria-label="Who does this? Now: <%= chore.assignee&.display_name || "up for grabs" %>">
+        <% if chore.assignee %><%= avatar(chore.assignee, small: true, title: nil) %><% else %><span class="hh-free">Up for grabs</span><% end %>
+      </button>
+      <div id="assign-<%= chore.id %>" popover class="hh-popover">
+        <p class="hh-popover-title">Who does “<%= chore.title %>”?</p>
+        <% @users.each do |user| %>
+          <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: user.id }, class: "hh-popover-item", aria: { current: (chore.assignee == user ? "true" : nil) } do %>
+            <%= avatar(user, small: true, title: nil) %><%= user == current_user ? "Me (#{user.display_name})" : user.display_name %>
+          <% end %>
+        <% end %>
+        <%= button_to assign_household_chore_path(chore, show: @filter), params: { assignee_id: "" }, class: "hh-popover-item", aria: { current: (chore.assignee ? nil : "true") } do %>
+          <span class="hh-avatar hh-avatar--small hh-avatar--free" aria-hidden="true">?</span>Up for grabs
+        <% end %>
+      </div>
     <% end %>
     <% unless chore.personal %>
       <%= button_to claim_label(chore), claim_household_chore_path(chore, show: @filter), class: "hh-btn hh-btn--text" %>

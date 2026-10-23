@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       member do
         post :complete
         post :claim
+        post :assign
       end
     end
 

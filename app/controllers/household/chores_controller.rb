@@ -1,7 +1,7 @@
 class Household::ChoresController < Household::BaseController
   BUCKETS = { overdue: "Overdue", today: "Today", week: "This week", later: "Later" }.freeze
 
-  before_action :set_chore, only: %i[edit update destroy complete claim]
+  before_action :set_chore, only: %i[edit update destroy complete claim assign]
 
   def index
     @filter = params[:show].presence_in(%w[mine free]) || "all"
@@ -92,6 +92,23 @@ class Household::ChoresController < Household::BaseController
 
     @chore.update!(assignee: @chore.assignee == current_user ? nil : current_user)
     Event.log!(@chore.assignee ? "chore_claimed" : "chore_released", user: current_user, chore: @chore)
+    redirect_to household_root_path(show: filter_param), status: :see_other
+  end
+
+  # Give the chore to someone (or back to "up for grabs") from the avatar menu.
+  # The new owner hears about it when it is not you.
+  def assign
+    return redirect_to(household_root_path(show: filter_param), status: :see_other) if @chore.personal
+
+    assignee = params[:assignee_id].present? ? User.find(params[:assignee_id]) : nil
+    if assignee != @chore.assignee
+      @chore.update!(assignee: assignee)
+      Event.log!(assignee ? "chore_assigned" : "chore_released", user: current_user, chore: @chore,
+                 summary: assignee && "#{@chore.title} (to #{assignee.display_name})")
+      if assignee && assignee != current_user
+        HouseholdPushJob.perform_later([ assignee.id ], "#{current_user.display_name} gave you “#{@chore.title}”", "", household_root_path)
+      end
+    end
     redirect_to household_root_path(show: filter_param), status: :see_other
   end
 
