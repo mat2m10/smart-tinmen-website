@@ -53,6 +53,14 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the notifications switch is on the profile page, not on the board" do
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select "[data-controller~=push]", count: 0
+    get household_profile_path
+    assert_select "[data-controller~=push] button[data-action='push#toggle']"
+  end
+
   test "members store and remove this phone's push subscription" do
     sign_in("alice@example.com")
     post household_push_subscription_path, as: :json, params: { subscription: { endpoint: "https://push.example.com/abc", keys: { p256dh: "p", auth: "a" } } }

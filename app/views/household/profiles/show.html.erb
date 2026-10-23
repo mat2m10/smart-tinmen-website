@@ -41,6 +41,11 @@
   <div class="hh-form-actions"><%= f.submit "Save", class: "hh-btn hh-btn--filled" %></div>
 <% end %>
 
+<section class="hh-card hh-push" data-controller="push" data-push-key-value="<%= ENV["VAPID_PUBLIC_KEY"] %>" aria-label="Notifications" hidden>
+  <p data-push-target="message">Get reminders and new notes on this phone.</p>
+  <button type="button" class="hh-btn hh-btn--tonal" data-push-target="button" data-action="push#toggle">Turn on notifications</button>
+</section>
+
 <section class="hh-card hh-profile-more">
   <p class="hh-hint">This profile is your account on smarttinmen.com; other apps on the site can use the same name and colour.</p>
   <%= button_to household_logout_path, method: :delete, class: "hh-btn hh-btn--text" do %><span class="ms" aria-hidden="true">logout</span>Sign out<% end %>

@@ -2,10 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 // Records a voice note in the browser and adds it to the form when it is sent
 // (through the formdata event, so it doesn't depend on setting input.files).
-// Posting while still recording stops first, then sends.
+// Posting while still recording stops first, then sends. The Post tap itself
+// is caught (not only the submit event), because on iPhone a mid-recording
+// Post lost the recording.
 // Without MediaRecorder the plain "Audio file" picker stays visible instead.
 export default class extends Controller {
-  static targets = [ "start", "stop", "input", "fallback", "panel", "status", "preview", "dot" ]
+  static targets = [ "start", "stop", "input", "fallback", "panel", "status", "preview", "dot", "post" ]
   static values = { maxSeconds: { type: Number, default: 300 } }
 
   connect() {
@@ -23,7 +25,8 @@ export default class extends Controller {
   }
 
   // Posting while recording: stop, and send once the recording is ready.
-  // A second tap while it is finishing waits for the same send.
+  // A second tap while it is finishing waits for the same send. Runs on the
+  // Post tap (before any submit) and again on submit, e.g. for the Enter key.
   submit(event) {
     if (this.submitWhenReady) {
       event.preventDefault()
@@ -61,7 +64,8 @@ export default class extends Controller {
     this.recorder = new MediaRecorder(this.stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {})
     this.recorder.ondataavailable = event => { if (event.data.size) this.chunks.push(event.data) }
     this.recorder.onstop = () => this.finish()
-    this.recorder.start()
+    // A chunk every second, so a recording that is stopped abruptly still has its audio.
+    this.recorder.start(1000)
 
     this.startedAt = Date.now()
     this.startTarget.hidden = true
@@ -72,10 +76,21 @@ export default class extends Controller {
     this.timer = setInterval(() => this.tick(), 500)
   }
 
+  // The microphone is released once the recorder has delivered its last
+  // chunk (in finish); releasing it straight away can cut the file short on iPhone.
   stop() {
     clearInterval(this.timer)
-    if (this.recorder?.state === "recording") this.recorder.stop()
+    if (this.recorder?.state === "recording") {
+      this.recorder.requestData()
+      this.recorder.stop()
+    } else {
+      this.releaseMicrophone()
+    }
+  }
+
+  releaseMicrophone() {
     this.stream?.getTracks().forEach(track => track.stop())
+    this.stream = null
   }
 
   // Throws away the recording, also one that is still being finished
@@ -99,6 +114,7 @@ export default class extends Controller {
   }
 
   finish() {
+    this.releaseMicrophone()
     this.stopTarget.hidden = true
     this.startTarget.hidden = false
     this.dotTarget.hidden = true
@@ -120,7 +136,7 @@ export default class extends Controller {
     this.previewTarget.hidden = false
     if (this.submitWhenReady) {
       this.submitWhenReady = false
-      this.element.requestSubmit()
+      this.element.requestSubmit(this.hasPostTarget ? this.postTarget : null)
     }
   }
 
