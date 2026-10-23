@@ -1,0 +1,37 @@
+<% content_for :title, "Profile" %>
+<h1 class="hh-title">Profile</h1>
+
+<%= form_with model: current_user, url: household_profile_path, method: :patch, class: "hh-card hh-form hh-profile" do |f| %>
+  <div class="hh-profile-head" style="<%= person_style(current_user) %>">
+    <%= avatar(current_user) %>
+    <div>
+      <p class="hh-profile-name"><%= current_user.display_name %></p>
+      <p class="hh-hint"><%= current_user.email %></p>
+    </div>
+  </div>
+
+  <% if current_user.errors.any? %>
+    <div class="hh-errors"><%= current_user.errors.full_messages.to_sentence %></div>
+  <% end %>
+
+  <%= f.label :nickname, "Name the household sees" %>
+  <%= f.text_field :nickname, placeholder: current_user.name.presence || "Your name", maxlength: 30 %>
+
+  <fieldset class="hh-swatches">
+    <legend>Your colour</legend>
+    <% colors = User::COLORS.dup %>
+    <% colors[current_user.color] ||= "Current" if current_user.color %>
+    <% colors.each do |hex, label| %>
+      <label class="hh-swatch" style="--hh-person: <%= hex %>" title="<%= label %>">
+        <%= f.radio_button :color, hex, class: "hh-visually-hidden" %><span aria-hidden="true"></span><span class="hh-visually-hidden"><%= label %></span>
+      </label>
+    <% end %>
+  </fieldset>
+
+  <div class="hh-form-actions"><%= f.submit "Save", class: "hh-btn hh-btn--filled" %></div>
+<% end %>
+
+<section class="hh-card hh-profile-more">
+  <p class="hh-hint">This profile is your account on smarttinmen.com; other apps on the site can use the same name and colour.</p>
+  <%= button_to household_logout_path, method: :delete, class: "hh-btn hh-btn--text" do %><span class="ms" aria-hidden="true">logout</span>Sign out<% end %>
+</section>

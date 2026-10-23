@@ -9,6 +9,13 @@ class User < ApplicationRecord
   normalizes :email, with: ->(email) { email.strip.downcase }
   validates :email, presence: true, uniqueness: true
   validates :color, format: { with: /\A#\h{6}\z/ }, allow_nil: true
+  validates :nickname, length: { maximum: 30 }
+
+  # Colours offered on the profile page; any other hex set earlier still works.
+  COLORS = { "#3F8F5A" => "Green", "#B7472A" => "Rust", "#3B6EA8" => "Blue", "#2F8A8A" => "Teal",
+             "#8A5BA8" => "Purple", "#B8487A" => "Rose", "#C28A1E" => "Ochre", "#5E4B3C" => "Brown" }.freeze
+
+  normalizes :nickname, with: ->(value) { value.strip.presence }
 
   def self.allowed_emails
     ENV.fetch("HOUSEHOLD_EMAILS", "").split(",").map { |email| email.strip.downcase }.reject(&:empty?)
@@ -29,7 +36,7 @@ class User < ApplicationRecord
   end
 
   def display_name
-    name.presence || email.split("@").first
+    nickname.presence || name.presence || email.split("@").first
   end
 
   def initial

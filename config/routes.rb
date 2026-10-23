@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     end
 
     get "agenda" => "agenda#show", as: :agenda
+    resource :profile, only: %i[show update]
     resources :completions, path: "done", only: %i[index update destroy]
     resources :notes, only: %i[index create destroy]
     resource :push_subscription, only: %i[create destroy]
