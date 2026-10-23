@@ -51,8 +51,9 @@ module Tabletop
       @entries ||= list.entries.to_a
     end
 
+    # jsonb keeps no key order, so ranks are shown in the usual order.
     def rank_requirements
-      @rules["rank_requirements"] || {}
+      (@rules["rank_requirements"] || {}).sort_by { |key, _| GameUnit.category_rank(rank_group(key).first) }
     end
 
     def rank_group(key)
