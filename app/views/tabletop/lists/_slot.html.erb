@@ -1,0 +1,28 @@
+<%# One upgrade slot: tap it to pick a legal upgrade (the browser's popover, no JS). %>
+<% popover_id = "slot-#{entry.id}-#{index}" %>
+<button type="button" class="tt-slot<%= " tt-slot--filled" if upgrade %>" popovertarget="<%= popover_id %>">
+  <span class="tt-slot-kind"><%= slot_label(slot) %></span>
+  <% if upgrade %>
+    <span class="tt-slot-name"><%= upgrade.name %> · <%= upgrade.points || "?" %></span>
+    <% if upgrade.adds_mini %><%= ownership(@collection, upgrade, needed[upgrade.id].to_i) %><% end %>
+  <% end %>
+</button>
+<div id="<%= popover_id %>" popover class="hh-popover tt-slot-menu">
+  <p class="hh-popover-title"><%= slot_label(slot) %> for <%= entry.game_unit.name %></p>
+  <%= form_with url: tabletop_list_entry_path(@list, entry), method: :patch do %>
+    <%= hidden_field_tag :slot, slot, id: nil %>
+    <%= hidden_field_tag :replace_id, upgrade&.id, id: nil %>
+    <%= hidden_field_tag :owned, "1", id: nil if @owned_only %>
+    <% options = validator.upgrade_options(entry, slot) %>
+    <% options.each do |option| %>
+      <button type="submit" name="upgrade_id" value="<%= option.id %>" class="hh-popover-item">
+        <span class="tt-pick-name"><%= option.name %><% if option.unique %> <small>unique</small><% end %></span>
+        <span class="tt-points"><%= points_label(option.points) %></span>
+      </button>
+    <% end %>
+    <% if options.empty? %><p class="hh-hint">No other legal upgrade for this slot.</p><% end %>
+    <% if upgrade %>
+      <button type="submit" name="upgrade_id" value="" class="hh-popover-item"><span class="ms" aria-hidden="true">close</span>Empty this slot (<%= upgrade.name %>)</button>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,129 @@
+<% content_for :title, @list.name %>
+<% validator = @list.validator %>
+<% needed = @list.entries.map(&:game_unit_id).tally %>
+<% needed_upgrades = @list.entries.flat_map(&:upgrade_ids).tally %>
+
+<div class="tt-head">
+  <div>
+    <h1 class="hh-title"><%= @list.name %></h1>
+    <p class="hh-hint hh-intro"><%= GameFaction::GAMES[@list.game] %> · <%= @list.faction %></p>
+  </div>
+  <div class="tt-head-actions">
+    <%= link_to edit_tabletop_list_path(@list), class: "hh-icon-btn", title: "Edit list", aria: { label: "Edit list" } do %><span class="ms" aria-hidden="true">edit</span><% end %>
+    <%= link_to print_tabletop_list_path(@list), class: "hh-icon-btn", title: "List card", aria: { label: "Printable list card" } do %><span class="ms" aria-hidden="true">print</span><% end %>
+  </div>
+</div>
+
+<section class="hh-card tt-summary" aria-label="Totals">
+  <div class="tt-summary-top">
+    <p class="tt-total"><%= list_size(@list) %></p>
+    <%= validity_badge(validator) %>
+  </div>
+  <ul class="tt-tallies">
+    <% validator.tallies.each do |tally| %>
+      <li class="<%= "is-off" unless tally.ok? %>"><%= tally.label %> <strong><%= tally.count %></strong> <small>/ <%= tally.range %></small></li>
+    <% end %>
+  </ul>
+
+  <% if !@list.legion? && @list.rules["ploy_cost"] %>
+    <div class="tt-ploys">
+      <span>0CP ploys instead of operatives</span>
+      <%= button_to tabletop_list_path(@list), method: :patch, params: { army_list: { ploys: @list.ploys - 1 } }, class: "hh-icon-btn", disabled: @list.ploys.zero?, aria: { label: "One ploy less" } do %><span class="ms" aria-hidden="true">remove</span><% end %>
+      <strong><%= @list.ploys %></strong>
+      <%= button_to tabletop_list_path(@list), method: :patch, params: { army_list: { ploys: @list.ploys + 1 } }, class: "hh-icon-btn", disabled: @list.ploys >= validator.max_ploys, aria: { label: "One ploy more" } do %><span class="ms" aria-hidden="true">add</span><% end %>
+    </div>
+  <% end %>
+
+  <% if validator.errors.any? %>
+    <ul class="tt-problems">
+      <% validator.errors.each do |error| %><li><%= error %></li><% end %>
+    </ul>
+  <% end %>
+  <% if validator.warnings.any? %>
+    <ul class="tt-warnings">
+      <% validator.warnings.each do |warning| %><li><%= warning %></li><% end %>
+    </ul>
+  <% end %>
+  <% validator.notes.each do |note| %>
+    <p class="hh-hint"><%= note %></p>
+  <% end %>
+</section>
+
+<% if @list.notes.present? %>
+  <p class="hh-hint tt-notes"><%= @list.notes %></p>
+<% end %>
+
+<section class="hh-group" aria-label="Units in this list">
+  <h2><%= @list.legion? ? "Units" : "Operatives" %> <span class="hh-count"><%= @list.entries.size %></span></h2>
+  <% if @list.entries.empty? %>
+    <p class="hh-empty">Nothing yet: add from the list below.</p>
+  <% else %>
+    <p class="hh-hint">Swipe a row to the left to remove it.</p>
+  <% end %>
+  <ul class="hh-list">
+    <% @list.entries.each do |entry| %>
+      <% unit = entry.game_unit %>
+      <li class="hh-swipe" data-controller="swipe">
+        <div class="hh-swipe-actions" data-swipe-target="actions">
+          <%= button_to tabletop_list_entry_path(@list, entry, owned: ("1" if @owned_only)), method: :delete, class: "hh-swipe-action hh-swipe-action--delete" do %><span class="ms" aria-hidden="true">delete</span>Remove<% end %>
+        </div>
+        <div class="hh-chore tt-entry" data-swipe-target="row" data-action="pointerdown->swipe#start pointermove->swipe#move pointerup->swipe#end pointercancel->swipe#end click->swipe#click:capture">
+          <div class="hh-chore-main">
+            <p class="tt-entry-head">
+              <span class="hh-chore-title"><%= unit.full_name %></span>
+              <% if @list.legion? %><span class="tt-points"><%= entry.points %></span><% end %>
+            </p>
+            <p class="hh-chore-meta">
+              <%= category_label(unit.category) %>
+              <% if @list.legion? %> · <%= points_label(unit.points) %><% end %>
+              · <%= ownership(@collection, unit, needed[unit.id]) %>
+            </p>
+            <% if @list.legion? && unit.slots.any? %>
+              <div class="tt-slots">
+                <% entry.filled_slots.each_with_index do |(slot, upgrade), index| %>
+                  <%= render "slot", entry: entry, slot: slot, upgrade: upgrade, index: index, validator: validator, needed: needed_upgrades %>
+                <% end %>
+              </div>
+              <% entry.unslotted_upgrades.each do |upgrade| %>
+                <p class="tt-problem-inline"><%= upgrade.name %> has no free <%= slot_label(upgrade.slot).downcase %> slot.</p>
+              <% end %>
+            <% end %>
+            <% if unit.category == "commander" && !@list.legion? && validator.loadouts.any? %>
+              <%= render "loadout", entry: entry, loadouts: validator.loadouts %>
+            <% end %>
+          </div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</section>
+
+<section class="hh-group tt-add" id="add" aria-label="Add">
+  <h2>Add <%= @list.legion? ? "a unit" : "an operative" %></h2>
+  <nav class="hh-chips" aria-label="Filter">
+    <% { false => "Everything", true => "Only what I own" }.each do |owned, label| %>
+      <%= link_to tabletop_list_path(@list, owned: ("1" if owned), anchor: "add"), class: "hh-chip", aria: { current: (@owned_only == owned ? "page" : nil) } do %>
+        <% if @owned_only == owned %><span class="ms" aria-hidden="true">check</span><% end %><%= label %>
+      <% end %>
+    <% end %>
+  </nav>
+  <% if @units.empty? %>
+    <p class="hh-empty"><%= @owned_only ? "Nothing owned yet: add it on the Collection page." : "No units imported for this faction." %></p>
+  <% end %>
+  <% @units.group_by(&:category).sort_by { |category, _| GameUnit.category_rank(category) }.each do |category, units| %>
+    <h3><%= category_label(category) %></h3>
+    <ul class="tt-picker">
+      <% units.each do |unit| %>
+        <li>
+          <%= button_to tabletop_list_entries_path(@list), params: { game_unit_id: unit.id, owned: ("1" if @owned_only) }, class: "tt-pick" do %>
+            <span class="tt-pick-name"><%= unit.full_name %> <%= ownership(@collection, unit, needed[unit.id].to_i) %></span>
+            <span class="tt-points">
+              <% if @list.legion? %><%= points_label(unit.points) %><% elsif unit.selection_cost && category != "operative" %><%= pluralize(unit.selection_cost, "selection") %><% end %>
+            </span>
+            <span class="ms" aria-hidden="true">add</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

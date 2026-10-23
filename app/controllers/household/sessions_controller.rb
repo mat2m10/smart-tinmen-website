@@ -8,9 +8,10 @@ class Household::SessionsController < Household::BaseController
   def create
     user = User.from_google(request.env["omniauth.auth"])
     if user
+      return_to = session[:return_to].to_s
       reset_session
       session[:household_user_id] = user.id
-      redirect_to household_root_path
+      redirect_to return_to.match?(%r{\A/(?![/\\])}) ? return_to : household_root_path
     else
       redirect_to household_login_path, alert: "That Google account isn't on the household list."
     end

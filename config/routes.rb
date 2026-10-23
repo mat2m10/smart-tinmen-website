@@ -39,4 +39,14 @@ Rails.application.routes.draw do
       post "push" => "pushes#create"
     end
   end
+
+  # Tabletop list builder: private, same sign-in as the household.
+  namespace :tabletop do
+    root "lists#index"
+    resources :lists, except: :index do
+      get :print, on: :member
+      resources :entries, only: %i[create update destroy]
+    end
+    resource :collection, only: %i[show update]
+  end
 end

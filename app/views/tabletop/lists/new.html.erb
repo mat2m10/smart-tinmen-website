@@ -1,0 +1,27 @@
+<% content_for :title, "New list" %>
+<h1 class="hh-title">New list</h1>
+
+<% if @factions.empty? %>
+  <p class="hh-empty">No game data yet. Import a faction first with <code>bin/rails tabletop:import &lt; faction.yml</code>.</p>
+<% else %>
+  <%= form_with model: @list, url: tabletop_lists_path, scope: :army_list, class: "hh-card hh-form" do |f| %>
+    <% if @list.errors.any? %>
+      <div class="hh-errors"><%= @list.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <%= f.label :name, "Name" %>
+    <%= f.text_field :name, required: true, maxlength: 80, placeholder: "Friday night list" %>
+
+    <fieldset class="hh-effort tt-factions">
+      <legend>Game and faction</legend>
+      <% @factions.each_with_index do |faction, index| %>
+        <label class="hh-check"><%= radio_button_tag "army_list[faction_id]", faction.id, @factions.one? || index.zero? %> <%= faction.label %></label>
+      <% end %>
+    </fieldset>
+
+    <div class="hh-form-actions">
+      <%= f.submit "Start building", class: "hh-btn hh-btn--filled" %>
+      <%= link_to "Cancel", tabletop_root_path, class: "hh-btn" %>
+    </div>
+  <% end %>
+<% end %>

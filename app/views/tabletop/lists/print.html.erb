@@ -1,0 +1,31 @@
+<% content_for :title, "#{@list.name} · card" %>
+<% validator = @list.validator %>
+<article class="tt-print">
+  <header>
+    <h1><%= @list.name %></h1>
+    <p><%= GameFaction::GAMES[@list.game] %> · <%= @list.faction %> · <strong><%= list_size(@list) %></strong><%= " · not valid yet" unless validator.valid? %></p>
+  </header>
+  <table>
+    <tbody>
+      <% @list.entries.each do |entry| %>
+        <tr>
+          <td>
+            <strong><%= entry.game_unit.full_name %></strong>
+            <% if entry.loadout %><span class="tt-print-sub"><%= entry.loadout %></span><% end %>
+            <% if entry.upgrades.any? %>
+              <span class="tt-print-sub"><%= entry.upgrades.map { |upgrade| "#{upgrade.name} (#{upgrade.points || "?"})" }.join(", ") %></span>
+            <% end %>
+          </td>
+          <td class="tt-num"><%= entry.points if @list.legion? %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @list.ploys.positive? %><p><%= pluralize(@list.ploys, "0CP ploy") %> instead of operatives</p><% end %>
+  <% if @list.notes.present? %><p class="tt-print-notes"><%= @list.notes %></p><% end %>
+</article>
+
+<div class="hh-form-actions tt-noprint">
+  <button type="button" class="hh-btn hh-btn--filled" data-controller="print" data-action="print#print"><span class="ms" aria-hidden="true">print</span>Print</button>
+  <%= link_to "Back to the list", tabletop_list_path(@list), class: "hh-btn" %>
+</div>

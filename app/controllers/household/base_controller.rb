@@ -14,8 +14,12 @@ class Household::BaseController < ApplicationController
     @current_user = user if user && User.allowed?(user.email)
   end
 
+  # Remembers the page so signing in leads back to it (the tabletop app shares this login).
   def require_household_user
-    redirect_to household_login_path unless current_user
+    return if current_user
+
+    session[:return_to] = request.fullpath if request.get? || request.head?
+    redirect_to household_login_path
   end
 
   def keep_out_of_search

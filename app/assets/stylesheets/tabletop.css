@@ -1,0 +1,100 @@
+/* ============================================================
+   FILE: app/assets/stylesheets/tabletop.css
+   PURPOSE: The private list builder (/tabletop). Loaded after household.css
+   and builds on its look and tokens (--hh-*); only what the builder adds
+   lives here, under tt-* class names.
+   ============================================================ */
+
+.tt { --tt-ok: #3F8F5A; --tt-ok-bg: #E3F1E6; --tt-warn: #8A6414; --tt-warn-bg: #FAF0D9; }
+
+.tt .tt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.tt .tt-head-actions { display: flex; gap: 4px; margin-top: 4px; }
+.tt .tt-faction { font-size: 1.1rem; margin-top: 24px; }
+.tt .tt-notes { margin: 12px 0 0; white-space: pre-line; }
+
+/* ---------- Valid / invalid ---------- */
+.tt .tt-badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px 2px 6px; border-radius: 999px;
+  font-size: .8rem; font-weight: 600; white-space: nowrap;
+}
+.tt .tt-badge .ms { font-size: 16px; }
+.tt .tt-badge--ok { background: var(--tt-ok-bg); color: var(--tt-ok); }
+.tt .tt-badge--bad { background: var(--hh-danger-bg); color: var(--hh-danger); }
+
+/* ---------- Totals and rule check ---------- */
+.tt .tt-summary { display: grid; gap: 10px; }
+.tt .tt-summary-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tt .tt-total { font-size: 1.4rem; font-weight: 600; }
+.tt .tt-tallies { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tt .tt-tallies li { padding: 4px 10px; border-radius: 8px; background: var(--hh-surface-2); font-size: .8rem; }
+.tt .tt-tallies small { color: var(--hh-muted); }
+.tt .tt-tallies li.is-off { background: var(--hh-danger-bg); color: var(--hh-danger); }
+.tt .tt-problems, .tt .tt-warnings { margin: 0; padding: 10px 12px 10px 28px; border-radius: 12px; font-size: .875rem; display: grid; gap: 2px; }
+.tt .tt-problems { background: var(--hh-danger-bg); color: var(--hh-danger); }
+.tt .tt-warnings { background: var(--tt-warn-bg); color: var(--tt-warn); }
+.tt .tt-problem-inline { color: var(--hh-danger); font-size: .8rem; margin-top: 4px; }
+.tt .tt-problem-inline:empty { display: none; }
+.tt .tt-ploys { display: flex; align-items: center; gap: 4px; font-size: .9rem; }
+.tt .tt-ploys > span { margin-right: auto; color: var(--hh-muted); }
+.tt .tt-ploys .hh-icon-btn:disabled { opacity: .35; cursor: default; }
+
+/* ---------- Entries and their upgrade slots ---------- */
+.tt .tt-entry .hh-chore-main { flex-basis: 100%; }
+.tt .tt-entry-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.tt .tt-points { font-weight: 600; font-size: .9rem; white-space: nowrap; color: var(--hh-ink); }
+.tt .tt-slots { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tt .tt-slot {
+  display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0; max-width: 100%;
+  padding: 4px 10px; border: 1px dashed var(--hh-line); border-radius: 10px; background: none;
+  color: var(--hh-muted); font: 500 .78rem/1.3 var(--hh-font); text-align: left; cursor: pointer;
+}
+.tt .tt-slot--filled { border-style: solid; border-color: var(--hh-tonal); background: var(--hh-tonal); color: var(--hh-on-tonal); }
+.tt .tt-slot-kind { font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; opacity: .75; }
+.tt .tt-slot-name { font-size: .85rem; overflow-wrap: anywhere; }
+.tt .tt-slot-menu { max-height: 80vh; overflow-y: auto; }
+.tt .hh-popover-item .tt-pick-name { flex: 1; }
+.tt .hh-popover-item small { color: var(--hh-muted); font-size: .72rem; }
+
+/* ---------- Ownership ---------- */
+.tt .tt-own { font-size: .75rem; color: var(--tt-ok); font-weight: 500; }
+.tt .tt-own--short { color: var(--hh-danger); }
+
+/* ---------- Picker ---------- */
+.tt .tt-picker { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.tt .tt-picker form.button_to { display: block; }
+.tt .tt-pick {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 0; border-radius: 12px;
+  background: var(--hh-surface); box-shadow: var(--hh-shadow); color: var(--hh-ink); font: 500 .95rem var(--hh-font);
+  text-align: left; cursor: pointer;
+}
+.tt .tt-pick:hover { background: var(--hh-surface-2); }
+.tt .tt-pick-name { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.tt .tt-pick .ms { color: var(--hh-primary); }
+
+/* ---------- Collection steppers ---------- */
+.tt .tt-stock { align-items: flex-start; }
+.tt .tt-steppers { display: flex; gap: 8px; flex-wrap: wrap; }
+.tt .tt-stepper { display: grid; justify-items: center; gap: 2px; }
+.tt .tt-stepper label { font-size: .72rem; color: var(--hh-muted); font-weight: 500; }
+.tt .tt-stepper-row { display: flex; align-items: center; }
+.tt .tt-stepper .hh-icon-btn { width: 32px; height: 32px; }
+.tt .tt-stepper input[type="number"] { width: 3.2em; padding: 6px 2px; text-align: center; -moz-appearance: textfield; }
+.tt .tt-stepper input::-webkit-outer-spin-button, .tt .tt-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---------- Printable list card ---------- */
+.tt .tt-print { background: var(--hh-surface); border-radius: 16px; padding: 16px; box-shadow: var(--hh-shadow); font-size: .9rem; }
+.tt .tt-print h1 { font-size: 1.3rem; font-weight: 700; }
+.tt .tt-print header p { color: var(--hh-muted); margin-bottom: 8px; }
+.tt .tt-print table { width: 100%; border-collapse: collapse; }
+.tt .tt-print td { padding: 5px 0; border-top: 1px solid var(--hh-line); vertical-align: top; }
+.tt .tt-print .tt-num { text-align: right; font-weight: 600; padding-left: 12px; white-space: nowrap; }
+.tt .tt-print-sub { display: block; color: var(--hh-muted); font-size: .8rem; }
+.tt .tt-print-notes { margin-top: 8px; white-space: pre-line; }
+
+@media print {
+  body.tt { background: #FFFFFF; font-size: 11pt; }
+  .tt .hh-appbar, .tt .tt-noprint, .tt .hh-flash { display: none !important; }
+  .tt .hh-page { max-width: none; padding: 0; }
+  .tt .tt-print { box-shadow: none; padding: 0; border-radius: 0; }
+  .tt .tt-print tr { break-inside: avoid; }
+}

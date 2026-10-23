@@ -1,0 +1,16 @@
+<% popover_id = "loadout-#{entry.id}" %>
+<div class="tt-slots">
+  <button type="button" class="tt-slot<%= " tt-slot--filled" if entry.loadout %>" popovertarget="<%= popover_id %>">
+    <span class="tt-slot-kind">Loadout</span>
+    <span class="tt-slot-name"><%= entry.loadout || "Choose…" %></span>
+  </button>
+</div>
+<div id="<%= popover_id %>" popover class="hh-popover">
+  <p class="hh-popover-title">Loadout for <%= entry.game_unit.name %></p>
+  <%= form_with url: tabletop_list_entry_path(@list, entry), method: :patch do %>
+    <%= hidden_field_tag :owned, "1", id: nil if @owned_only %>
+    <% loadouts.each do |loadout| %>
+      <button type="submit" name="loadout" value="<%= loadout %>" class="hh-popover-item" aria-current="<%= "true" if entry.loadout == loadout %>"><%= loadout %></button>
+    <% end %>
+  <% end %>
+</div>

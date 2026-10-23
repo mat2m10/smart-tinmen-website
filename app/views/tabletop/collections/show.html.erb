@@ -1,0 +1,31 @@
+<% content_for :title, "Collection" %>
+<h1 class="hh-title">Collection</h1>
+
+<nav class="hh-chips" aria-label="Game">
+  <% GameFaction::GAMES.each do |game, name| %>
+    <%= link_to tabletop_collection_path(game: game), class: "hh-chip", aria: { current: (@game == game ? "page" : nil) } do %>
+      <% if @game == game %><span class="ms" aria-hidden="true">check</span><% end %><%= name %>
+    <% end %>
+  <% end %>
+</nav>
+<p class="hh-hint hh-intro">Count units (boxes): each one once, as built, painted or still unbuilt.</p>
+
+<% if @factions.empty? %>
+  <p class="hh-empty">No units imported for this game yet.</p>
+<% end %>
+
+<% @factions.each do |faction, groups| %>
+  <h2 class="tt-faction"><%= faction %></h2>
+  <% groups.each do |category, units| %>
+    <section class="hh-group">
+      <h3><%= category_label(category) %></h3>
+      <ul class="hh-list"><%= render partial: "item", collection: units %></ul>
+    </section>
+  <% end %>
+  <% if @upgrades[faction].present? %>
+    <section class="hh-group">
+      <h3>Upgrade miniatures</h3>
+      <ul class="hh-list"><%= render partial: "item", collection: @upgrades[faction] %></ul>
+    </section>
+  <% end %>
+<% end %>

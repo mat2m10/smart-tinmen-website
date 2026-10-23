@@ -1,0 +1,24 @@
+<% record = @collection.item(item) %>
+<% dom = "item-#{item.class.name.underscore.dasherize}-#{item.id}" %>
+<li class="hh-chore tt-stock" id="<%= dom %>">
+  <div class="hh-chore-main">
+    <p class="hh-chore-title"><%= item.is_a?(GameUnit) ? item.full_name : item.name %></p>
+    <p class="hh-chore-meta">Own <span data-stepper-target="owned"><%= record&.owned.to_i %></span><%= " · #{record.note}" if record&.note.present? %></p>
+    <p class="tt-problem-inline" data-stepper-target="status" role="status"></p>
+  </div>
+  <%= form_with url: tabletop_collection_path, method: :patch, scope: :collection_item, class: "tt-steppers", data: { controller: "stepper", action: "submit->stepper#submit" } do |f| %>
+    <%= hidden_field_tag :item_type, item.class.name, id: nil %>
+    <%= hidden_field_tag :item_id, item.id, id: nil %>
+    <% CollectionItem::COUNTS.each do |count| %>
+      <div class="tt-stepper" data-stepper-field>
+        <label for="<%= dom %>-<%= count %>"><%= count.to_s.humanize %></label>
+        <div class="tt-stepper-row">
+          <button type="button" class="hh-icon-btn" data-action="stepper#step" data-stepper-delta-param="-1" aria-label="One less <%= count %>"><span class="ms" aria-hidden="true">remove</span></button>
+          <%= f.number_field count, value: record&.public_send(count).to_i, min: 0, max: 999, id: "#{dom}-#{count}", inputmode: "numeric", data: { action: "change->stepper#save" } %>
+          <button type="button" class="hh-icon-btn" data-action="stepper#step" data-stepper-delta-param="1" aria-label="One more <%= count %>"><span class="ms" aria-hidden="true">add</span></button>
+        </div>
+      </div>
+    <% end %>
+    <noscript><%= f.submit "Save", class: "hh-btn hh-btn--tonal" %></noscript>
+  <% end %>
+</li>
