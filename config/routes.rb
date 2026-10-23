@@ -21,6 +21,7 @@ Rails.application.routes.draw do
 
     get "agenda" => "agenda#show", as: :agenda
     resource :profile, only: %i[show update]
+    get "avatars/:id" => "avatars#show", as: :avatar
     resources :completions, path: "done", only: %i[index update destroy]
     resources :notes, only: %i[index create destroy]
     resource :push_subscription, only: %i[create destroy]

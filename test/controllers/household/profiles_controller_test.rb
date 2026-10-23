@@ -47,6 +47,40 @@ class Household::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Test", users(:alice).reload.display_name
   end
 
+  test "a profile photo shows as the avatar, can be served to the household and removed" do
+    sign_in("alice@example.com")
+    patch household_profile_path, params: { user: { photo_upload: fixture_file_upload("photo.jpg", "image/jpeg") } }
+    alice = users(:alice).reload
+    assert alice.photo?
+    assert_equal "image/jpeg", alice.photo_type
+
+    get household_root_path
+    assert_select ".hh-me-link .hh-avatar--photo img[src^='#{household_avatar_path(alice)}']"
+    sign_in("bob@example.com")
+    get household_avatar_path(alice, v: alice.updated_at.to_i)
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+
+    sign_in("alice@example.com")
+    patch household_profile_path, params: { user: { remove_photo: "1" } }
+    assert_not users(:alice).reload.photo?
+    get household_avatar_path(alice)
+    assert_response :not_found
+  end
+
+  test "a file that is not a picture is refused as a photo" do
+    sign_in("alice@example.com")
+    patch household_profile_path, params: { user: { photo_upload: fixture_file_upload("not_a_photo.jpg", "image/jpeg") } }
+    assert_response :unprocessable_entity
+    assert_not users(:alice).reload.photo?
+  end
+
+  test "avatars are only served to signed-in members" do
+    users(:alice).update!(photo: file_fixture("photo.jpg").binread, photo_type: "image/jpeg")
+    get household_avatar_path(users(:alice))
+    assert_redirected_to household_login_path
+  end
+
   test "signed out, the profile is not reachable" do
     get household_profile_path
     assert_redirected_to household_login_path

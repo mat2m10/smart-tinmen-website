@@ -17,6 +17,27 @@ class User < ApplicationRecord
 
   normalizes :nickname, with: ->(value) { value.strip.presence }
 
+  PHOTO_TYPES = %w[image/jpeg image/png image/webp].freeze
+  PHOTO_MAX_BYTES = 2.megabytes
+  validate :photo_allowed
+
+  # Takes an uploaded picture; the type comes from the bytes, not the browser.
+  def photo_upload=(file)
+    return if file.blank?
+
+    data = file.read
+    self.photo_type = Marcel::MimeType.for(StringIO.new(data), name: file.original_filename, declared_type: file.content_type)
+    self.photo = data
+  end
+
+  def remove_photo=(value)
+    self.photo = self.photo_type = nil if ActiveModel::Type::Boolean.new.cast(value)
+  end
+
+  def photo?
+    photo_type.present?
+  end
+
   def self.allowed_emails
     ENV.fetch("HOUSEHOLD_EMAILS", "").split(",").map { |email| email.strip.downcase }.reject(&:empty?)
   end
@@ -41,5 +62,14 @@ class User < ApplicationRecord
 
   def initial
     display_name.first.upcase
+  end
+
+  private
+
+  def photo_allowed
+    return if photo.nil?
+
+    errors.add(:photo, "must be a JPEG, PNG or WebP picture") unless PHOTO_TYPES.include?(photo_type)
+    errors.add(:photo, "is too large") if photo.bytesize > PHOTO_MAX_BYTES
   end
 end
