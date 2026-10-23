@@ -23,6 +23,6 @@
       <span class="ms" aria-hidden="true">mic</span>Audio file
       <%= f.file_field :voice, accept: "audio/*", class: "hh-visually-hidden", data: { recorder_target: "input" } %>
     </label>
-    <button type="submit" class="hh-btn hh-btn--filled hh-send"><span class="ms" aria-hidden="true">send</span>Post</button>
+    <button type="submit" class="hh-btn hh-btn--filled hh-send" data-recorder-target="post" data-action="recorder#submit"><span class="ms" aria-hidden="true">send</span>Post</button>
   </div>
 <% end %>

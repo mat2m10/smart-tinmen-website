@@ -2,15 +2,17 @@ import { Controller } from "@hotwired/stimulus"
 
 // Turns household notifications on or off for this phone. On iPhone this
 // only works once the app is added to the home screen (iOS 16.4 and later).
+// With invite (the board) the card only shows on phones that can still turn
+// notifications on, and goes away once they are on; the profile page has the switch.
 export default class extends Controller {
   static targets = [ "message", "button" ]
-  static values = { key: String }
+  static values = { key: String, invite: Boolean }
 
   async connect() {
     if (!this.keyValue) return
     const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      if (/iPhone|iPad/.test(navigator.userAgent) && !standalone) {
+      if (/iPhone|iPad/.test(navigator.userAgent) && !standalone && !this.inviteValue) {
         this.show("To get notifications on iPhone: tap Share, then “Add to Home Screen”, and open Household from there.", false)
       }
       return
@@ -21,9 +23,10 @@ export default class extends Controller {
       subscription = await this.registration.pushManager.getSubscription()
       if (subscription) await this.save(subscription)
     } catch {
-      this.show("Notifications are not available right now.", false)
+      if (!this.inviteValue) this.show("Notifications are not available right now.", false)
       return
     }
+    if (this.inviteValue && (subscription || Notification.permission === "denied")) return
     if (subscription) {
       this.show("Notifications are on for this phone.", true, "Turn off")
     } else if (Notification.permission === "denied") {
@@ -44,7 +47,7 @@ export default class extends Controller {
       } else {
         const subscription = await this.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: this.decode(this.keyValue) })
         await this.save(subscription)
-        this.show("Notifications are on for this phone.", true, "Turn off")
+        this.show("Notifications are on for this phone.", !this.inviteValue, "Turn off")
       }
     } catch {
       this.show("Notifications could not be turned on. Allow them for this site and try again.", true, "Try again")
