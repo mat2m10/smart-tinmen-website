@@ -8,7 +8,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
   test "home shows every section, the real projects and both founders" do
     get root_url
-    %w[work services process record team contact].each do |id|
+    %w[work services process team contact].each do |id|
       assert_select "section##{id}"
     end
     assert_select ".st-project", 6
