@@ -75,6 +75,15 @@ class Household::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_not users(:alice).reload.photo?
   end
 
+  test "text named .jpg or a non-file value is not taken as a photo" do
+    sign_in("alice@example.com")
+    patch household_profile_path, params: { user: { photo_upload: Rack::Test::UploadedFile.new(StringIO.new("just some text"), "image/jpeg", original_filename: "x.jpg") } }
+    assert_response :unprocessable_entity
+    patch household_profile_path, params: { user: { photo_upload: "not a file" } }
+    assert_redirected_to household_profile_path
+    assert_not users(:alice).reload.photo?
+  end
+
   test "avatars are only served to signed-in members" do
     users(:alice).update!(photo: file_fixture("photo.jpg").binread, photo_type: "image/jpeg")
     get household_avatar_path(users(:alice))
