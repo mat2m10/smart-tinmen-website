@@ -167,6 +167,32 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_select "li.hh-chore--assigned[style*='#3F8F5A'] .hh-chore-title", text: "Find a GP"
   end
 
+  test "the avatar menu gives a chore to the other member, who gets a push" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    get household_root_path
+    assert_select "#assign-#{chore.id}[popover] button", text: /Up for grabs/
+
+    assert_enqueued_with(job: HouseholdPushJob, args: [ [ users(:bob).id ], "Test gave you “Clean the toilet”", "", household_root_path ]) do
+      post assign_household_chore_path(chore), params: { assignee_id: users(:bob).id }
+    end
+    assert_equal users(:bob), chore.reload.assignee
+    assert_equal "chore_assigned", Event.last.action
+
+    assert_no_enqueued_jobs(only: HouseholdPushJob) { post assign_household_chore_path(chore), params: { assignee_id: "" } }
+    assert_nil chore.reload.assignee
+  end
+
+  test "a personal chore cannot be given away" do
+    chore = chores(:gp)
+    chore.update!(personal: true, assignee: users(:alice))
+    sign_in("alice@example.com")
+    get household_root_path
+    assert_select "#assign-#{chore.id}", count: 0
+    post assign_household_chore_path(chore), params: { assignee_id: users(:bob).id }
+    assert_equal users(:alice), chore.reload.assignee
+  end
+
   test "invalid input re-renders the form" do
     sign_in("alice@example.com")
     post household_chores_path, params: { chore: { title: "", area: "Cleaning", due_on: Date.current } }

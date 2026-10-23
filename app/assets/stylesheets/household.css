@@ -156,6 +156,28 @@ body.hh {
 .hh .hh-chore-actions { display: flex; gap: 4px; align-items: center; }
 .hh .hh-free { font-size: .75rem; color: var(--hh-muted); }
 
+/* ---------- Who does it: avatar menu ---------- */
+.hh .hh-assign-btn {
+  display: inline-flex; align-items: center; padding: 4px; border: 0; border-radius: 999px;
+  background: none; cursor: pointer; font: inherit;
+}
+.hh .hh-assign-btn:hover { background: var(--hh-surface-2); }
+.hh .hh-assign-btn .hh-free { padding: 2px 6px; border: 1px dashed var(--hh-line); border-radius: 999px; }
+.hh .hh-popover {
+  margin: auto; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 0; border-radius: 20px;
+  background: var(--hh-surface); color: var(--hh-ink); box-shadow: 0 8px 32px rgba(94, 75, 60, .25);
+}
+.hh .hh-popover::backdrop { background: rgba(46, 41, 36, .25); }
+.hh .hh-popover-title { font-weight: 600; margin: 4px 8px 8px; }
+.hh .hh-popover form.button_to { display: block; }
+.hh .hh-popover-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 8px; border: 0; border-radius: 12px;
+  background: none; color: var(--hh-ink); font: 500 1rem var(--hh-font); text-align: left; cursor: pointer;
+}
+.hh .hh-popover-item:hover { background: var(--hh-surface-2); }
+.hh .hh-popover-item[aria-current="true"] { background: var(--hh-tonal); }
+.hh .hh-avatar--free { background: var(--hh-surface-2); color: var(--hh-muted); }
+
 /* ---------- Agenda ---------- */
 .hh .hh-agenda-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .hh .hh-agenda-pager { display: flex; align-items: center; gap: 4px; }

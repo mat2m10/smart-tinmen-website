@@ -1,6 +1,6 @@
 # One line in the household's activity log, read by the assistant through the API.
 class Event < ApplicationRecord
-  ACTIONS = %w[chore_added chore_edited chore_deleted chore_done chore_undone chore_claimed chore_released note_added transcript_added].freeze
+  ACTIONS = %w[chore_added chore_edited chore_deleted chore_done chore_undone chore_claimed chore_assigned chore_released note_added transcript_added].freeze
 
   belongs_to :user, optional: true
 
