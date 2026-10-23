@@ -15,7 +15,8 @@ class Household::NotesController < Household::BaseController
       summary = @note.body.presence || "(#{@note.attachments.map(&:kind).tally.map { |k, n| "#{n} #{k}" }.join(", ")})"
       Event.log!("note_added", user: current_user, note: @note, summary: summary)
       others = @note.chore ? @note.chore.audience(except: current_user) : User.where.not(id: current_user.id)
-      HouseholdPushJob.perform_later(others.ids, "#{current_user.display_name} added a note", summary, back_path) if others.exists?
+      # The board no longer lists notes, so the push opens where the note can be read.
+      HouseholdPushJob.perform_later(others.ids, "#{current_user.display_name} added a note", summary, note_path) if others.exists?
       redirect_to back_path, notice: "Note added", status: :see_other
     else
       problems = (@note.errors.full_messages + @note.attachments.flat_map { |a| a.errors.full_messages }).uniq
@@ -37,8 +38,10 @@ class Household::NotesController < Household::BaseController
   end
 
   def back_path(chore = @note&.chore)
-    return household_root_path if params[:return_to] == "board"
+    params[:return_to] == "board" ? household_root_path : note_path(chore)
+  end
 
+  def note_path(chore = @note&.chore)
     chore ? edit_household_chore_path(chore, anchor: "notes") : household_notes_path
   end
 end
