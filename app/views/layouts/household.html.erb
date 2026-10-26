@@ -40,7 +40,13 @@
     <% end %>
     <main class="hh-page">
       <% flash.each do |type, message| %>
-        <p class="hh-flash hh-flash--<%= type %>" role="status"><%= message %></p>
+        <% next if type == "undo" %>
+        <div class="hh-flash hh-flash--<%= type %>" role="status">
+          <span><%= message %></span>
+          <% if type == "notice" && flash[:undo] %>
+            <%= button_to "Undo", household_completion_path(flash[:undo], return_to: "board"), method: :delete, class: "hh-btn hh-btn--text" %>
+          <% end %>
+        </div>
       <% end %>
       <%= yield %>
     </main>

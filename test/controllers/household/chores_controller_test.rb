@@ -274,4 +274,40 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_not chore.reload.personal
     assert_equal users(:bob), chore.assignee
   end
+
+  test "a ticked repeating chore leaves the board until it is due again, and Undo brings it back" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    post complete_household_chore_path(chore), params: { seen: 0 }
+    follow_redirect!
+    assert_select ".hh-flash--notice", /Done/
+    assert_select ".hh-flash--notice form[action=?]", household_completion_path(chore.completions.last, return_to: "board")
+    assert_select ".hh-list .hh-chore-title", text: "Clean the toilet", count: 0
+
+    delete household_completion_path(chore.completions.last, return_to: "board")
+    assert_redirected_to household_root_path
+    follow_redirect!
+    assert_select ".hh-flash--notice", /Not done: Clean the toilet/
+    assert_select ".hh-list .hh-chore-title", text: "Clean the toilet"
+    assert_equal Date.current, chore.reload.due_on
+  end
+
+  test "editing a resting chore brings it back on the board" do
+    chore = chores(:toilet)
+    chore.complete!(users(:alice))
+    assert chore.reload.resting?
+    travel 2.seconds do
+      chore.update!(due_on: Date.current + 2)
+      assert_not chore.reload.resting?
+    end
+  end
+
+  test "the Done page has a Not done button and says when a chore comes back" do
+    chore = chores(:toilet)
+    chore.complete!(users(:alice))
+    sign_in("alice@example.com")
+    get household_completions_path
+    assert_select ".hh-chore-actions form[action=?] button", household_completion_path(chore.completions.last), text: /Not done/
+    assert_select ".hh-chore-meta", /back #{chore.reload.due_on.strftime("%a %-d %b")}/
+  end
 end
