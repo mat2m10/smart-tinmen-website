@@ -4,7 +4,7 @@ class Chore < ApplicationRecord
   # Suggestions only: area and room are free text, so each household keeps
   # its own list in the database (and nothing personal lives in this code).
   DEFAULT_AREAS = [ "Cleaning", "Laundry", "Food", "Kids", "Admin", "Family & friends", "Home & repairs" ].freeze
-  REPEAT_UNITS = %w[none day week month year].freeze
+  REPEAT_UNITS = %w[none day weekday week month year].freeze
   EFFORTS = { 1 => "Quick", 2 => "Medium", 3 => "Big" }.freeze
   # Turns "Empty the dishwasher" into "emptied the dishwasher" for "X did it"
   # notifications. Titles starting with another word fall back to quoting.
@@ -168,6 +168,8 @@ class Chore < ApplicationRecord
   def advance(date)
     case repeat_unit
     when "day" then date.advance(days: repeat_every)
+    # Monday to Friday only, e.g. daycare drop-off: Friday moves on to Monday.
+    when "weekday" then repeat_every.times.reduce(date) { |day, _| day = day.next_day; day = day.next_day while day.on_weekend?; day }
     when "week" then date.advance(weeks: repeat_every)
     when "month" then date.advance(months: repeat_every)
     when "year" then date.advance(years: repeat_every)

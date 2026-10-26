@@ -13,7 +13,7 @@ class Household::AgendaController < Household::BaseController
 
     @entries = Hash.new { |hash, key| hash[key] = [] }
     chores.each do |chore|
-      dates = chore.repeat_unit == "day" ? [ chore.due_on ].select { |date| @days.cover?(date) } : chore.occurrences(@days)
+      dates = chore.repeat_unit.in?(%w[day weekday]) ? [ chore.due_on ].select { |date| @days.cover?(date) } : chore.occurrences(@days)
       dates.each { |date| @entries[date] << { chore: chore, date: date, forecast: date != chore.due_on } }
     end
     @entries.each_value { |list| list.sort_by! { |entry| [ entry[:chore].due_time || "", entry[:chore].title ] } }
