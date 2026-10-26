@@ -114,7 +114,8 @@ body.hh {
 .hh .hh-chip .ms { font-size: 18px; }
 
 /* ---------- Messages ---------- */
-.hh .hh-flash { padding: 12px 16px; border-radius: 12px; background: var(--hh-surface-2); margin-bottom: 12px; }
+.hh .hh-flash { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-radius: 12px; background: var(--hh-surface-2); margin-bottom: 12px; }
+.hh .hh-flash form { flex: none; }
 .hh .hh-flash--alert { background: var(--hh-danger-bg); color: var(--hh-danger); }
 .hh .hh-empty, .hh .hh-hint { color: var(--hh-muted); font-size: .875rem; margin-top: 8px; }
 .hh .hh-intro { margin: -8px 0 16px; }

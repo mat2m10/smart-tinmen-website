@@ -9,7 +9,7 @@ class Household::ChoresController < Household::BaseController
     chores = chores.where(assignee: current_user) if @filter == "mine"
     chores = chores.where(assignee_id: nil) if @filter == "free"
     # Your personal chores get their own section at the top, whatever their date.
-    @personal, shared = chores.partition(&:personal)
+    @personal, shared = chores.reject(&:resting?).partition(&:personal)
     @buckets = shared.group_by(&:bucket)
 
     # The balance compares shared work only; personal chores count for no one.
@@ -79,6 +79,7 @@ class Household::ChoresController < Household::BaseController
       true
     end
     if done
+      flash[:undo] = @chore.completions.order(:created_at, :id).last.id
       sentence = @chore.done_sentence(doer.display_name)
       notify_others(doer == current_user ? sentence : "#{sentence} (ticked off by #{current_user.display_name})")
     end

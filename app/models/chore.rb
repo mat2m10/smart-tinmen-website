@@ -73,6 +73,15 @@ class Chore < ApplicationRecord
     repeat_unit != "none"
   end
 
+  # A repeating chore that was ticked off stays off the board until it is due
+  # again, like a finished one-off. Editing it (a new date, say) brings it back.
+  def resting?(today = Date.current)
+    return false unless repeating? && due_on > today
+
+    last = completions.max_by(&:created_at)
+    last.present? && last.created_at >= updated_at - 1.second
+  end
+
   def complete!(user, on: Date.current)
     transaction do
       completions.create!(user: user, completed_on: on, effort: effort, planning: planning, previous_due_on: due_on)

@@ -22,7 +22,9 @@ class Household::CompletionsController < Household::BaseController
     chore = @completion.chore
     chore.undo!(@completion)
     Event.log!("chore_undone", user: current_user, chore: chore)
-    redirect_to household_completions_path, notice: "Deleted the tick for #{chore.title}; its points are off the counter", status: :see_other
+    # Undo on the board's "Done" message goes back to the board.
+    back = params[:return_to] == "board" ? household_root_path : household_completions_path
+    redirect_to back, notice: "Not done: #{chore.title}. It is back on the list", status: :see_other
   end
 
   private
