@@ -14,6 +14,29 @@ class Household::Api::ChoresController < Household::Api::BaseController
     save(Chore.find(params[:id]), :ok)
   end
 
+  # Ticks a chore off for whoever said they did it ("I did the laundry"), on
+  # the day they did it. A one-off chore that is already done counts once.
+  def complete
+    chore = Chore.find(params[:id])
+    attrs = params.expect(completion: %i[by on])
+    doer = User.find_by(email: attrs[:by].to_s.strip.downcase)
+    return render json: { errors: [ "Unknown by" ] }, status: :unprocessable_entity unless doer
+
+    on = attrs[:on].present? ? (Date.iso8601(attrs[:on]) rescue nil) : Date.current
+    return render json: { errors: [ "on must be a date, not in the future" ] }, status: :unprocessable_entity if on.nil? || on > Date.current
+
+    done = chore.with_lock do
+      next false if chore.done_at?
+
+      chore.complete!(doer, on: on)
+      Event.log!("chore_done", by_claude: true, chore: chore, summary: "#{chore.title} (done by #{doer.display_name})")
+      true
+    end
+    return render json: { errors: [ "Already done" ] }, status: :unprocessable_entity unless done
+
+    render json: chore.reload.as_api_json
+  end
+
   private
 
   def save(chore, status)

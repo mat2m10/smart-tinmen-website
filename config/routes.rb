@@ -31,7 +31,9 @@ Rails.application.routes.draw do
     resources :attachments, only: :show
 
     namespace :api, defaults: { format: :json } do
-      resources :chores, only: %i[index create update]
+      resources :chores, only: %i[index create update] do
+        post :complete, on: :member
+      end
       get "completions" => "completions#index"
       get "events" => "events#index"
       resources :notes, only: %i[index create]
