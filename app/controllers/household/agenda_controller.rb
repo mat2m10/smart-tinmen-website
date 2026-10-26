@@ -1,6 +1,6 @@
 # Two weeks of chores, day by day. Chores that repeat weekly or less often
 # also appear on their coming dates, so you can see what next week looks like;
-# daily ones only on their real due date, or they would fill every day.
+# daily and weekday ones only on their real due date, or they would fill every day.
 class Household::AgendaController < Household::BaseController
   DAYS = 14
 
@@ -13,7 +13,7 @@ class Household::AgendaController < Household::BaseController
 
     @entries = Hash.new { |hash, key| hash[key] = [] }
     chores.each do |chore|
-      dates = chore.repeat_unit == "day" ? [ chore.due_on ].select { |date| @days.cover?(date) } : chore.occurrences(@days)
+      dates = chore.repeat_unit.in?(%w[day weekday]) ? [ chore.due_on ].select { |date| @days.cover?(date) } : chore.occurrences(@days)
       dates.each { |date| @entries[date] << { chore: chore, date: date, forecast: date != chore.due_on } }
     end
     @entries.each_value { |list| list.sort_by! { |entry| [ entry[:chore].due_time || "", entry[:chore].title ] } }

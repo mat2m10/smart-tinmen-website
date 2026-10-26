@@ -11,6 +11,20 @@ class ChoreTest < ActiveSupport::TestCase
     assert_equal 1, chore.completions.count
   end
 
+  test "a weekday chore skips the weekend" do
+    chore = Chore.create!(title: "Take the kid to daycare", area: "Kids", due_on: Date.new(2026, 10, 24), repeat_unit: "weekday", effort: 1)
+    assert_equal Date.new(2026, 10, 26), chore.due_on # created on a Saturday: starts on Monday
+    chore.update!(due_on: Date.new(2026, 10, 23))
+    chore.complete!(users(:alice), on: Date.new(2026, 10, 23)) # a Friday
+    assert_equal Date.new(2026, 10, 26), chore.reload.due_on # Monday
+    chore.complete!(users(:bob), on: Date.new(2026, 10, 26))
+    assert_equal Date.new(2026, 10, 27), chore.reload.due_on
+    chore.complete!(users(:bob), on: Date.new(2026, 10, 31)) # done late, on a Saturday
+    assert_equal Date.new(2026, 11, 2), chore.reload.due_on
+    assert_equal "Every weekday", chore.repeat_label
+    assert_equal [ Date.new(2026, 11, 2), Date.new(2026, 11, 3) ], chore.occurrences(Date.new(2026, 11, 1)..Date.new(2026, 11, 3))
+  end
+
   test "a fixed schedule keeps its calendar day, even when done late" do
     chore = chores(:rent)
     chore.update!(due_on: Date.new(2026, 10, 25))

@@ -4,7 +4,7 @@ class Chore < ApplicationRecord
   # Suggestions only: area and room are free text, so each household keeps
   # its own list in the database (and nothing personal lives in this code).
   DEFAULT_AREAS = [ "Cleaning", "Laundry", "Food", "Kids", "Admin", "Family & friends", "Home & repairs" ].freeze
-  REPEAT_UNITS = %w[none day week month year].freeze
+  REPEAT_UNITS = %w[none day weekday week month year].freeze
   EFFORTS = { 1 => "Quick", 2 => "Medium", 3 => "Big" }.freeze
   # Turns "Empty the dishwasher" into "emptied the dishwasher" for "X did it"
   # notifications. Titles starting with another word fall back to quoting.
@@ -39,6 +39,9 @@ class Chore < ApplicationRecord
   validates :assignee, presence: { message: "is needed for a personal task" }, if: :personal
   # Optional time of day ("14:30") for appointments; without it a chore is all-day.
   validates :due_time, format: { with: /\A([01]\d|2[0-3]):[0-5]\d\z/ }, allow_nil: true
+
+  # A weekday chore never falls on a weekend, also not the first time.
+  before_validation -> { self.due_on = due_on.next_day while due_on.on_weekend? }, if: -> { repeat_unit == "weekday" && due_on }
 
   normalizes :due_time, with: ->(value) { (match = value.strip.match(/\A(\d{1,2}):(\d{2})(:\d{2})?\z/)) ? format("%02d:%s", match[1].to_i, match[2]) : value.strip.presence }
 
@@ -168,6 +171,8 @@ class Chore < ApplicationRecord
   def advance(date)
     case repeat_unit
     when "day" then date.advance(days: repeat_every)
+    # Monday to Friday only, e.g. daycare drop-off: Friday moves on to Monday.
+    when "weekday" then repeat_every.times.reduce(date) { |day, _| day = day.next_day; day = day.next_day while day.on_weekend?; day }
     when "week" then date.advance(weeks: repeat_every)
     when "month" then date.advance(months: repeat_every)
     when "year" then date.advance(years: repeat_every)
