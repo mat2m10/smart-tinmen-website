@@ -97,4 +97,39 @@ class Household::ApiTest < ActionDispatch::IntegrationTest
     patch household_api_chore_path(chores(:toilet)), headers: auth, as: :json, params: { chore: { effort: 2 } }
     assert_equal [ true ], Event.pluck(:by_claude)
   end
+
+  test "Claude ticks a chore off for whoever did it, on the day they did it" do
+    chore = chores(:toilet)
+    post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "Alice@example.com ", on: Date.yesterday.iso8601 } }
+    assert_response :success
+    completion = chore.completions.last
+    assert_equal [ users(:alice), Date.yesterday ], [ completion.user, completion.completed_on ]
+    assert_equal chore.reload.due_on.iso8601, response.parsed_body["due_on"]
+    event = Event.last
+    assert_equal [ "chore_done", true, "Clean the toilet (done by Alice)" ], [ event.action, event.by_claude, event.summary ]
+  end
+
+  test "a one-off chore done through the API counts once" do
+    chore = chores(:gp)
+    post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "bob@example.com" } }
+    assert_response :success
+    assert chore.reload.done_at
+    assert_equal Date.current, chore.completions.last.completed_on
+    assert_no_difference "Completion.count" do
+      post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "bob@example.com" } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "completing needs a known member and a date that is not in the future" do
+    chore = chores(:toilet)
+    assert_no_difference "Completion.count" do
+      post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "nobody@example.com" } }
+      assert_response :unprocessable_entity
+      post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "alice@example.com", on: Date.tomorrow.iso8601 } }
+      assert_response :unprocessable_entity
+      post complete_household_api_chore_path(chore), headers: auth, as: :json, params: { completion: { by: "alice@example.com", on: "soon" } }
+      assert_response :unprocessable_entity
+    end
+  end
 end
