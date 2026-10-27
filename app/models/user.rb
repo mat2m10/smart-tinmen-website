@@ -64,9 +64,13 @@ class User < ApplicationRecord
     display_name.first.upcase
   end
 
-  # The number on the app icon: open chores due by today that are yours or up for grabs.
+  # The number on the app icon: every open chore that is yours, also the ones
+  # due later (you can often do them early), plus what is up for grabs by
+  # today. A ticked repeating chore resting until its next date is left out.
   def badge_count(today = Date.current)
-    Chore.visible_to(self).pending.where(due_on: ..today, assignee_id: [ id, nil ]).count
+    chores = Chore.visible_to(self).pending
+    chores.where(assignee_id: id).or(chores.where(assignee_id: nil, due_on: ..today))
+          .includes(:completions).count { |chore| !chore.resting?(today) }
   end
 
   private
