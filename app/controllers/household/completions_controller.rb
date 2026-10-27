@@ -35,7 +35,7 @@ class Household::CompletionsController < Household::BaseController
   # tick still exists and stays a 404.
   def set_completion
     @completion = Completion.where(chore: Chore.visible_to(current_user)).find_by(id: params[:id])
-    head(:not_found) if @completion.nil? && (action_name != "destroy" || Completion.exists?(params[:id]))
+    head(:not_found) if @completion.nil? && (action_name != "destroy" || Completion.exists?(id: params[:id]))
   end
 
   # Undo on the board's "Done" message goes back to the board, same filter.
