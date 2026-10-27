@@ -125,7 +125,8 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
       WebPush.define_singleton_method(:payload_send, original)
     end
     assert_equal users(:alice).badge_count, badges["https://push.example.com/#{users(:alice).id}"]
-    assert_equal users(:alice).badge_count + 1, badges["https://push.example.com/#{users(:bob).id}"]
+    assert_equal users(:bob).badge_count, badges["https://push.example.com/#{users(:bob).id}"]
+    assert_equal users(:alice).badge_count + 2, users(:bob).badge_count # his late chore and the GP
   end
 
   test "pages set the app badge for the signed-in member" do
