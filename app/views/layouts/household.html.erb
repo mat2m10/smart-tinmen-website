@@ -44,7 +44,7 @@
         <div class="hh-flash hh-flash--<%= type %>" role="status">
           <span><%= message %></span>
           <% if type == "notice" && flash[:undo] %>
-            <%= button_to "Undo", household_completion_path(flash[:undo], return_to: "board"), method: :delete, class: "hh-btn hh-btn--text" %>
+            <%= button_to "Undo", household_completion_path(flash[:undo], return_to: "board", show: params[:show].presence_in(%w[mine free])), method: :delete, class: "hh-btn hh-btn--text" %>
           <% end %>
         </div>
       <% end %>

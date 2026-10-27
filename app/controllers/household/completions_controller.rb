@@ -5,7 +5,7 @@ class Household::CompletionsController < Household::BaseController
 
   def index
     @completions = Completion.recent.where(chore: Chore.visible_to(current_user))
-                             .includes(:user, chore: :assignee).order(completed_on: :desc, created_at: :desc)
+                             .includes(:user, chore: %i[assignee completions]).order(completed_on: :desc, created_at: :desc)
     @users = User.order(:name, :email)
   end
 
@@ -19,17 +19,26 @@ class Household::CompletionsController < Household::BaseController
   end
 
   def destroy
+    return redirect_to(back_path, notice: "That tick was already taken back", status: :see_other) unless @completion
+
     chore = @completion.chore
-    chore.undo!(@completion)
+    back_on_list = chore.undo!(@completion)
     Event.log!("chore_undone", user: current_user, chore: chore)
-    # Undo on the board's "Done" message goes back to the board.
-    back = params[:return_to] == "board" ? household_root_path : household_completions_path
-    redirect_to back, notice: "Not done: #{chore.title}. It is back on the list", status: :see_other
+    notice = back_on_list ? "Not done: #{chore.title}. It is back on the list" : "Removed an older tick of #{chore.title}; its points are off the counter"
+    redirect_to back_path, notice: notice, status: :see_other
   end
 
   private
 
+  # A second tap on Undo, or a tick someone else already took back, finds
+  # nothing: destroy says so instead of showing a 404.
   def set_completion
-    @completion = Completion.where(chore: Chore.visible_to(current_user)).find(params[:id])
+    @completion = Completion.where(chore: Chore.visible_to(current_user)).find_by(id: params[:id])
+    head(:not_found) if @completion.nil? && action_name != "destroy"
+  end
+
+  # Undo on the board's "Done" message goes back to the board, same filter.
+  def back_path
+    params[:return_to] == "board" ? household_root_path(show: params[:show].presence_in(%w[mine free])) : household_completions_path
   end
 end

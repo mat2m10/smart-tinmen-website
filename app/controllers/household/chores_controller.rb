@@ -74,12 +74,12 @@ class Household::ChoresController < Household::BaseController
     done = @chore.with_lock do
       next false if @chore.done_at? || (params[:seen].present? && params[:seen].to_i != @chore.completions.count)
 
-      @chore.complete!(doer)
+      completion = @chore.complete!(doer)
       Event.log!("chore_done", user: current_user, chore: @chore, summary: (doer == current_user ? nil : "#{@chore.title} (done by #{doer.display_name})"))
-      true
+      completion
     end
     if done
-      flash[:undo] = @chore.completions.order(:created_at, :id).last.id
+      flash[:undo] = done.id
       sentence = @chore.done_sentence(doer.display_name)
       notify_others(doer == current_user ? sentence : "#{sentence} (ticked off by #{current_user.display_name})")
     end

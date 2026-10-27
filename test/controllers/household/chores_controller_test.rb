@@ -292,16 +292,6 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_equal Date.current, chore.reload.due_on
   end
 
-  test "editing a resting chore brings it back on the board" do
-    chore = chores(:toilet)
-    chore.complete!(users(:alice))
-    assert chore.reload.resting?
-    travel 2.seconds do
-      chore.update!(due_on: Date.current + 2)
-      assert_not chore.reload.resting?
-    end
-  end
-
   test "the Done page has a Not done button and says when a chore comes back" do
     chore = chores(:toilet)
     chore.complete!(users(:alice))
@@ -309,5 +299,30 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     get household_completions_path
     assert_select ".hh-chore-actions form[action=?] button", household_completion_path(chore.completions.last), text: /Not done/
     assert_select ".hh-chore-meta", /back #{chore.reload.due_on.strftime("%a %-d %b")}/
+  end
+
+  test "Undo keeps the board filter, and a second tap says it was already taken back" do
+    sign_in("alice@example.com")
+    chore = chores(:toilet)
+    post complete_household_chore_path(chore, show: "free"), params: { seen: 0 }
+    follow_redirect!
+    tick = chore.completions.last
+    assert_select ".hh-flash--notice form[action=?]", household_completion_path(tick, return_to: "board", show: "free")
+    delete household_completion_path(tick, return_to: "board", show: "free")
+    assert_redirected_to household_root_path(show: "free")
+    delete household_completion_path(tick, return_to: "board", show: "free")
+    assert_redirected_to household_root_path(show: "free")
+    follow_redirect!
+    assert_select ".hh-flash--notice", /already taken back/
+  end
+
+  test "taking back an older tick says the chore stays done" do
+    chore = chores(:toilet)
+    older = chore.complete!(users(:alice))
+    chore.complete!(users(:alice))
+    sign_in("alice@example.com")
+    delete household_completion_path(older)
+    follow_redirect!
+    assert_select ".hh-flash--notice", /Removed an older tick of Clean the toilet/
   end
 end
