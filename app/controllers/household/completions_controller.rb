@@ -30,11 +30,12 @@ class Household::CompletionsController < Household::BaseController
 
   private
 
-  # A second tap on Undo, or a tick someone else already took back, finds
-  # nothing: destroy says so instead of showing a 404.
+  # A second tap on Undo, or a tick someone else already took back, no longer
+  # exists: destroy says so instead of showing a 404. Someone else's personal
+  # tick still exists and stays a 404.
   def set_completion
     @completion = Completion.where(chore: Chore.visible_to(current_user)).find_by(id: params[:id])
-    head(:not_found) if @completion.nil? && action_name != "destroy"
+    head(:not_found) if @completion.nil? && (action_name != "destroy" || Completion.exists?(params[:id]))
   end
 
   # Undo on the board's "Done" message goes back to the board, same filter.
