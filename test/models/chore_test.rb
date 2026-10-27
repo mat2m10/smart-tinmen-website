@@ -141,4 +141,23 @@ class ChoreTest < ActiveSupport::TestCase
     assert_includes Chore.visible_to(users(:alice)), chores(:toilet)
     assert_empty chore.audience(except: users(:bob))
   end
+
+  test "complete! returns the new tick and undo! says whether the chore came back" do
+    chore = chores(:toilet)
+    older = chore.complete!(users(:alice))
+    latest = chore.complete!(users(:bob))
+    assert_equal [ users(:alice), users(:bob) ], [ older.user, latest.user ]
+    assert_not chore.undo!(older)
+    assert chore.undo!(latest)
+  end
+
+  test "editing a resting chore brings it back on the board" do
+    chore = chores(:toilet)
+    chore.complete!(users(:alice))
+    assert chore.reload.resting?
+    travel 2.seconds do
+      chore.update!(due_on: Date.current + 2)
+      assert_not chore.reload.resting?
+    end
+  end
 end
