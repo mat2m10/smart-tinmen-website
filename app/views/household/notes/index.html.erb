@@ -1,6 +1,6 @@
 <% content_for :title, "Notes" %>
 <h1 class="hh-title">Notes</h1>
-<p class="hh-hint hh-intro">Anything worth remembering: what ran out, what is broken, a photo of a letter, a voice note on the way home. Claude reads these twice a day and turns them into tasks or answers here.</p>
+<p class="hh-hint hh-intro">Anything worth remembering: what ran out, what is broken, a photo of a letter, a voice note on the way home.<% if current_user.home.assistant? %> Claude reads these twice a day and turns them into tasks or answers here.<% end %></p>
 
 <%= render "composer", note: @note, placeholder: "What should the household know?" %>
 

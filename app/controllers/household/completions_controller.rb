@@ -6,7 +6,7 @@ class Household::CompletionsController < Household::BaseController
   def index
     @completions = Completion.recent.where(chore: Chore.visible_to(current_user))
                              .includes(:user, chore: %i[assignee completions]).order(completed_on: :desc, created_at: :desc)
-    @users = User.order(:name, :email)
+    @users = current_user.home.users.order(:name, :email)
   end
 
   # Only who did it can change; the date and points stay as they were.
@@ -14,7 +14,7 @@ class Household::CompletionsController < Household::BaseController
   def update
     return head(:not_found) if @completion.chore.personal
 
-    @completion.update!(user: User.find(params.expect(completion: [ :user_id ])[:user_id]))
+    @completion.update!(user: current_user.home.users.find(params.expect(completion: [ :user_id ])[:user_id]))
     redirect_to household_completions_path, notice: "Now on #{@completion.user.display_name}: #{@completion.chore.title}", status: :see_other
   end
 

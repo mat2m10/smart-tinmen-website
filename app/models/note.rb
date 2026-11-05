@@ -3,16 +3,20 @@
 class Note < ApplicationRecord
   MAX_PHOTOS = 4
 
+  belongs_to :home
   belongs_to :chore, optional: true, inverse_of: :remarks
   belongs_to :user, optional: true
   has_many :attachments, -> { without_data.order(:id) }, dependent: :delete_all, inverse_of: :note
 
+  before_validation -> { self.home ||= chore&.home || user&.home }
+
   validates :body, length: { maximum: 5000 }
   validate :has_content
+  validate :chore_lives_here
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
   # Loose notes, and remarks on chores the user may see (not the other's personal ones).
-  scope :visible_to, ->(user) { where(chore_id: nil).or(where(chore_id: Chore.visible_to(user).select(:id))) }
+  scope :visible_to, ->(user) { where(home_id: user.home_id, chore_id: nil).or(where(home_id: user.home_id, chore_id: Chore.visible_to(user).select(:id))) }
 
   def author_name
     from_claude ? "Claude" : (user&.display_name || "Someone")
@@ -34,6 +38,10 @@ class Note < ApplicationRecord
   end
 
   private
+
+  def chore_lives_here
+    errors.add(:chore, "is not in this household") if chore && chore.home_id != home_id
+  end
 
   def has_content
     errors.add(:base, "Write something, or add a photo or a voice note") if body.blank? && attachments.empty?

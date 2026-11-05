@@ -2,24 +2,24 @@ class Household::Api::ChoresController < Household::Api::BaseController
   FIELDS = %i[title notes area room due_on due_time repeat_unit repeat_every fixed_schedule effort planning personal assignee_email].freeze
 
   def index
-    chores = params[:include_done] == "true" ? Chore.all : Chore.pending
+    chores = params[:include_done] == "true" ? @home.chores : @home.chores.pending
     render json: chores.includes(:assignee, :completions).order(:due_on, :title).map(&:as_api_json)
   end
 
   def create
-    save(Chore.new, :created)
+    save(@home.chores.new, :created)
   end
 
   def update
-    save(Chore.find(params[:id]), :ok)
+    save(@home.chores.find(params[:id]), :ok)
   end
 
   # Ticks a chore off for whoever said they did it ("I did the laundry"), on
   # the day they did it. A one-off chore that is already done counts once.
   def complete
-    chore = Chore.find(params[:id])
+    chore = @home.chores.find(params[:id])
     attrs = params.expect(completion: %i[by on])
-    doer = User.find_by(email: attrs[:by].to_s.strip.downcase)
+    doer = @home.users.find_by(email: attrs[:by].to_s.strip.downcase)
     return render json: { errors: [ "Unknown by" ] }, status: :unprocessable_entity unless doer
 
     on = attrs[:on].present? ? (Date.iso8601(attrs[:on]) rescue nil) : Date.current
@@ -43,7 +43,7 @@ class Household::Api::ChoresController < Household::Api::BaseController
     attrs = params.expect(chore: FIELDS).to_h
     if attrs.key?("assignee_email")
       email = attrs.delete("assignee_email")
-      chore.assignee = email.present? ? User.find_by(email: email.strip.downcase) : nil
+      chore.assignee = email.present? ? @home.users.find_by(email: email.strip.downcase) : nil
       return render json: { errors: [ "Unknown assignee_email" ] }, status: :unprocessable_entity if email.present? && chore.assignee.nil?
     end
 

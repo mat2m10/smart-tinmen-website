@@ -19,6 +19,7 @@ class Chore < ApplicationRecord
     pick prepare register renew repair replace schedule sort tidy vacuum wash water
   ].freeze
 
+  belongs_to :home
   belongs_to :assignee, class_name: "User", optional: true
   belongs_to :created_by, class_name: "User", optional: true
   has_many :completions, dependent: :destroy
@@ -35,6 +36,7 @@ class Chore < ApplicationRecord
   validates :repeat_every, numericality: { only_integer: true, in: 1..365 }
   validates :effort, inclusion: { in: EFFORTS.keys }
   validates :assignee, presence: true, unless: -> { assignee_id.nil? }
+  validate :assignee_lives_here
   # A personal chore belongs to one person and only they see it.
   validates :assignee, presence: { message: "is needed for a personal task" }, if: :personal
   # Optional time of day ("14:30") for appointments; without it a chore is all-day.
@@ -47,14 +49,16 @@ class Chore < ApplicationRecord
 
   # Timed chores are appointments and get an event in the shared Google Calendar.
   CALENDAR_FIELDS = %w[title notes area room due_on due_time assignee_id personal].freeze
-  after_commit :sync_calendar, on: %i[create update], if: -> { (due_time || due_time_before_last_save) && saved_changes.keys.intersect?(CALENDAR_FIELDS) }
+  after_commit :sync_calendar, on: %i[create update], if: -> { home.assistant? && (due_time || due_time_before_last_save) && saved_changes.keys.intersect?(CALENDAR_FIELDS) }
   # A second after_commit naming the same method would replace the first.
-  after_destroy_commit -> { HouseholdCalendarJob.perform_later(id) }, if: -> { due_time }
+  after_destroy_commit -> { HouseholdCalendarJob.perform_later(id) }, if: -> { home.assistant? && due_time }
 
   scope :pending, -> { where(done_at: nil) }
   scope :finished, -> { where.not(done_at: nil) }
   scope :shared, -> { where(personal: false) }
-  scope :visible_to, ->(user) { shared.or(where(assignee: user)) }
+  # Everything a member may see: only their own home, and within it the shared
+  # chores and their own personal ones. Screens start from this scope.
+  scope :visible_to, ->(user) { where(home_id: user.home_id, personal: false).or(where(home_id: user.home_id, assignee: user)) }
 
   def self.area_options
     (DEFAULT_AREAS + distinct.pluck(:area)).uniq.sort
@@ -66,7 +70,7 @@ class Chore < ApplicationRecord
 
   # Who else hears about this chore: nobody when it is personal.
   def audience(except:)
-    personal ? User.none : User.where.not(id: except)
+    personal ? User.none : home.users.where.not(id: except)
   end
 
   def repeating?
@@ -170,6 +174,10 @@ class Chore < ApplicationRecord
   end
 
   private
+
+  def assignee_lives_here
+    errors.add(:assignee, "is not in this household") if assignee && assignee.home_id != home_id
+  end
 
   def sync_calendar
     HouseholdCalendarJob.perform_later(id)

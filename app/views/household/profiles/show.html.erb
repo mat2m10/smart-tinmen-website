@@ -47,6 +47,7 @@
 </section>
 
 <section class="hh-card hh-profile-more">
+  <%= link_to household_members_path, class: "hh-btn hh-btn--text" do %><span class="ms" aria-hidden="true">group</span>Members and invites<% end %>
   <p class="hh-hint">This profile is your account on smarttinmen.com; other apps on the site can use the same name and colour.</p>
   <%= button_to household_logout_path, method: :delete, class: "hh-btn hh-btn--text" do %><span class="ms" aria-hidden="true">logout</span>Sign out<% end %>
 </section>

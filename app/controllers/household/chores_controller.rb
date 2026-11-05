@@ -13,8 +13,8 @@ class Household::ChoresController < Household::BaseController
     @buckets = shared.group_by(&:bucket)
 
     # The balance compares shared work only; personal chores count for no one.
-    recent = Completion.where(completed_on: 30.days.ago.to_date.., chore: Chore.shared)
-    @users = User.order(:name, :email)
+    recent = Completion.where(completed_on: 30.days.ago.to_date.., chore: current_user.home.chores.shared)
+    @users = current_user.home.users.order(:name, :email)
     @effort = recent.group(:user_id).sum(:effort)
     @planning = recent.where(planning: true).group(:user_id).count
     @recently_done = Completion.where(chore: Chore.visible_to(current_user)).includes(:chore, :user).order(created_at: :desc).limit(8)
@@ -26,7 +26,7 @@ class Household::ChoresController < Household::BaseController
   end
 
   def create
-    @chore = Chore.new(chore_params.merge(created_by: current_user))
+    @chore = current_user.home.chores.new(chore_params.merge(created_by: current_user))
     @chore.assignee = current_user if @chore.personal
     if @chore.save
       Event.log!("chore_added", user: current_user, chore: @chore)
@@ -102,7 +102,7 @@ class Household::ChoresController < Household::BaseController
   def assign
     return redirect_to(household_root_path(show: filter_param), status: :see_other) if @chore.personal
 
-    assignee = params[:assignee_id].present? ? User.find(params[:assignee_id]) : nil
+    assignee = params[:assignee_id].present? ? current_user.home.users.find(params[:assignee_id]) : nil
     if assignee != @chore.assignee
       @chore.update!(assignee: assignee)
       Event.log!(assignee ? "chore_assigned" : "chore_released", user: current_user, chore: @chore,
