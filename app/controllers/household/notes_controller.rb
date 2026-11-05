@@ -6,7 +6,7 @@ class Household::NotesController < Household::BaseController
   end
 
   def create
-    @note = Note.new(body: note_params[:body], user: current_user)
+    @note = current_user.home.notes.new(body: note_params[:body], user: current_user)
     @note.chore = Chore.visible_to(current_user).find(note_params[:chore_id]) if note_params[:chore_id].present?
     Array(note_params[:photos]).compact_blank.first(Note::MAX_PHOTOS).each { |file| @note.attachments << Attachment.from_upload("photo", file) }
     @note.attachments << Attachment.from_upload("voice", note_params[:voice]) if note_params[:voice].present?
@@ -14,7 +14,7 @@ class Household::NotesController < Household::BaseController
     if @note.attachments.all?(&:valid?) && @note.save
       summary = @note.body.presence || "(#{@note.attachments.map(&:kind).tally.map { |k, n| "#{n} #{k}" }.join(", ")})"
       Event.log!("note_added", user: current_user, note: @note, summary: summary)
-      others = @note.chore ? @note.chore.audience(except: current_user) : User.where.not(id: current_user.id)
+      others = @note.chore ? @note.chore.audience(except: current_user) : current_user.home.users.where.not(id: current_user.id)
       # The board no longer lists notes, so the push opens where the note can be read.
       HouseholdPushJob.perform_later(others.ids, "#{current_user.display_name} added a note", summary, note_path) if others.exists?
       redirect_to back_path, notice: "Note added", status: :see_other

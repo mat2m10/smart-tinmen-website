@@ -11,7 +11,7 @@ class Household::BaseController < ApplicationController
     return @current_user if defined?(@current_user)
 
     user = User.find_by(id: session[:household_user_id])
-    @current_user = user if user && User.allowed?(user.email)
+    @current_user = user if user&.home_id
   end
 
   def require_household_user

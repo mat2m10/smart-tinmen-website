@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,6 +44,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_170000) do
     t.datetime "updated_at", null: false
     t.string "due_time", limit: 5
     t.boolean "personal", default: false, null: false
+    t.bigint "home_id", null: false
+    t.index ["home_id"], name: "index_chores_on_home_id"
     t.index ["assignee_id"], name: "index_chores_on_assignee_id"
     t.index ["created_by_id"], name: "index_chores_on_created_by_id"
     t.index ["done_at"], name: "index_chores_on_done_at"
@@ -72,7 +74,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_170000) do
     t.bigint "note_id"
     t.string "summary"
     t.datetime "created_at", null: false
+    t.bigint "home_id", null: false
+    t.index ["home_id"], name: "index_events_on_home_id"
     t.index ["user_id"], name: "index_events_on_user_id"
+  end
+
+  create_table "homes", force: :cascade do |t|
+    t.boolean "assistant", default: false, null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.datetime "invite_expires_at"
+    t.string "invite_token"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assistant"], name: "index_homes_on_the_assistant_home", unique: true, where: "assistant"
+    t.index ["created_by_id"], name: "index_homes_on_created_by_id"
+    t.index ["invite_token"], name: "index_homes_on_invite_token", unique: true
   end
 
   create_table "notes", force: :cascade do |t|
@@ -82,6 +99,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_170000) do
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "home_id", null: false
+    t.index ["home_id"], name: "index_notes_on_home_id"
     t.index ["chore_id"], name: "index_notes_on_chore_id"
     t.index ["created_at"], name: "index_notes_on_created_at"
     t.index ["user_id"], name: "index_notes_on_user_id"
@@ -109,16 +128,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_170000) do
     t.binary "photo"
     t.string "photo_type"
     t.datetime "updated_at", null: false
+    t.bigint "home_id"
+    t.index ["home_id"], name: "index_users_on_home_id"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "attachments", "notes", on_delete: :cascade
+  add_foreign_key "chores", "homes"
   add_foreign_key "chores", "users", column: "assignee_id"
   add_foreign_key "chores", "users", column: "created_by_id"
   add_foreign_key "completions", "chores"
   add_foreign_key "completions", "users"
+  add_foreign_key "events", "homes"
   add_foreign_key "events", "users", on_delete: :nullify
+  add_foreign_key "homes", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "notes", "homes"
   add_foreign_key "notes", "chores", on_delete: :nullify
   add_foreign_key "notes", "users", on_delete: :nullify
   add_foreign_key "push_subscriptions", "users", on_delete: :cascade
+  add_foreign_key "users", "homes"
 end

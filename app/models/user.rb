@@ -1,5 +1,8 @@
-# A member of the household. Only emails listed in HOUSEHOLD_EMAILS can sign in.
+# A member of one household. People join through an invite link; the emails in
+# HOUSEHOLD_EMAILS (the founders) belong to the first home and can start others.
 class User < ApplicationRecord
+  belongs_to :home, optional: true
+  has_many :started_homes, class_name: "Home", foreign_key: :created_by_id, inverse_of: :created_by, dependent: :nullify
   has_many :assigned_chores, class_name: "Chore", foreign_key: :assignee_id, inverse_of: :assignee, dependent: :nullify
   has_many :created_chores, class_name: "Chore", foreign_key: :created_by_id, inverse_of: :created_by, dependent: :nullify
   has_many :completions, dependent: :nullify
@@ -47,13 +50,21 @@ class User < ApplicationRecord
   end
 
   # Google only fills info.email when the address is verified.
-  def self.from_google(auth)
+  # Someone already in a home stays there, whatever link they opened.
+  def self.from_google(auth, invite: nil)
     email = auth&.info&.email
-    return unless allowed?(email)
+    return if email.blank?
 
     user = find_or_initialize_by(email: email)
-    user.update!(name: auth.info.first_name.presence || auth.info.name.presence || user.name, avatar_url: auth.info.image)
+    home = user.home || invite || (Home.for_founders if allowed?(email))
+    return unless home
+
+    user.update!(home: home, name: auth.info.first_name.presence || auth.info.name.presence || user.name, avatar_url: auth.info.image)
     user
+  end
+
+  def founder?
+    self.class.allowed?(email)
   end
 
   def display_name

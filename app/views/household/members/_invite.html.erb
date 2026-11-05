@@ -1,0 +1,5 @@
+<% if home.invite_active? %>
+  <input type="text" readonly value="<%= household_join_url(home.invite_token) %>" aria-label="Invite link for <%= home.name %>">
+  <p class="hh-hint">Works until <%= home.invite_expires_at.strftime("%-d %b %Y") %>. A new link cancels this one.</p>
+<% end %>
+<%= button_to(home.invite_active? ? "New link" : "Create invite link", household_invite_path, params: renew_params, class: "hh-btn hh-btn--tonal") %>

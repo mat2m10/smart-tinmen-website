@@ -78,7 +78,7 @@ class Household::NotesControllerTest < ActionDispatch::IntegrationTest
   test "members can delete their own and Claude's notes, not each other's" do
     sign_in("alice@example.com")
     mine = Note.create!(body: "mine", user: users(:alice))
-    claudes = Note.create!(body: "from Claude", from_claude: true)
+    claudes = Note.create!(home: homes(:ours), body: "from Claude", from_claude: true)
     bobs = Note.create!(body: "bob's", user: users(:bob))
     delete household_note_path(mine)
     delete household_note_path(claudes)

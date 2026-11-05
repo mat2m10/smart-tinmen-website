@@ -115,7 +115,7 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
   test "each push carries the recipient's badge count" do
     subscribe(users(:alice))
     subscribe(users(:bob))
-    Chore.create!(title: "Bob's late chore", area: "Admin", due_on: Date.yesterday, assignee: users(:bob))
+    Chore.create!(home: homes(:ours), title: "Bob's late chore", area: "Admin", due_on: Date.yesterday, assignee: users(:bob))
     badges = {}
     original = WebPush.method(:payload_send)
     WebPush.define_singleton_method(:payload_send) { |**args| badges[args[:endpoint]] = JSON.parse(args[:message])["badge"] }
@@ -160,7 +160,7 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
   test "the agenda shows two weeks day by day, with repeats ahead, all-day items before timed ones" do
     chores(:toilet).update!(due_on: Date.current)
     chores(:gp).update!(due_on: Date.current, due_time: "09:15")
-    Chore.create!(title: "Old letter", area: "Admin", due_on: Date.current - 3)
+    Chore.create!(home: homes(:ours), title: "Old letter", area: "Admin", due_on: Date.current - 3)
     sign_in("alice@example.com")
     get household_agenda_path
     assert_response :success
@@ -170,7 +170,7 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
     assert_equal [ "Clean the toilet", "Find a GP" ], today.css(".hh-chore-title").map(&:text)
     assert_equal [ "All day", "09:15" ], today.css(".hh-agenda-time").map(&:text)
     assert_select ".hh-agenda-item--forecast .hh-chore-title", "Clean the toilet"
-    Chore.create!(title: "Feed the cat", area: "Food", due_on: Date.current, repeat_unit: "day")
+    Chore.create!(home: homes(:ours), title: "Feed the cat", area: "Food", due_on: Date.current, repeat_unit: "day")
     get household_agenda_path
     assert_select ".hh-agenda-item .hh-chore-title", { text: "Feed the cat", count: 1 }
 

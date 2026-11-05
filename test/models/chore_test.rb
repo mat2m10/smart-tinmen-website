@@ -12,7 +12,7 @@ class ChoreTest < ActiveSupport::TestCase
   end
 
   test "a weekday chore skips the weekend" do
-    chore = Chore.create!(title: "Take the kid to daycare", area: "Kids", due_on: Date.new(2026, 10, 24), repeat_unit: "weekday", effort: 1)
+    chore = Chore.create!(home: homes(:ours), title: "Take the kid to daycare", area: "Kids", due_on: Date.new(2026, 10, 24), repeat_unit: "weekday", effort: 1)
     assert_equal Date.new(2026, 10, 26), chore.due_on # created on a Saturday: starts on Monday
     chore.update!(due_on: Date.new(2026, 10, 23))
     chore.complete!(users(:alice), on: Date.new(2026, 10, 23)) # a Friday
@@ -67,7 +67,7 @@ class ChoreTest < ActiveSupport::TestCase
   end
 
   test "area suggestions mix the defaults with what the household already uses" do
-    Chore.create!(title: "Wash the car", area: "Car", due_on: Date.current)
+    Chore.create!(home: homes(:ours), title: "Wash the car", area: "Car", due_on: Date.current)
     assert_includes Chore.area_options, "Cleaning"
     assert_includes Chore.area_options, "Car"
     assert_equal Chore.area_options.uniq, Chore.area_options

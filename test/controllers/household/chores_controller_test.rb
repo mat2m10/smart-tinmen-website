@@ -45,9 +45,9 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_select ".hh-bar", 2
   end
 
-  test "removing someone from the list ends their session" do
+  test "taking someone out of their household ends their session" do
     sign_in("alice@example.com")
-    ENV["HOUSEHOLD_EMAILS"] = "bob@example.com"
+    users(:alice).update!(home: nil)
     get household_root_path
     assert_redirected_to household_login_path
   end

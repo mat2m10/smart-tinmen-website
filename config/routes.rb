@@ -20,6 +20,10 @@ Rails.application.routes.draw do
     end
 
     get "agenda" => "agenda#show", as: :agenda
+    get "members" => "members#index", as: :members
+    get "join/:token" => "invites#show", as: :join
+    resource :invite, only: :create
+    resources :homes, only: :create
     resource :profile, only: %i[show update]
     get "avatars/:id" => "avatars#show", as: :avatar
     resources :completions, path: "done", only: %i[index update destroy]

@@ -37,19 +37,19 @@ class UserTest < ActiveSupport::TestCase
     base = Date.current >= chores(:rent).due_on ? 2 : 1
     assert_equal base, alice.badge_count
     assert_equal base + 1, bob.badge_count
-    Chore.create!(title: "Bob's late chore", area: "Admin", due_on: Date.yesterday, assignee: bob)
-    Chore.create!(title: "Bob's secret", area: "Admin", due_on: Date.current, assignee: bob, personal: true)
-    Chore.create!(title: "Alice's late chore", area: "Admin", due_on: Date.yesterday, assignee: alice)
-    Chore.create!(title: "Alice's chore next month", area: "Admin", due_on: Date.current + 30, assignee: alice)
-    Chore.create!(title: "Free next week", area: "Admin", due_on: Date.current + 7)
-    Chore.create!(title: "Already done", area: "Admin", due_on: Date.yesterday, done_at: Time.current)
+    Chore.create!(home: homes(:ours), title: "Bob's late chore", area: "Admin", due_on: Date.yesterday, assignee: bob)
+    Chore.create!(home: homes(:ours), title: "Bob's secret", area: "Admin", due_on: Date.current, assignee: bob, personal: true)
+    Chore.create!(home: homes(:ours), title: "Alice's late chore", area: "Admin", due_on: Date.yesterday, assignee: alice)
+    Chore.create!(home: homes(:ours), title: "Alice's chore next month", area: "Admin", due_on: Date.current + 30, assignee: alice)
+    Chore.create!(home: homes(:ours), title: "Free next week", area: "Admin", due_on: Date.current + 7)
+    Chore.create!(home: homes(:ours), title: "Already done", area: "Admin", due_on: Date.yesterday, done_at: Time.current)
     assert_equal base + 2, alice.badge_count
     assert_equal base + 3, bob.badge_count
   end
 
   test "a ticked repeating chore of yours leaves the badge until it is due again" do
     alice = users(:alice)
-    chore = Chore.create!(title: "Alice's weekly", area: "Admin", due_on: Date.current, repeat_unit: "week", repeat_every: 1, assignee: alice)
+    chore = Chore.create!(home: homes(:ours), title: "Alice's weekly", area: "Admin", due_on: Date.current, repeat_unit: "week", repeat_every: 1, assignee: alice)
     before = alice.badge_count
     chore.complete!(alice)
     assert_equal before - 1, alice.badge_count

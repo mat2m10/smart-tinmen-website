@@ -1,4 +1,5 @@
 toilet:
+  home: ours
   title: Clean the toilet
   area: Cleaning
   room: Bathroom
@@ -8,6 +9,7 @@ toilet:
   effort: 1
 
 rent:
+  home: ours
   title: Pay the rent
   area: Admin
   due_on: <%= Date.current.change(day: 25) %>
@@ -18,6 +20,7 @@ rent:
   planning: true
 
 gp:
+  home: ours
   title: Find a GP
   area: Admin
   due_on: <%= Date.current + 10 %>

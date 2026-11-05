@@ -1,0 +1,38 @@
+<% content_for :title, "Members" %>
+<h1 class="hh-title"><%= @home.name %></h1>
+
+<section class="hh-card">
+  <h2>Members</h2>
+  <ul class="hh-members">
+    <% @members.each do |member| %>
+      <li><%= avatar(member, small: true, title: nil) %> <%= member.display_name %> <span class="hh-hint"><%= member.email %></span></li>
+    <% end %>
+  </ul>
+</section>
+
+<section class="hh-card hh-form">
+  <h2>Invite someone</h2>
+  <p class="hh-hint">Anyone with this link can join and see everything shared in this household, so only send it to people you live with.</p>
+  <%= render "invite", home: @home, renew_params: {} %>
+</section>
+
+<% if current_user.founder? %>
+  <section class="hh-card hh-form">
+    <h2>Start another household</h2>
+    <p class="hh-hint">For friends with their own home. They get a separate board; you see none of it once they join.</p>
+    <%= form_with url: household_homes_path, scope: :home do |f| %>
+      <%= f.label :name, "Name" %>
+      <%= f.text_field :name, required: true, maxlength: 60 %>
+      <div class="hh-form-actions"><%= f.submit "Create", class: "hh-btn hh-btn--filled" %></div>
+    <% end %>
+
+    <% @started_homes.each do |home| %>
+      <h3><%= home.name %></h3>
+      <% if home.users.empty? %>
+        <%= render "invite", home: home, renew_params: { home_id: home.id } %>
+      <% else %>
+        <p class="hh-hint">Joined: <%= pluralize(home.users.size, "member") %>.</p>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>
