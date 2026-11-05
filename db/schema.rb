@@ -45,11 +45,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.string "due_time", limit: 5
     t.boolean "personal", default: false, null: false
     t.bigint "home_id", null: false
-    t.index ["home_id"], name: "index_chores_on_home_id"
     t.index ["assignee_id"], name: "index_chores_on_assignee_id"
     t.index ["created_by_id"], name: "index_chores_on_created_by_id"
     t.index ["done_at"], name: "index_chores_on_done_at"
     t.index ["due_on"], name: "index_chores_on_due_on"
+    t.index ["home_id"], name: "index_chores_on_home_id"
   end
 
   create_table "completions", force: :cascade do |t|
@@ -100,9 +100,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "home_id", null: false
-    t.index ["home_id"], name: "index_notes_on_home_id"
     t.index ["chore_id"], name: "index_notes_on_chore_id"
     t.index ["created_at"], name: "index_notes_on_created_at"
+    t.index ["home_id"], name: "index_notes_on_home_id"
     t.index ["user_id"], name: "index_notes_on_user_id"
   end
 
@@ -129,8 +129,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.string "photo_type"
     t.datetime "updated_at", null: false
     t.bigint "home_id"
-    t.index ["home_id"], name: "index_users_on_home_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["home_id"], name: "index_users_on_home_id"
   end
 
   add_foreign_key "attachments", "notes", on_delete: :cascade
@@ -142,8 +142,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   add_foreign_key "events", "homes"
   add_foreign_key "events", "users", on_delete: :nullify
   add_foreign_key "homes", "users", column: "created_by_id", on_delete: :nullify
-  add_foreign_key "notes", "homes"
   add_foreign_key "notes", "chores", on_delete: :nullify
+  add_foreign_key "notes", "homes"
   add_foreign_key "notes", "users", on_delete: :nullify
   add_foreign_key "push_subscriptions", "users", on_delete: :cascade
   add_foreign_key "users", "homes"
