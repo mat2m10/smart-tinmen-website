@@ -116,38 +116,16 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Done can be ticked off for the person a chore belongs to" do
+  test "Done always counts for whoever taps it: there is no button to tick it off for someone else" do
     sign_in("alice@example.com")
     chore = chores(:toilet)
     chore.update!(assignee: users(:bob))
-    bob = users(:bob).display_name
     get household_root_path
-    assert_select "button", text: "#{bob} did it"
+    assert_select "button", text: /did it/, count: 0
 
-    assert_enqueued_with(job: HouseholdPushJob, args: ->(args) { args[1].include?("ticked off by #{users(:alice).display_name}") }) do
-      post complete_household_chore_path(chore), params: { seen: chore.completions.count, by: users(:bob).id }
-    end
-    assert_equal users(:bob), chore.completions.order(:id).last.user
-    assert_equal "Clean the toilet (done by #{bob})", Event.where(action: "chore_done").last.summary
-  end
-
-  test "Done for someone else falls back to you unless they own the chore" do
-    sign_in("alice@example.com")
-    chore = chores(:toilet)
-    post complete_household_chore_path(chore), params: { by: users(:bob).id }
+    post complete_household_chore_path(chore), params: { seen: chore.completions.count, by: users(:bob).id }
     assert_equal users(:alice), chore.completions.order(:id).last.user
-
-    chore.update!(assignee: users(:alice))
-    post complete_household_chore_path(chore), params: { by: users(:bob).id }
-    assert_equal users(:alice), chore.completions.order(:id).last.user
-  end
-
-  test "your own and personal chores have no did-it button" do
-    chores(:toilet).update!(assignee: users(:alice))
-    chores(:gp).update!(personal: true, assignee: users(:alice))
-    sign_in("alice@example.com")
-    get household_root_path
-    assert_select "button", text: /did it\z/, count: 0
+    assert_equal "Clean the toilet", Event.where(action: "chore_done").last.summary
   end
 
   test "personal chores get their own section at the top" do

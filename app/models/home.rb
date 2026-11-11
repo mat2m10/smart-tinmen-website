@@ -10,6 +10,7 @@ class Home < ApplicationRecord
   has_many :chores, dependent: :restrict_with_error
   has_many :notes, dependent: :restrict_with_error
   has_many :events, dependent: :restrict_with_error
+  has_many :lists, dependent: :restrict_with_error
 
   validates :name, presence: true, length: { maximum: 60 }
 

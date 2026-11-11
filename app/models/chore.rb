@@ -6,8 +6,8 @@ class Chore < ApplicationRecord
   DEFAULT_AREAS = [ "Cleaning", "Laundry", "Food", "Kids", "Admin", "Family & friends", "Home & repairs" ].freeze
   REPEAT_UNITS = %w[none day weekday week month year].freeze
   EFFORTS = { 1 => "Quick", 2 => "Medium", 3 => "Big" }.freeze
-  # Turns "Empty the dishwasher" into "emptied the dishwasher" for "X did it"
-  # notifications. Titles starting with another word fall back to quoting.
+  # Turns "Empty the dishwasher" into "emptied the dishwasher" for the push
+  # the others get when a chore is done. Titles starting with another word fall back to quoting.
   PAST_TENSE = {
     "bring" => "brought", "buy" => "bought", "do" => "did", "feed" => "fed", "find" => "found", "get" => "got",
     "give" => "gave", "go" => "went", "hang" => "hung", "make" => "made", "mop" => "mopped", "pay" => "paid",

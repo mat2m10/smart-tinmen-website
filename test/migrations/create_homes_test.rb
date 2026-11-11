@@ -1,10 +1,11 @@
 require "test_helper"
 require Rails.root.join("db/migrate/20261105120000_create_homes").to_s
+require Rails.root.join("db/migrate/20261111120000_create_lists").to_s
 
 # The migration moves a live household's data, so it runs here on tables that
 # hold rows. Everything, the schema changes too, is rolled back after the test.
 class CreateHomesTest < ActiveSupport::TestCase
-  MODELS = [ User, Chore, Note, Event, Home ].freeze
+  MODELS = [ User, Chore, Note, Event, Home, List, ListItem ].freeze
 
   def after_teardown
     super
@@ -42,8 +43,11 @@ class CreateHomesTest < ActiveSupport::TestCase
     connection.select_value(sql).to_i
   end
 
+  # Lists point at homes, so they come off first and go back last.
   def migrate(direction)
-    ActiveRecord::Migration.suppress_messages { CreateHomes.new.migrate(direction) }
+    migrations = [ CreateHomes, CreateLists ]
+    migrations.reverse! if direction == :down
+    ActiveRecord::Migration.suppress_messages { migrations.each { |migration| migration.new.migrate(direction) } }
     reset_schema_caches
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
     t.index ["invite_token"], name: "index_homes_on_invite_token", unique: true
   end
 
+  create_table "list_items", force: :cascade do |t|
+    t.bigint "added_by_id"
+    t.string "body", null: false
+    t.datetime "checked_at"
+    t.datetime "created_at", null: false
+    t.bigint "list_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["added_by_id"], name: "index_list_items_on_added_by_id"
+    t.index ["list_id"], name: "index_list_items_on_list_id"
+  end
+
+  create_table "lists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "home_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["home_id"], name: "index_lists_on_home_id"
+  end
+
   create_table "notes", force: :cascade do |t|
     t.bigint "chore_id"
     t.bigint "user_id"
@@ -142,6 +161,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120000) do
   add_foreign_key "events", "homes"
   add_foreign_key "events", "users", on_delete: :nullify
   add_foreign_key "homes", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "list_items", "lists", on_delete: :cascade
+  add_foreign_key "list_items", "users", column: "added_by_id", on_delete: :nullify
+  add_foreign_key "lists", "homes"
   add_foreign_key "notes", "chores", on_delete: :nullify
   add_foreign_key "notes", "homes"
   add_foreign_key "notes", "users", on_delete: :nullify

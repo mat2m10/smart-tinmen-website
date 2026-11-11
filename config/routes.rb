@@ -26,6 +26,11 @@ Rails.application.routes.draw do
     resources :homes, only: :create
     resource :profile, only: %i[show update]
     get "avatars/:id" => "avatars#show", as: :avatar
+    resources :lists, only: %i[index show create destroy] do
+      resources :items, controller: "list_items", only: %i[create update destroy] do
+        delete :ticked, on: :collection, action: :clear
+      end
+    end
     resources :completions, path: "done", only: %i[index update destroy]
     resources :notes, only: %i[index create destroy]
     resource :push_subscription, only: %i[create destroy]
