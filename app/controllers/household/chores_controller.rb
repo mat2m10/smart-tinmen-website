@@ -67,21 +67,18 @@ class Household::ChoresController < Household::BaseController
 
   # The button sends how many times the chore had been done when the page was
   # shown, so a double tap or a second phone with an old page counts once.
-  # "by" ticks it off for the person it belongs to when they forgot to.
+  # It always counts for whoever taps Done; the Done page can change who did it.
   def complete
-    doer = current_user
-    doer = @chore.assignee if params[:by].present? && params[:by].to_i == @chore.assignee_id
     done = @chore.with_lock do
       next false if @chore.done_at? || (params[:seen].present? && params[:seen].to_i != @chore.completions.count)
 
-      completion = @chore.complete!(doer)
-      Event.log!("chore_done", user: current_user, chore: @chore, summary: (doer == current_user ? nil : "#{@chore.title} (done by #{doer.display_name})"))
+      completion = @chore.complete!(current_user)
+      Event.log!("chore_done", user: current_user, chore: @chore)
       completion
     end
     if done
       flash[:undo] = done.id
-      sentence = @chore.done_sentence(doer.display_name)
-      notify_others(doer == current_user ? sentence : "#{sentence} (ticked off by #{current_user.display_name})")
+      notify_others(@chore.done_sentence(current_user.display_name))
     end
     notice = "#{done ? "Done" : "Already done"}: #{@chore.title}"
     redirect_to household_root_path(show: filter_param), notice: notice, status: :see_other

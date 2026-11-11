@@ -276,6 +276,10 @@ body.hh {
   .hh .hh-brand { display: none; }
   .hh .hh-fab span:last-child { display: none; }
   .hh .hh-fab { padding: 16px; }
+  /* Five tabs: tighter, the sign-out button moves to the profile page only. */
+  .hh .hh-nav { gap: 0; min-width: 0; overflow-x: auto; }
+  .hh .hh-nav a { padding: 8px 9px; font-size: .9rem; }
+  .hh .hh-signout { display: none; }
 }
 
 /* ---------- Front page: notes and notifications ---------- */
@@ -301,3 +305,29 @@ body.hh {
 .hh .hh-swatch input:checked + span { outline: 3px solid var(--hh-ink); outline-offset: 2px; }
 .hh .hh-swatch input:focus-visible + span { outline: 3px solid var(--hh-primary); outline-offset: 2px; }
 .hh .hh-profile-more { margin-top: 16px; display: grid; gap: 8px; justify-items: start; }
+
+/* ---------- Lists ---------- */
+.hh .hh-listcard { color: var(--hh-ink); text-decoration: none; }
+.hh .hh-listcard .hh-chore-title { font-weight: 600; }
+.hh .hh-list-suggestions { margin: 16px 0 0; }
+.hh .hh-list-suggestions form { display: inline; }
+.hh .hh-list-suggestions .hh-chip { background: none; cursor: pointer; font-family: var(--hh-font); }
+.hh .hh-additem { display: flex; gap: 8px; align-items: center; margin: 16px 0; padding: 8px 8px 8px 12px; }
+.hh .hh-additem input[type="text"] { flex: 1; min-width: 0; }
+.hh .hh-back { margin-left: -12px; }
+.hh .hh-items { gap: 6px; }
+.hh .hh-item {
+  display: flex; align-items: center; gap: 4px; padding: 4px 4px 4px 8px;
+  border-radius: 12px; background: var(--hh-surface); box-shadow: var(--hh-shadow);
+}
+.hh .hh-item > form:first-child { flex: 1; min-width: 0; }
+.hh .hh-item-tick {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 4px; border: 0; background: none;
+  color: var(--hh-ink); font: 400 1rem var(--hh-font); text-align: left; cursor: pointer;
+}
+.hh .hh-item-tick .ms { color: var(--hh-primary); }
+.hh .hh-item-body { overflow-wrap: anywhere; }
+.hh .hh-item--ticked { box-shadow: none; background: var(--hh-surface-2); }
+.hh .hh-item--ticked .hh-item-body { text-decoration: line-through; color: var(--hh-muted); }
+.hh .hh-item--ticked .hh-item-tick .ms { color: var(--hh-muted); }
+.hh .hh-item-by { display: inline-flex; }

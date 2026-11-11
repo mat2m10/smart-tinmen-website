@@ -1,0 +1,30 @@
+<% content_for :title, @list.name %>
+<% to_get, ticked = @items %>
+<p><%= link_to household_lists_path, class: "hh-btn hh-btn--text hh-back" do %><span class="ms" aria-hidden="true">chevron_left</span>All lists<% end %></p>
+<h1 class="hh-title"><%= @list.name %></h1>
+
+<%= form_with url: household_list_items_path(@list), scope: :list_item, class: "hh-card hh-additem" do |f| %>
+  <%= f.label :body, "Add to #{@list.name}", class: "hh-visually-hidden" %>
+  <%= f.text_field :body, placeholder: "Add something…", maxlength: 200, required: true, autofocus: params[:adding].present?, autocomplete: "off" %>
+  <%= f.button class: "hh-btn hh-btn--tonal", aria: { label: "Add" } do %><span class="ms" aria-hidden="true">add</span>Add<% end %>
+<% end %>
+
+<% if to_get.any? %>
+  <ul class="hh-list hh-items">
+    <%= render partial: "household/lists/item", collection: to_get, locals: { list: @list } %>
+  </ul>
+<% else %>
+  <p class="hh-empty"><%= ticked.any? ? "Everything is ticked off." : "Nothing on this list yet." %></p>
+<% end %>
+
+<% if ticked.any? %>
+  <section class="hh-group">
+    <h2>Ticked off <span class="hh-count"><%= ticked.size %></span></h2>
+    <ul class="hh-list hh-items hh-items--ticked">
+      <%= render partial: "household/lists/item", collection: ticked, locals: { list: @list } %>
+    </ul>
+    <%= button_to ticked_household_list_items_path(@list), method: :delete, class: "hh-btn hh-btn--text" do %><span class="ms" aria-hidden="true">delete</span>Clear ticked items<% end %>
+  </section>
+<% end %>
+
+<%= button_to household_list_path(@list), method: :delete, class: "hh-btn hh-btn--danger", form: { data: { turbo_confirm: "Delete the list #{@list.name} and everything on it?" } } do %><span class="ms" aria-hidden="true">delete</span>Delete this list<% end %>

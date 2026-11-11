@@ -1,0 +1,33 @@
+<% content_for :title, "Lists" %>
+<h1 class="hh-title">Lists</h1>
+<p class="hh-hint hh-intro">Shared lists you both add to: groceries, gift ideas, things you'd like to buy. Ticking something off earns no points.</p>
+
+<% if @lists.any? %>
+  <ul class="hh-list">
+    <% @lists.each do |list| %>
+      <% left = list.items.count { |item| !item.ticked? } %>
+      <li>
+        <%= link_to household_list_path(list), class: "hh-chore hh-listcard" do %>
+          <span class="hh-chore-title"><%= list.name %></span>
+          <span class="hh-count"><%= left.zero? ? "empty" : pluralize(left, "item") %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="hh-empty">No lists yet.</p>
+<% end %>
+
+<% if @suggested.any? %>
+  <div class="hh-chips hh-list-suggestions">
+    <% @suggested.each do |name| %>
+      <%= button_to household_lists_path, params: { list: { name: name } }, class: "hh-chip" do %><span class="ms" aria-hidden="true">add</span><%= name %><% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= form_with url: household_lists_path, scope: :list, class: "hh-card hh-additem" do |f| %>
+  <%= f.label :name, "New list", class: "hh-visually-hidden" %>
+  <%= f.text_field :name, placeholder: "New list, e.g. Things for the boat", maxlength: 40, required: true %>
+  <%= f.button class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">add</span>Create<% end %>
+<% end %>
