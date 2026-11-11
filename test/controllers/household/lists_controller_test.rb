@@ -62,6 +62,12 @@ class Household::ListsControllerTest < ActionDispatch::IntegrationTest
     patch household_list_item_path(list, milk)
     assert_not milk.reload.ticked?
 
+    # A double tap on the tick button ticks it once, not on and off again.
+    2.times { patch household_list_item_path(list, milk), params: { ticked: "1" } }
+    assert milk.reload.ticked?
+    patch household_list_item_path(list, milk), params: { ticked: "0" }
+    assert_not milk.reload.ticked?
+
     patch household_list_item_path(list, milk)
     delete ticked_household_list_items_path(list)
     assert_equal [ "Eggs" ], list.items.reload.map(&:body)

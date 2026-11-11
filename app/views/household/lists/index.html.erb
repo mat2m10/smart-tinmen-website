@@ -28,6 +28,6 @@
 
 <%= form_with url: household_lists_path, scope: :list, class: "hh-card hh-additem" do |f| %>
   <%= f.label :name, "New list", class: "hh-visually-hidden" %>
-  <%= f.text_field :name, placeholder: "New list, e.g. Things for the boat", maxlength: 40, required: true %>
+  <%= f.text_field :name, placeholder: "New list, e.g. Hardware store", maxlength: 40, required: true %>
   <%= f.button class: "hh-btn hh-btn--tonal" do %><span class="ms" aria-hidden="true">add</span>Create<% end %>
 <% end %>

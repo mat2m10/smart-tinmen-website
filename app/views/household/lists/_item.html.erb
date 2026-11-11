@@ -1,5 +1,5 @@
 <li class="hh-item<%= " hh-item--ticked" if item.ticked? %>">
-  <%= button_to household_list_item_path(list, item), method: :patch, class: "hh-item-tick", aria: { label: item.ticked? ? "Put #{item.body} back on the list" : "Tick off #{item.body}", pressed: item.ticked?.to_s } do %>
+  <%= button_to household_list_item_path(list, item), method: :patch, params: { ticked: item.ticked? ? "0" : "1" }, class: "hh-item-tick", aria: { label: item.ticked? ? "Put #{item.body} back on the list" : "Tick off #{item.body}", pressed: item.ticked?.to_s } do %>
     <span class="ms" aria-hidden="true"><%= item.ticked? ? "check_box" : "check_box_outline_blank" %></span>
     <span class="hh-item-body"><%= item.body %></span>
   <% end %>

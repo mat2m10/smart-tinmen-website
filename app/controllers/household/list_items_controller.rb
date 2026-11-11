@@ -16,10 +16,12 @@ class Household::ListItemsController < Household::BaseController
     end
   end
 
-  # Tick an item off, or bring it back.
+  # Tick an item off, or bring it back. The button says which, so a double tap
+  # or two phones tapping at once land on the same state instead of undoing it.
   def update
     item = @list.items.find(params[:id])
-    item.update!(checked_at: item.ticked? ? nil : Time.current)
+    tick = params[:ticked].present? ? params[:ticked] == "1" : !item.ticked?
+    item.update!(checked_at: tick ? (item.checked_at || Time.current) : nil)
     redirect_to household_list_path(@list), status: :see_other
   end
 

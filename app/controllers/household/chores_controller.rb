@@ -122,7 +122,7 @@ class Household::ChoresController < Household::BaseController
     @note = Note.new(chore: @chore)
   end
 
-  # One plain sentence, no body: "Matthieu emptied the dishwasher". Personal
+  # One plain sentence, no body: "Sam emptied the dishwasher". Personal
   # chores stay quiet.
   def notify_others(sentence)
     ids = @chore.audience(except: current_user).ids
