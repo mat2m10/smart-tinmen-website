@@ -10,7 +10,7 @@ section. There are no models.
 
 ## Stack
 
-- Ruby 3.3.12 (`.ruby-version`), Rails 8.1
+- Ruby 3.3.14 (`.ruby-version`), Rails 8.1
 - Sprockets + importmap-rails (no Node build step), Turbo, Stimulus
 - PostgreSQL (`pg` gem; required by the Rails config even though the site has no models)
 - Puma
@@ -30,7 +30,7 @@ section. There are no models.
 
 ## Run it locally
 
-Prerequisites: Ruby 3.3.12 and a running PostgreSQL server that your user can
+Prerequisites: Ruby 3.3.14 and a running PostgreSQL server that your user can
 connect to.
 
 ```sh
