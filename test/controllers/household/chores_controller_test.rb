@@ -128,6 +128,13 @@ class Household::ChoresControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Clean the toilet", Event.where(action: "chore_done").last.summary
   end
 
+  test "the chore form offers categories to tap, and a new one can still be typed" do
+    sign_in("alice@example.com")
+    get new_household_chore_path
+    assert_select "[data-controller='choice'] button.hh-chip[data-choice-value-param='Food']", text: "Food"
+    assert_select "[data-controller='choice'] input[name='chore[area]'][required]"
+  end
+
   test "personal chores get their own section at the top" do
     chores(:gp).update!(personal: true, assignee: users(:alice))
     sign_in("alice@example.com")

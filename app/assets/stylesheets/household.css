@@ -112,6 +112,11 @@ body.hh {
 }
 .hh .hh-chip[aria-current="page"] { background: var(--hh-tonal); border-color: var(--hh-tonal); color: var(--hh-on-tonal); padding-left: 8px; }
 .hh .hh-chip .ms { font-size: 18px; }
+/* Category picker on the chore form: chips you tap instead of typing. */
+.hh .hh-choice { display: grid; gap: 6px; }
+.hh .hh-choice-chips { margin: 0; }
+.hh .hh-choice-chips .hh-chip { background: none; cursor: pointer; font-family: var(--hh-font); }
+.hh .hh-choice-chips .hh-chip[aria-pressed="true"] { background: var(--hh-tonal); border-color: var(--hh-tonal); color: var(--hh-on-tonal); }
 
 /* ---------- Messages ---------- */
 .hh .hh-flash { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-radius: 12px; background: var(--hh-surface-2); margin-bottom: 12px; }

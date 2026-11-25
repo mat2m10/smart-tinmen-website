@@ -160,6 +160,8 @@ class Household::RemindersTest < ActionDispatch::IntegrationTest
   test "the agenda shows two weeks day by day, with repeats ahead, all-day items before timed ones" do
     chores(:toilet).update!(due_on: Date.current)
     chores(:gp).update!(due_on: Date.current, due_time: "09:15")
+    # The rent fixture falls on the 25th: keep it off today's list on that day.
+    chores(:rent).update!(due_on: Date.current + 20)
     Chore.create!(home: homes(:ours), title: "Old letter", area: "Admin", due_on: Date.current - 3)
     sign_in("alice@example.com")
     get household_agenda_path

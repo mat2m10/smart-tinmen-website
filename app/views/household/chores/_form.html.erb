@@ -8,18 +8,20 @@
   <%= f.label :title, "What needs doing" %>
   <%= f.text_field :title, required: true, autofocus: chore.new_record? %>
 
-  <div class="hh-row">
-    <div>
-      <%= f.label :area %>
-      <%= f.text_field :area, list: "hh-areas", required: true, maxlength: 40 %>
-      <datalist id="hh-areas"><% Chore.visible_to(current_user).area_options.each do |area| %><option value="<%= area %>"><% end %></datalist>
+  <%# Tap a category; typing a new one still works. %>
+  <div class="hh-choice" data-controller="choice">
+    <%= f.label :area, "Category" %>
+    <div class="hh-chips hh-choice-chips" role="group" aria-label="Pick a category">
+      <% Chore.visible_to(current_user).area_options.each do |area| %>
+        <button type="button" class="hh-chip" data-choice-target="chip" data-action="choice#pick" data-choice-value-param="<%= area %>" aria-pressed="false"><%= area %></button>
+      <% end %>
     </div>
-    <div>
-      <%= f.label :room, "Room (optional)" %>
-      <%= f.text_field :room, list: "hh-rooms", maxlength: 40 %>
-      <datalist id="hh-rooms"><% Chore.visible_to(current_user).room_options.each do |room| %><option value="<%= room %>"><% end %></datalist>
-    </div>
+    <%= f.text_field :area, required: true, maxlength: 40, placeholder: "Or type a new category", data: { choice_target: "input", action: "input->choice#sync" } %>
   </div>
+
+  <%= f.label :room, "Room (optional)" %>
+  <%= f.text_field :room, list: "hh-rooms", maxlength: 40 %>
+  <datalist id="hh-rooms"><% Chore.visible_to(current_user).room_options.each do |room| %><option value="<%= room %>"><% end %></datalist>
 
   <div class="hh-row">
     <div>
