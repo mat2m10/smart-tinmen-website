@@ -47,6 +47,7 @@ Rails.application.routes.draw do
       get "events" => "events#index"
       resources :notes, only: %i[index create]
       resources :attachments, only: %i[show update]
+      resources :lists, only: %i[index create]
       post "push" => "pushes#create"
     end
   end
